@@ -35,7 +35,9 @@ namespace Main
         {
             if(Service.LoginUser(EmailInputTextBox.Text,PasswordInputBox.Password))
             {
-                MessageBox.Show("Zalogowano !");
+                MainWindow mainWindow = new MainWindow();
+                mainWindow.Show();
+                this.Hide();
             }
             else 
             {

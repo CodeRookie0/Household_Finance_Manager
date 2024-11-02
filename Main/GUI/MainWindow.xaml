@@ -1,0 +1,170 @@
+﻿<Window x:Class="Main.GUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
+        mc:Ignorable="d"
+         WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+        Title="MainWindow" Height="750" Width="1400">
+    <Grid MouseDown="Grid_MouseDown">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Background="White">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <StackPanel Background="White">
+                <Grid Background="Transparent" Height="100">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Image Source="../Resources/logo_PNG.png" Width="50" Height="50" Margin="25,10,10,10" Grid.Column="0"/>
+                    <TextBlock Text="SmartBudget" FontWeight="Bold" FontSize="20" Margin="10" VerticalAlignment="Center" Grid.Column="1"/>
+                </Grid>
+                <StackPanel Margin="0,0,0,0">
+                    <Border x:Name="DashboardBorder" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="DashboardButton"  Click="DashboardButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="DashboardButton_MouseEnter" MouseLeave="DashboardButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="DashboardTextBlock" Text="Dashboard" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="FamilyMembersBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="FamilyMembersButton"  Click="FamilyMembersButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="FamilyMembersButton_MouseEnter" MouseLeave="FamilyMembersButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="FamilyMembersTextBlock" Text="Family members" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <StackPanel>
+                        <Border x:Name="TransactionsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                            <StackPanel Orientation="Horizontal">
+                                <Button x:Name="TransactionsButton"  Click="TransactionsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10"  Width="230" MouseEnter="TransactionsButton_MouseEnter" MouseLeave="TransactionsButton_MouseLeave">
+                                    <StackPanel Orientation="Horizontal" Width="205">
+                                        <TextBlock x:Name="TransactionsTextBlock" Text="Transactions" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                        <Image x:Name="ArrowImage" Source="../Resources/arrow_down_black.png" Width="25" Height="25" VerticalAlignment="Center" Margin="55,0,0,0"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+                        <StackPanel x:Name="SubMenu" Visibility="Collapsed">
+                            <Border x:Name="MyTransactionsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="35,0,10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="MyTransactionsButton" Click="MyTransactionsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="205" MouseEnter="MyTransactionsButton_MouseEnter" MouseLeave="MyTransactionsButton_MouseLeave">
+                                        <StackPanel Orientation="Horizontal" Width="205">
+                                            <TextBlock x:Name="MyTransactionsTextBlock" Text="My transactions" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                            <Border x:Name="FamilyTransactionsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="35,0,10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="FamilyTransactionsButton" Click="FamilyTransactionsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="205" MouseEnter="FamilyTransactionsButton_MouseEnter" MouseLeave="FamilyTransactionsButton_MouseLeave">
+                                        <StackPanel Orientation="Horizontal" Width="205">
+                                            <TextBlock x:Name="FamilyTransactionsTextBlock" Text="Family transactions" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                    <Border x:Name="CategoriesBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="CategoriesButton"  Click="CategoriesButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="CategoriesButton_MouseEnter" MouseLeave="CategoriesButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="CategoriesTextBlock" Text="Categories" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="StoresBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="StoresButton"  Click="StoresButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="StoresButton_MouseEnter" MouseLeave="StoresButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="StoresTextBlock" Text="Stores" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="GoalsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="GoalsButton"  Click="GoalsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="GoalsButton_MouseEnter" MouseLeave="GoalsButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="GoalsTextBlock" Text="Goals" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="LimitsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="LimitsButton"  Click="LimitsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="LimitsButton_MouseEnter" MouseLeave="LimitsButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="LimitsTextBlock" Text="Limits" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="RecurringPaymentsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="RecurringPaymentsButton"  Click="RecurringPaymentsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="RecurringPaymentsButton_MouseEnter" MouseLeave="RecurringPaymentsButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="RecurringPaymentsTextBlock" Text="Recurring payments" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                    <Border x:Name="StatisticsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="StatisticsButton"  Click="StatisticsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="StatisticsButton_MouseEnter" MouseLeave="StatisticsButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="StatisticsTextBlock" Text="Statistics" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+            <Border x:Name="ExitBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0"  Grid.Row="1">
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="ExitButton"  Click="ExitButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="ExitButtonButton_MouseEnter" MouseLeave="ExitButtonButton_MouseLeave">
+                        <StackPanel Orientation="Horizontal" Width="205">
+                            <TextBlock x:Name="ExitTextBlock" Text="Exit" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Grid>
+        <Border Background="#A3D4E0" Width="1" HorizontalAlignment="Right" VerticalAlignment="Stretch"/>
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ContentControl Grid.Row="1" Name="MainContentArea" Background="White"/>
+            <Grid Background="White" Height="100" VerticalAlignment="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="SelectedUserControlTextBlock" Text="Dashboard" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" Grid.Column="0"/>
+                <Image Source="../Resources/notification.png" Width="27" Height="27" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,130,5"/>
+                <Image Source="../Resources/settings.png" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,210,5"/>
+                <Image Source="../Resources/logo_PNG.png" Width="55" Height="55" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,15,5"/>
+                
+                <Border Background="#A3D4E0" Height="1" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Bottom"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

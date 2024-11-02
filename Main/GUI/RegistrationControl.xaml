@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
         mc:Ignorable="d"
         Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
         Title="Rejestracja" Height="500" Width="800">
