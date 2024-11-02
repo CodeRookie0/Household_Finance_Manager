@@ -125,7 +125,7 @@ namespace Main.Logic
         {
             using (DBSqlite database = new DBSqlite())
             {
-                string insertQuery = "INSERT INTO Users (Name, Email,PasswordHash,Salt,CreatedAt) VALUES (@name, @email, @password,@Salt,@createdAt)";
+                string insertQuery = "INSERT INTO Users (UserName, Email,PasswordHash,Salt,RoleId,CreatedAt) VALUES (@name, @email, @password,@salt, @roleId,@createdAt)";
 
                 try
                 {
@@ -133,7 +133,8 @@ namespace Main.Logic
                         new SqliteParameter("@name", username),
                         new SqliteParameter("@email", email),
                         new SqliteParameter("@password", password),
-                        new SqliteParameter("@Salt", Salt),
+                        new SqliteParameter("@salt", Salt),
+                        new SqliteParameter("@roleId", 1),
                         new SqliteParameter("@createdAt", DateTime.Now.ToString()));
                     return true;
                 }
