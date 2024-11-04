@@ -91,7 +91,7 @@ namespace Main.GUI
         {
             HighlightButton(FamilyMembersBorder, FamilyMembersTextBlock);
             buttonActiveStates[FamilyMembersButton] = true;
-            MainContentArea.Content = new FamilyMembersControl();
+            MainContentArea.Content = new CreateFamilyPrompt();
             SelectedUserControlTextBlock.Text = FamilyMembersTextBlock.Text;
         }
 

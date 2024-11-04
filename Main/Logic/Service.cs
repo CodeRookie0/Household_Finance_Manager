@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace Main.Logic
 {
@@ -81,6 +82,17 @@ namespace Main.Logic
 
             return passedValidation;
         }
+
+        static public bool IsFamilyCodeInUse(string code)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT COUNT(1) FROM Family WHERE FamilyCode = @FamilyCode";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@FamilyCode", code));
+                return result.Rows.Count > 0 && Convert.ToInt32(result.Rows[0][0]) > 0;
+            }
+        }
+
         static public string HashPassword(byte[] bytesToHash, byte[] salt)
         {
             var byteResult = new Rfc2898DeriveBytes(bytesToHash, salt, 1000);
