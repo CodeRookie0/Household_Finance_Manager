@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Main.Logic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -21,9 +22,11 @@ namespace Main.GUI
     public partial class MainWindow : Window
     {
         private Dictionary<Button, bool> buttonActiveStates = new Dictionary<Button, bool>();
+        private readonly int userId;
 
-        public MainWindow()
+        public MainWindow(int loggedInUserId)
         {
+            userId = loggedInUserId;
             InitializeComponent();
 
             buttonActiveStates[TransactionsButton] = false;
@@ -87,11 +90,18 @@ namespace Main.GUI
             MainContentArea.Content = new DashboardControl();
             SelectedUserControlTextBlock.Text= DashboardTextBlock.Text;
         }
-        private void FamilyMembersButton_Click(object sender, RoutedEventArgs e)
+        public void FamilyMembersButton_Click(object sender, RoutedEventArgs e)
         {
             HighlightButton(FamilyMembersBorder, FamilyMembersTextBlock);
             buttonActiveStates[FamilyMembersButton] = true;
-            MainContentArea.Content = new CreateFamilyPrompt();
+            if (Service.UserHasFamily(userId))
+            {
+                MainContentArea.Content = new FamilyMembersControl(userId);
+            }
+            else
+            {
+                MainContentArea.Content = new CreateFamilyPrompt(userId, this);
+            }
             SelectedUserControlTextBlock.Text = FamilyMembersTextBlock.Text;
         }
 
@@ -99,6 +109,7 @@ namespace Main.GUI
         {
             HighlightButton(StatisticsBorder, StatisticsTextBlock);
             buttonActiveStates[StatisticsButton] = true;
+            MainContentArea.Content = new StatisticsControl();
             SelectedUserControlTextBlock.Text = StatisticsTextBlock.Text;
         }
 
@@ -407,6 +418,12 @@ namespace Main.GUI
             ExitTextBlock.Foreground = Brushes.Black;
 
             ArrowImage.Source = new BitmapImage(new Uri("../Resources/arrow_down_black.png", UriKind.Relative));
+        }
+
+        private void ProfileSettingsIconImage_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ProfileSettingsControl profileSettings = new ProfileSettingsControl(userId);
+            profileSettings.ShowDialog();
         }
     }
 }

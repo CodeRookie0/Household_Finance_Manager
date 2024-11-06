@@ -10,9 +10,9 @@
         <Grid VerticalAlignment="Center" HorizontalAlignment="Center">
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="/Resources/family.png" 
-                   Width="200" Height="200"
+                   Width="250" Height="250"
                        Margin="0,0,0,20"
-                   HorizontalAlignment="Center" />
+                   HorizontalAlignment="Center" Opacity="0.8"/>
 
                 <TextBlock Text="Utwórz swoją rodzinę, aby rozpocząć wspólne śledzenie budżetu!"
                        FontSize="20" FontWeight="Bold"
@@ -26,12 +26,38 @@
                        HorizontalAlignment="Center"
                        Margin="0,5,0,0"/>
 
-                <Button Content="Utwórz rodzinę"
-                     Style="{StaticResource mainButton}"
-                    Margin="0,20,0,0"
-                        FontSize="18"
-                    HorizontalAlignment="Center"
-                    Click="CreateFamilyButton_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                    <Button x:Name="CreateFamilyButton"  Content="Utwórz rodzinę"
+                    Style="{StaticResource mainButton}"
+                    FontSize="18"
+                    Click="CreateFamilyButton_Click" Margin="0,0,50,0" Height="55.94" VerticalAlignment="Bottom"/>
+
+                    <Button x:Name="JoinFamilyButton"  Content="Dołącz do rodziny"
+                    Style="{StaticResource mainButton}"
+                    FontSize="18" Click="JoinFamilyButton_Click"/>
+                </StackPanel>
+                <ListView Name="JoinRequestsListView" Width="610" Margin="0,30,0,30"
+                          ItemsSource="{Binding JoinRequests}">
+                    <ListView.Style>
+                        <Style TargetType="ListView">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Items.Count, RelativeSource={RelativeSource Self}}" Value="0">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Items.Count, RelativeSource={RelativeSource Self}}" Value="1">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.Style>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Kod Rodziny" DisplayMemberBinding="{Binding FamilyCode}" Width="200"/>
+                            <GridViewColumn Header="Data Wysłania" DisplayMemberBinding="{Binding JoinRequestDate, StringFormat='{}{0:yyyy-MM-dd}'}" Width="200"/>
+                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding RequestStatus}" Width="200"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </StackPanel>
         </Grid>
     </Grid>

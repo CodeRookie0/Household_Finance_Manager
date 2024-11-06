@@ -1,0 +1,35 @@
+﻿<Window x:Class="Main.GUI.CreateFamilyControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
+        Background="White" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+        mc:Ignorable="d"
+        Title="Utwórz Rodzinę" Width="400" Height="200" ResizeMode="NoResize">
+    <Border BorderBrush="#4EB1B6" BorderThickness="3" Background="White">
+        <Grid MouseDown="Grid_MouseDown">
+            <Button x:Name="CloseButton" 
+                    VerticalAlignment="Top" HorizontalAlignment="Right"
+                    Margin="0,0,0,0" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
+                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+            </Button>
+            <TextBlock Text="Wprowadź nazwę rodziny:" 
+                       VerticalAlignment="Top" 
+                       HorizontalAlignment="Center" 
+                       FontSize="20" 
+                       Margin="0,30,0,20" />
+            <TextBox x:Name="FamilyNameTextBox" 
+                     Width="250" 
+                     Height="30" 
+                     FontSize="20"
+                     VerticalAlignment="Center" 
+                     HorizontalAlignment="Center"/>
+            <Button x:Name="SubmitButton" Content="Zatwierdź" 
+                    Style="{StaticResource submitButton}"
+                    VerticalAlignment="Bottom" 
+                    HorizontalAlignment="Center" 
+                    Margin="0,20,0,20" Click="SubmitButton_Click" Width="150" Height="40" Padding="5"/>
+        </Grid>
+    </Border>
+</Window>

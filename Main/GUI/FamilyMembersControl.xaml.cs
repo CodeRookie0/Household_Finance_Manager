@@ -20,8 +20,10 @@ namespace Main.GUI
     /// </summary>
     public partial class FamilyMembersControl : UserControl
     {
-        public FamilyMembersControl()
+        private readonly int userId;
+        public FamilyMembersControl(int loggedInUserId)
         {
+            userId = loggedInUserId;
             InitializeComponent();
         }
     }

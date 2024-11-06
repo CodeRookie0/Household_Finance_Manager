@@ -33,9 +33,10 @@ namespace Main
 
         private void LoginButton_Click(object sender, RoutedEventArgs e)
         {
-            if(Service.LoginUser(EmailInputTextBox.Text,PasswordInputBox.Password))
+            int userId = -1;
+            if (Service.LoginUser(EmailInputTextBox.Text, PasswordInputBox.Password, ref userId) && userId > 0)
             {
-                MainWindow mainWindow = new MainWindow();
+                MainWindow mainWindow = new MainWindow(userId);
                 mainWindow.Show();
                 this.Hide();
             }

@@ -1,0 +1,53 @@
+﻿<Window x:Class="Main.GUI.JoinFamilyControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
+        Background="White" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+        mc:Ignorable="d"
+        Title="Dołącz do rodziny" Width="600" Height="280" ResizeMode="NoResize">
+    <Border BorderBrush="#4EB1B6" BorderThickness="3" Background="White">
+        <Grid MouseDown="Grid_MouseDown" Background="White">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1.5*"/>
+            </Grid.ColumnDefinitions>
+            <Border Background="#D3D3D3" Margin="5,5,5,5" CornerRadius="5" Grid.Column="0">
+                <StackPanel Margin="10">
+                    <TextBlock Text="Kod możesz uzyskać od osoby, która stworzyła rodzinę." 
+                               FontSize="14" TextWrapping="Wrap"/>
+                    <TextBlock Text="Po kliknięciu na przycisk 'Dołącz do rodziny', wyślemy prośbę o dołączenie." 
+                               FontSize="14" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                    <TextBlock Text="Jeśli prośba zostanie zaakceptowana przez twórca rodziny, zostaniesz dodany do rodziny." 
+                               FontSize="14" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                    <TextBlock Text="Status swojej prośby możesz śledzić w zakładce 'Rodzina' w aplikacji." 
+                               FontSize="14" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="10" Grid.Column="1">
+                <Button x:Name="CloseButton" 
+        VerticalAlignment="Top" HorizontalAlignment="Right"
+        Margin="0,-40,-30,0" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
+                    <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+                </Button>
+                <TextBlock Text="Wprowadź unikalny kod rodziny:" 
+                VerticalAlignment="Top" 
+                HorizontalAlignment="Center" 
+                FontSize="20" 
+                Margin="0,30,0,20" />
+                <TextBox x:Name="FamilyCodeTextBox" 
+              Width="250" 
+              Height="30" 
+              FontSize="20"
+              VerticalAlignment="Center" 
+              HorizontalAlignment="Center"/>
+                <Button x:Name="JoinFamilyButton" Content="Dołącz do rodziny" 
+             Style="{StaticResource submitButton}"
+             VerticalAlignment="Bottom" 
+             HorizontalAlignment="Center" 
+             Margin="0,20,0,20" Width="150" Height="40" Padding="5" Click="JoinFamilyButton_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

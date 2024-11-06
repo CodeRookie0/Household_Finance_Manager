@@ -65,8 +65,59 @@ namespace Main.Logic
                     command.ExecuteNonQuery();
                 }
             }
-
         }
+
+        public object ExecuteScalar(string query, params SqliteParameter[] parameters)
+        {
+            using (_connection = new SqliteConnection(_connectionString))
+            {
+                _connection.Open();
+                using (SqliteCommand command = new SqliteCommand(query, _connection))
+                {
+                    if (parameters != null)
+                    {
+                        command.Parameters.AddRange(parameters);
+                    }
+
+                    return command.ExecuteScalar();
+                }
+            }
+        }
+
+        public List<Dictionary<string, object>> ExecuteQueryToList(string query, params SqliteParameter[] parameters)
+        {
+            var results = new List<Dictionary<string, object>>();
+
+            using (_connection = new SqliteConnection(_connectionString))
+            {
+                _connection.Open();
+
+                using (SqliteCommand command = new SqliteCommand(query, _connection))
+                {
+                    if (parameters != null)
+                    {
+                        command.Parameters.AddRange(parameters);
+                    }
+
+                    using (SqliteDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            var row = new Dictionary<string, object>();
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                row[reader.GetName(i)] = reader[i];
+                            }
+                            results.Add(row);
+                        }
+                    }
+                }
+            }
+
+            return results;
+        }
+
+
         public void Dispose()
         {
             if (_connection != null)
