@@ -14,19 +14,41 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2.1*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
         <TextBlock Grid.Row="0" Text="Members:" FontSize="20" FontWeight="Bold" Margin="20,15,20,15"/>
         <ListBox Grid.Row="1" x:Name="FamilyMembersListBox" Background="#F3F3F3" BorderThickness="0" 
                  Padding="5" Margin="20,0,20,0">
-            <ListBoxItem Content="John Doe" Padding="10" FontSize="16"/>
-            <ListBoxItem Content="Jane Smith" Padding="10" FontSize="16"/>
+           
         </ListBox>
 
         <TextBlock Grid.Row="2" Text="Join Requests:" FontSize="20" FontWeight="Bold" Margin="20,15,20,15" />
         <ListBox Grid.Row="3" x:Name="JoinRequestsListBox" Background="#F3F3F3" BorderThickness="0" 
                  Padding="5" Margin="20,0,20,15">
-            <ListBoxItem Content="Alice Johnson" Padding="10" FontSize="16"/>
-            <ListBoxItem Content="Bob Brown" Padding="10" FontSize="16"/>
+            
+            <!--<ListBoxItem Content="Alice Johnson" Padding="10" FontSize="16"/> -->
+           <!--<ListBoxItem Content="Bob Brown" Padding="10" FontSize="16"/> -->
         </ListBox>
+
+        <Border Background="#ffffff" Grid.Column="1" Grid.RowSpan="3">
+            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Center" Margin="80">
+                <StackPanel Orientation="Vertical">
+                    <Button Content="Usuń członka" Style="{StaticResource mainButton}"/>
+                    <Button Content="Modyfikacja uprawnień" Style="{StaticResource mainButton}"/>
+                    <Button Content="Ustawienia Rodziny" Style="{StaticResource mainButton}"/>
+                </StackPanel>
+               
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="4" Grid.Column="1" Background="#ffffff" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="80">
+            <Button Content="Rozaptrzenie próśb"  Style="{StaticResource mainButton}" Click="Button_Click"/>
+        </StackPanel>
+
+
     </Grid>
 </UserControl>
 
