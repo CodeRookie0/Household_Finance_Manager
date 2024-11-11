@@ -316,24 +316,19 @@ namespace Main.Logic
         {
             using (DBSqlite database = new DBSqlite())
             {
-                using (var transaction = database.BeginTransaction())
+                try
                 {
-                    try
-                    {
-                        string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = @FamilyId";
-                        database.ExecuteNonQuery(updateUsersQuery, new SqliteParameter("@FamilyId", familyId));
+                    string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = @FamilyId";
+                    database.ExecuteNonQuery(updateUsersQuery, new SqliteParameter("@FamilyId", familyId));
 
-                        string deleteFamilyQuery = "DELETE FROM Family WHERE FamilyID = @FamilyID";
-                        database.ExecuteNonQuery(deleteFamilyQuery, new SqliteParameter("@FamilyID", familyId));
+                    string deleteFamilyQuery = "DELETE FROM Family WHERE FamilyID = @FamilyID";
+                    database.ExecuteNonQuery(deleteFamilyQuery, new SqliteParameter("@FamilyID", familyId));
 
-                        transaction.Commit();
-                        return true;
-                    }
-                    catch (Exception)
-                    {
-                        transaction.Rollback();
-                        return false;
-                    }
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
                 }
             }
         }

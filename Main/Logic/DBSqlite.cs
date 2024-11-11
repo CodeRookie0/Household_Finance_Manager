@@ -52,17 +52,6 @@ namespace Main.Logic
             return resultTable;
         }
 
-        public SqliteTransaction BeginTransaction()
-        {
-            using (_connection = new SqliteConnection(_connectionString))
-            {
-                _connection = new SqliteConnection(_connectionString);
-                _connection.Open();
-                _transaction = _connection.BeginTransaction();
-                return _transaction;
-            }
-        }
-
         public void ExecuteNonQuery(string query, params SqliteParameter[] parameters)
         {
             using (_connection = new SqliteConnection(_connectionString))
