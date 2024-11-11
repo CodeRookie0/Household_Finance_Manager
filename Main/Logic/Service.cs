@@ -197,6 +197,25 @@ namespace Main.Logic
 
         }
 
+        public static bool LeaveFamily(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string updateUserQuery = "UPDATE Users SET FamilyID = NULL WHERE UserID = @UserID";
+
+                try
+                {
+                    database.ExecuteNonQuery(updateUserQuery, new SqliteParameter("@UserID", userId));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+
         // Add Methods
         public static bool AddUser(string userName, string email, string password, string Salt)
         {

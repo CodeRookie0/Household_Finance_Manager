@@ -22,6 +22,7 @@ namespace Main.GUI
     /// </summary>
     public partial class FamilySettingsControl : Window
     {
+        private MainWindow mainWindow;
         private readonly int userId;
         private readonly int familyId;
         private readonly string familyCode;
@@ -29,10 +30,11 @@ namespace Main.GUI
         private string familyCreatedAt;
         private readonly DispatcherTimer codeDisplayTimer;
         private readonly RotateTransform rotateTransform;
-        public FamilySettingsControl(int loggedInUserId,int userFamilyId)
+        public FamilySettingsControl(int loggedInUserId,int userFamilyId,MainWindow mainWindow)
         {
             userId = loggedInUserId;
             familyId = userFamilyId;
+            this.mainWindow = mainWindow;
             InitializeComponent();
 
             familyCode = Service.GetCodeByFamilyId(familyId);
@@ -158,6 +160,7 @@ namespace Main.GUI
                         if (success)
                         {
                             MessageBox.Show("Rodzina została pomyślnie usunięta.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                            mainWindow.FamilyMembersButton_Click(sender, e);
                             this.Close();
                         }
                         else

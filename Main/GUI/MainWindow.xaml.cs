@@ -96,7 +96,7 @@ namespace Main.GUI
             buttonActiveStates[FamilyMembersButton] = true;
             if (Service.UserHasFamily(userId))
             {
-                MainContentArea.Content = new FamilyMembersControl(userId);
+                MainContentArea.Content = new FamilyMembersControl(userId, this);
             }
             else
             {

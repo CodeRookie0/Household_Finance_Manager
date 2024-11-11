@@ -23,10 +23,12 @@ namespace Main.GUI
     /// </summary>
     public partial class FamilyMembersControl : UserControl
     {
+        private MainWindow mainWindow;
         private readonly int userId;
-        public FamilyMembersControl(int loggedInUserId)
+        public FamilyMembersControl(int loggedInUserId, MainWindow mainWindow)
         {
             userId = loggedInUserId;
+            this.mainWindow = mainWindow;
             InitializeComponent();
             if (!Service.IsPrimaryUser(userId))
             {
@@ -36,6 +38,8 @@ namespace Main.GUI
                 ReviewRequestsButton.Visibility = Visibility.Collapsed;
                 ModifyPermissionsButton.Visibility = Visibility.Collapsed;
                 RemoveMemberButton.Visibility = Visibility.Collapsed;
+                FamilySettingsButton.Visibility=Visibility.Collapsed;
+                LeaveFamilyButton.Visibility = Visibility.Visible;
             }
             DBSqlite dBSqlite = new DBSqlite();
             var answerJoinReqeust = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users INNER JOIN JoinRequests ON Users.UserID=JoinRequests.UserID WHERE JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
@@ -103,8 +107,46 @@ namespace Main.GUI
 
         private void FamilySettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            FamilySettingsControl familySettings= new FamilySettingsControl(userId, Service.GetFamilyIdByPrimaryUserId(userId));
+            FamilySettingsControl familySettings= new FamilySettingsControl(userId, Service.GetFamilyIdByPrimaryUserId(userId),mainWindow);
             familySettings.Show();
+        }
+
+        private void LeaveFamilyButton_Click(object sender, RoutedEventArgs e)
+        {
+            PasswordPrompt passwordWindow = new PasswordPrompt();
+            bool? result = passwordWindow.ShowDialog();
+
+            if (result == true)
+            {
+                string enteredPassword = passwordWindow.EnteredPassword;
+
+                bool isPasswordCorrect = Service.ValidateUserPassword(userId, enteredPassword);
+
+                if (isPasswordCorrect)
+                {
+                    var deleteResult = MessageBox.Show("Czy na pewno chcesz opuścić rodzinę?", "Potwierdzenie", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (deleteResult == MessageBoxResult.Yes)
+                    {
+                        bool success = Service.LeaveFamily(userId);
+
+                        if (success)
+                        {
+                            MessageBox.Show("Udało Ci się opuścić rodzinę.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                            mainWindow.FamilyMembersButton_Click(sender, e);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Wystąpił błąd podczas opuszczania rodziny. Spróbuj ponownie.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Wprowadzone hasło jest niepoprawne. Spróbuj ponownie.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            mainWindow.FamilyMembersButton_Click(sender, e);
         }
     }
 }
