@@ -28,7 +28,15 @@ namespace Main.GUI
         {
             userId = loggedInUserId;
             InitializeComponent();
-
+            if (!Service.IsPrimaryUser(userId))
+            {
+                FamilySettingsButton.Visibility = Visibility.Collapsed;
+                JoinRequestsListBox.Visibility = Visibility.Collapsed;
+                JoinRequestsTextBlock.Visibility = Visibility.Collapsed;
+                ReviewRequestsButton.Visibility = Visibility.Collapsed;
+                ModifyPermissionsButton.Visibility = Visibility.Collapsed;
+                RemoveMemberButton.Visibility = Visibility.Collapsed;
+            }
             DBSqlite dBSqlite = new DBSqlite();
             var answerJoinReqeust = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users INNER JOIN JoinRequests ON Users.UserID=JoinRequests.UserID WHERE JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId",userId));
@@ -49,7 +57,7 @@ namespace Main.GUI
              }
 
 
-            var answerFamilyMemebers = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users WHERE FamilyID=(SELECT FamilyID FROM Users WHERE UserID=@UserId) AND UserId!=@UserId",
+            var answerFamilyMemebers = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users WHERE FamilyID=(SELECT FamilyID FROM Users WHERE UserID=@UserId) AND UserID!=@UserId",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
 
             foreach (DataRow row in answerFamilyMemebers.Rows)
@@ -91,6 +99,12 @@ namespace Main.GUI
             List<PendingUser> answer = GeneratePendingUser();
             AddFamilyMemberRequest addFamilyMemberRequest = new AddFamilyMemberRequest(answer,userId);
             addFamilyMemberRequest.ShowDialog();
+        }
+
+        private void FamilySettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            FamilySettingsControl familySettings= new FamilySettingsControl(userId, Service.GetFamilyIdByPrimaryUserId(userId));
+            familySettings.Show();
         }
     }
 }

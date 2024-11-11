@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ namespace Main.Logic
         // Database Connection
         private readonly string _connectionString;
         private SqliteConnection _connection;
+        private SqliteTransaction _transaction;
 
         public DBSqlite()
         {
@@ -48,6 +50,17 @@ namespace Main.Logic
             }
 
             return resultTable;
+        }
+
+        public SqliteTransaction BeginTransaction()
+        {
+            using (_connection = new SqliteConnection(_connectionString))
+            {
+                _connection = new SqliteConnection(_connectionString);
+                _connection.Open();
+                _transaction = _connection.BeginTransaction();
+                return _transaction;
+            }
         }
 
         public void ExecuteNonQuery(string query, params SqliteParameter[] parameters)

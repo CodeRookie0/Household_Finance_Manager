@@ -1,0 +1,55 @@
+﻿<Window x:Class="Main.GUI.FamilySettingsControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
+            mc:Ignorable="d"
+    Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+    Title="SettingProifl" Height="590" Width="400">
+    <Grid MouseDown="Grid_MouseDown">
+    <Border BorderBrush="#4EB1B6" BorderThickness="3">
+        <Grid Background="#ffffff">
+            <Button x:Name="CloseButton" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
+                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+            </Button>
+            <Border Background="#333AA9AD" Margin="10,75,10,10" CornerRadius="20">
+                <StackPanel VerticalAlignment="Center" Margin="15,0,15,0">
+                    <StackPanel Orientation="Vertical" Margin="0,40,0,0">
+                        <Label x:Name="FamilyNameLabel" Content="Nazwa rodziny" FontSize="20" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="350" Height="45">
+                            <TextBox x:Name="FamilyNameInput"  FontSize="23" IsEnabled="False" Margin="5,0,5,0" Width="285" HorizontalAlignment="Left" Height="32.5933333333333"/>
+                            <Button x:Name="ChangeNameButton" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{StaticResource NoHoverButtonStyle}" Width="49" Margin="0,0,10,0" Click="ChangeNameButton_Click">
+                                <Image x:Name="ChangeImage" Source="../Resources/edit.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Width="27" Height="27"/>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10,15,10,0" >
+                        <StackPanel x:Name="EditButtonsPanel" Orientation="Horizontal" Visibility="Collapsed">
+                            <Button x:Name="CancelChangesButton" Content="Anuluj" VerticalAlignment="Bottom" Style="{StaticResource Button2}" Width="150" Height="50"  Margin="0,0,25,0" Click="CancelChangesButton_Click" />
+                            <Button x:Name="ChangeDataButton" Content="Zapisz" Style="{StaticResource mainButton2}"  Width="150" Height="50" Click="SaveChangesButton_Click" Margin="0,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="0,10,0,10">
+                        <Label  x:Name="FamilyCodeLabel" Content="Unikalny kod rodziny" FontSize="20" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Width="350" Height="45">
+                            <TextBox x:Name="FamilyCodeInput"  FontSize="23" IsEnabled="False" Margin="5,0,5,0" Width="285" HorizontalAlignment="Left" Height="32.5933333333333" Text="* * * * * * * * *"/>
+                            <Button x:Name="CodePreviewButton" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{StaticResource NoHoverButtonStyle}" Width="49" Margin="0,0,10,0" Click="CodePreviewButton_Click">
+                                <Image x:Name="PreviewImage" Source="../Resources/preview.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Width="32" Height="32"/>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Margin="0,10,0,10">
+                        <Label  x:Name="FamilyCreatedAtLabel" Content="Data stworzenia" FontSize="20" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                        <TextBox x:Name="FamilyCreatedAtInput"  FontSize="23" IsEnabled="False" Margin="5,13,5,13" Width="285" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10,0,10,0">
+                        <Button x:Name="DeleteFamilyButton" Content="Usuń rodzinę" VerticalAlignment="Bottom" Style="{StaticResource Button2}" Width="150" Height="50" Margin="0,0,0,0" Click="DeleteFamilyButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+            <Image Source="../Resources/logo_PNG.png" Width="130" Height="130" VerticalAlignment="Top" Margin="10"/>
+        </Grid>
+    </Border>
+    </Grid>
+</Window>

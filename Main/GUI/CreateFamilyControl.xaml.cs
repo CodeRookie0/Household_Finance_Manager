@@ -61,7 +61,7 @@ namespace Main.GUI
             if (Service.AddFamily(userId, familyName, familyCode))
             {
                 MessageBox.Show($"Rodzina została pomyślnie stworzona!\n" +
-                $"Twój unikalny kod rodziny: {familyCode}\n\n" +
+                $"Twój unikalny kod rodziny znajdziesz w ustawieniach rodziny.\n\n" +
                 "Podziel się tym kodem, aby inni mogli dołączyć do Twojej rodziny. " +
                 "Osoby, które chcą dołączyć, powinny wprowadzić ten kod w aplikacji, " +
                 "aby wysłać prośbę o dołączenie do wspólnego budżetu.",

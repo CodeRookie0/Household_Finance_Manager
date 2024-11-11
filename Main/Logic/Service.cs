@@ -86,6 +86,41 @@ namespace Main.Logic
             return passedValidation;
         }
 
+        public static bool ValidateUserPassword(int userId, string password)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT PasswordHash,Salt FROM Users WHERE UserID=@UserID";
+                var result = database.ExecuteQuery(selectQuery, new Microsoft.Data.Sqlite.SqliteParameter("@UserID", userId));
+                if (result.Rows.Count > 0)
+                {
+                    var tmp = result.Rows[0];
+
+                    string hashPassword = HashPassword(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(tmp["Salt"].ToString()));
+
+                    if (hashPassword == tmp["PasswordHash"].ToString())
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public static bool IsPrimaryUser(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                int familyId = GetFamilyIdByPrimaryUserId(userId);
+                string selectQuery = "SELECT COUNT(1) FROM Family WHERE PrimaryUserID = @UserID AND FamilyID = @FamilyId";
+                var result = database.ExecuteScalar(selectQuery,
+                    new SqliteParameter("@UserID", userId),
+                    new SqliteParameter("@FamilyId", familyId));
+
+                return Convert.ToInt32(result) > 0;
+            }
+        }
+
         static public bool IsFamilyCodeInUse(string code)
         {
             using (DBSqlite database = new DBSqlite())
@@ -238,10 +273,106 @@ namespace Main.Logic
 
         // Update Methods
 
+        public static bool UpdateFamilyName(int familyId, string newFamilyName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string updateQuery = "UPDATE Family SET FamilyName = @FamilyName WHERE FamilyID = @FamilyID";
+                try
+                {
+                    database.ExecuteNonQuery(updateQuery,
+                        new SqliteParameter("@FamilyName", newFamilyName),
+                        new SqliteParameter("@FamilyID", familyId));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
 
         // Delete Methods
+        public static bool DeleteFamily(int familyId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                using (var transaction = database.BeginTransaction())
+                {
+                    try
+                    {
+                        string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = @FamilyId";
+                        database.ExecuteNonQuery(updateUsersQuery, new SqliteParameter("@FamilyId", familyId));
+
+                        string deleteFamilyQuery = "DELETE FROM Family WHERE FamilyID = @FamilyID";
+                        database.ExecuteNonQuery(deleteFamilyQuery, new SqliteParameter("@FamilyID", familyId));
+
+                        transaction.Commit();
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        transaction.Rollback();
+                        return false;
+                    }
+                }
+            }
+        }
 
         // GET Methods
+        public static string GetCodeByFamilyId(int familyId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT FamilyCode FROM Family WHERE FamilyID = @FamilyID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@FamilyID", familyId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["FamilyCode"].ToString();
+            }
+        }
+        public static string GetFamilyNameByFamilyId(int familyId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT FamilyName FROM Family WHERE FamilyID = @FamilyID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@FamilyID", familyId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["FamilyName"].ToString();
+            }
+        }
+        public static string GetFamilyCreatedAtByFamilyId(int familyId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT CreatedAt FROM Family WHERE FamilyID = @FamilyID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@FamilyID", familyId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return Convert.ToDateTime(result.Rows[0]["CreatedAt"]).ToString("yyyy-MM-dd");
+            }
+        }
+
+        public static int GetFamilyIdByPrimaryUserId(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT FamilyID FROM Family WHERE PrimaryUserID = @PrimaryUserID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@PrimaryUserID", userId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return -1;
+                }
+                return Convert.ToInt32(result.Rows[0]["FamilyID"]);
+            }
+        }
 
         public static int GetFamilyIdByCode(string familyCode)
         {
