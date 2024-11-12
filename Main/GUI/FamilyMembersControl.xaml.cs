@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
 
 namespace Main.GUI
 {
@@ -77,11 +78,27 @@ namespace Main.GUI
                 FamilyMembersListBox.Items.Add(listBoxItem);
 
             }
-
-
-
-
         }
+
+        private void ChangePermision(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
+            DBSqlite dBSqlite = new DBSqlite();
+            DataTable answer = dBSqlite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@MyId) AND Users.UserID!=@MyId"
+                , new Microsoft.Data.Sqlite.SqliteParameter("@MyId", userId));
+
+            foreach (DataRow row in answer.Rows)
+            {
+                PendingUser tmp = new PendingUser(Int32.Parse(row["UserID"].ToString()));
+                tmp.Name = row["UserName"].ToString();
+                tmp.Role = row["RoleName"].ToString();
+                users.Add(tmp);
+
+            }
+            PermissionEditorControl permissionEditor = new PermissionEditorControl(users);
+            permissionEditor.ShowDialog();
+        }
+
 
         private List<PendingUser> GeneratePendingUser()
         {

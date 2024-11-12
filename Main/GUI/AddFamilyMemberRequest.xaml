@@ -18,6 +18,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource imgClose}"/>
         <Border Background="#ffffff" Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="#3AA9AD">
 
             <TextBlock Text="Prośby o dodanie do rodziny" Grid.ColumnSpan="2" Grid.Row="0"
@@ -25,13 +26,14 @@
         </Border>
 
         <Border  Grid.Row="1" Grid.ColumnSpan="2" Background="#ffffff" BorderThickness="3" BorderBrush="#3AA9AD">
+
             <ListBox x:Name="ListUser" Background="#F3F3F3" BorderThickness="0" Padding="15">
                 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Name}" Margin="0,0,10,0"/>
-                            <ComboBox SelectedItem="{Binding Role}" Width="120">
+                            <ComboBox x:Name="Roles"  SelectedItem="{Binding Role}" Width="120">
                                 <ComboBoxItem Content="Admin"/>
                                 <ComboBoxItem Content="Partner" IsSelected="True"/>
                                 <ComboBoxItem Content="Child"/>

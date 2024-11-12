@@ -243,6 +243,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\PermissionEditorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\ProfileSettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -262,6 +266,9 @@
     </Compile>
     <Compile Include="GUI\PasswordPrompt.xaml.cs">
       <DependentUpon>PasswordPrompt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\PermissionEditorControl.xaml.cs">
+      <DependentUpon>PermissionEditorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\ProfileSettingsControl.xaml.cs">
       <DependentUpon>ProfileSettingsControl.xaml</DependentUpon>
