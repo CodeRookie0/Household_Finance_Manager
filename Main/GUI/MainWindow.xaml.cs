@@ -132,6 +132,7 @@ namespace Main.GUI
         {
             HighlightButton(StoresBorder, StoresTextBlock);
             buttonActiveStates[StoresButton] = true;
+            MainContentArea.Content = new StoresControl(userId);
             SelectedUserControlTextBlock.Text = StoresTextBlock.Text;
         }
 

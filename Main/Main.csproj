@@ -174,6 +174,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\ListElementStore.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\AddCategoryControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -221,6 +225,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\ListElementStore.xaml.cs">
+      <DependentUpon>ListElementStore.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\AddCategoryControl.xaml.cs">
       <DependentUpon>AddCategoryControl.xaml</DependentUpon>
@@ -280,6 +287,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\StoresControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GUI\MainWindow.xaml.cs">
@@ -300,12 +311,16 @@
     <Compile Include="GUI\StatisticsControl.xaml.cs">
       <DependentUpon>StatisticsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\StoresControl.xaml.cs">
+      <DependentUpon>StoresControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logic\DBSqlite.cs" />
     <Compile Include="Models\Category.cs" />
     <Compile Include="Models\JoinRequest.cs" />
     <Compile Include="Logic\Service.cs" />
     <Compile Include="Logic\FamilyCodeGenerator.cs" />
     <Compile Include="Models\PendingUser.cs" />
+    <Compile Include="Models\Store.cs" />
     <Compile Include="Models\Subcategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
