@@ -174,7 +174,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="GUI\AddCategoryControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\AddFamilyMemberRequest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\AddSubategoryControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\CategoriesControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -210,8 +222,17 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="GUI\AddCategoryControl.xaml.cs">
+      <DependentUpon>AddCategoryControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\AddFamilyMemberRequest.xaml.cs">
       <DependentUpon>AddFamilyMemberRequest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\AddSubategoryControl.xaml.cs">
+      <DependentUpon>AddSubategoryControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\CategoriesControl.xaml.cs">
+      <DependentUpon>CategoriesControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\CreateFamilyControl.xaml.cs">
       <DependentUpon>CreateFamilyControl.xaml</DependentUpon>
@@ -280,10 +301,12 @@
       <DependentUpon>StatisticsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Logic\DBSqlite.cs" />
-    <Compile Include="Logic\JoinRequest.cs" />
+    <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\JoinRequest.cs" />
     <Compile Include="Logic\Service.cs" />
     <Compile Include="Logic\FamilyCodeGenerator.cs" />
     <Compile Include="Models\PendingUser.cs" />
+    <Compile Include="Models\Subcategory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -353,6 +376,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\delete_red.png" />
+    <Resource Include="Resources\edit_green.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\SQLitePCLRaw.lib.e_sqlite3.2.0.4\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('packages\SQLitePCLRaw.lib.e_sqlite3.2.0.4\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />

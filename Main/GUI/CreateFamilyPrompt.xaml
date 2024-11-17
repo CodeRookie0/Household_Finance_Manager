@@ -52,7 +52,7 @@
                     </ListView.Style>
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn Header="Kod Rodziny" DisplayMemberBinding="{Binding FamilyCode}" Width="200"/>
+                            <GridViewColumn Header="Nazwa Rodziny" DisplayMemberBinding="{Binding FamilyName}" Width="200"/>
                             <GridViewColumn Header="Data Wysłania" DisplayMemberBinding="{Binding JoinRequestDate, StringFormat='{}{0:yyyy-MM-dd}'}" Width="200"/>
                             <GridViewColumn Header="Status" DisplayMemberBinding="{Binding RequestStatus}" Width="200"/>
                         </GridView>

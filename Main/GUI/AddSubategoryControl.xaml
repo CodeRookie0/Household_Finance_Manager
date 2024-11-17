@@ -1,0 +1,114 @@
+﻿<Window x:Class="Main.GUI.AddSubategoryControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
+        mc:Ignorable="d"
+        Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+        Title="AddSubategoryControl" Height="600" Width="400">
+    <Window.Resources>
+                <LinearGradientBrush x:Key="PolygonGradient1" StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4EB1B6" Offset="0"/>
+                    <GradientStop Color="#3AA9AD" Offset="1"/>
+                </LinearGradientBrush>
+
+                <LinearGradientBrush x:Key="PolygonGradient2" StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#4EB1B6" Offset="0"/>
+                    <GradientStop Color="#3AA9AD" Offset="1"/>
+                </LinearGradientBrush>
+
+                <RadialGradientBrush x:Key="CircleGradient" Center="0.5,0.5" RadiusX="0.5" RadiusY="0.5">
+                    <GradientStop Color="#4EB1B6" Offset="0"/>
+                    <GradientStop Color="#3AA9AD" Offset="1"/>
+                </RadialGradientBrush>
+
+                <LinearGradientBrush x:Key="TriangleGradient" StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#3AA9AD" Offset="0"/>
+                    <GradientStop Color="#4EB1B6" Offset="1"/>
+                </LinearGradientBrush>
+            </Window.Resources>
+    <Border Background="#FF3AA9AD" CornerRadius="20" BorderBrush="#3AA9AD" BorderThickness="0">
+        <Grid>
+            <Button x:Name="CloseButton" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
+                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+            </Button>
+            <Canvas>
+                <Polygon Points="0,25 290,138 0,300" Fill="{StaticResource PolygonGradient1}" Stroke="#3AA9AD" StrokeThickness="2" HorizontalAlignment="Center" Canvas.Top="33" VerticalAlignment="Top">
+                    <Polygon.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.4"/>
+                    </Polygon.Effect>
+                </Polygon>
+
+                <Polygon Points="133,375 267,334 106,761" Fill="{StaticResource PolygonGradient2}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Left="91" Canvas.Top="13" RenderTransformOrigin="0.5,0.5">
+                    <Polygon.RenderTransform>
+                        <RotateTransform Angle="30"/>
+                    </Polygon.RenderTransform>
+                    <Polygon.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.4"/>
+                    </Polygon.Effect>
+                </Polygon>
+
+                <Ellipse Width="80" Height="80" Fill="{StaticResource CircleGradient}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Left="297" Canvas.Top="222">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.3"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Ellipse Width="40" Height="40" Fill="{StaticResource CircleGradient}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Left="337" Canvas.Top="518">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.3"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Polygon Points="67,375 200,500 300,375" Fill="{StaticResource TriangleGradient}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Left="98" Canvas.Top="-435" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Polygon.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.4"/>
+                    </Polygon.Effect>
+                </Polygon>
+
+                <Ellipse Width="32" Height="33" Fill="{StaticResource CircleGradient}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Left="168" Canvas.Top="33" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.3"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Ellipse Width="27" Height="27" Fill="{StaticResource CircleGradient}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Left="107" Canvas.Top="328" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.3"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+
+                <Ellipse Width="93" Height="93" Fill="{StaticResource CircleGradient}" Stroke="#3AA9AD" StrokeThickness="2" Canvas.Top="433" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="-11">
+                    <Ellipse.Effect>
+                        <DropShadowEffect Color="Black" Direction="270" ShadowDepth="6" BlurRadius="12" Opacity="0.3"/>
+                    </Ellipse.Effect>
+                </Ellipse>
+            </Canvas>
+
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0 20">
+                <TextBlock x:Name="CategoryTitleText" Text="Dodaj Podkategorię" Style="{StaticResource titleText}" Foreground="White" HorizontalAlignment="Center" Margin="0 20"/>
+
+                <Grid x:Name="SelectedCategoryGrid" Margin="0 10 0 0" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="SelectedCategoryNameTextBox" Width="300" Height="45" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Foreground="Black" Padding="10" IsEnabled="false"/>
+                    <Label x:Name="SelectedCategoryNameTextBoxPlaceholder" Content="Kategoria" Background="Transparent" Foreground="Black" Opacity="1" IsHitTestVisible="False" Margin="5,0,0,0" FontSize="16" VerticalAlignment="Center"/>
+                </Grid>
+                <Grid Margin="0 10 0 0" HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="SubcategoryNameTextBox" Width="300" Height="45" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="16" Foreground="Black" Padding="10" GotFocus="SubcategoryNameTextBox_GotFocus" LostFocus="SubcategoryNameTextBox_LostFocus"/>
+                    <Label x:Name="SubcategoryNameTextBoxPlaceholder" Content="Nazwa podkategorii" Background="Transparent" Foreground="Gray" Opacity="1" IsHitTestVisible="False" Margin="5,0,0,0" FontSize="16" VerticalAlignment="Center"/>
+                </Grid>
+                <StackPanel x:Name="SubcategoryContainer" Margin="0,10,0,0"/>
+                <TextBlock x:Name="AddSubcategoryText" Text="Dodaj podkategorię" Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="0 10 20 10" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="AddSubcategoryText_Click"/>
+                <Button x:Name="AddSubcategoryButton" Content="Zapisz" Width="200" Height="55" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 10" Style="{StaticResource Button}" FontSize="16" Foreground="White" Click="AddSubcategoryButton_Click" MouseEnter="AddSubcategoryButton_MouseEnter" MouseLeave="AddSubcategoryButton_MouseLeave" Background="Transparent"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

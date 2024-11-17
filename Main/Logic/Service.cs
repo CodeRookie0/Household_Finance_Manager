@@ -16,6 +16,7 @@ using System.Windows;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using Main.Models;
 
 namespace Main.Logic
 {
@@ -288,7 +289,59 @@ namespace Main.Logic
                 }
             }
         }
+        public static int AddCategory(string categoryName,int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                int categoryId = -1;
 
+                string insertQuery = "INSERT INTO Categories (CategoryName, UserID) VALUES (@CategoryName, @UserID);";
+
+                try
+                {
+                    database.ExecuteNonQuery(insertQuery,
+                        new SqliteParameter("@CategoryName", categoryName),
+                        new SqliteParameter("@UserID", userId));
+
+                    string selectQuery = "SELECT CategoryID FROM Categories WHERE CategoryName = @CategoryName AND UserID = @UserID ORDER BY CategoryID DESC LIMIT 1;";
+
+                    var result = database.ExecuteQuery(selectQuery,
+                        new SqliteParameter("@CategoryName", categoryName),
+                        new SqliteParameter("@UserID", userId));
+
+                    if (result != null && result.Rows.Count > 0)
+                    {
+                        categoryId = Convert.ToInt32(result.Rows[0]["CategoryID"]);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return -1;
+                }
+                return categoryId;
+            }
+        }
+
+        public static bool AddSubcategory(int categoryId, string subcategoryName, int userId)
+        {
+                using (DBSqlite database = new DBSqlite())
+                {
+                    string insertQuery = "INSERT INTO Subcategories (CategoryID, SubcategoryName, UserID) VALUES (@CategoryID, @SubcategoryName, @UserID);";
+
+                    try
+                    {
+                        database.ExecuteNonQuery(insertQuery,
+                            new SqliteParameter("@CategoryID", categoryId),
+                            new SqliteParameter("@SubcategoryName", subcategoryName),
+                            new SqliteParameter("@UserID", userId));
+                        return true;
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
+        }
 
         // Update Methods
 
@@ -310,6 +363,43 @@ namespace Main.Logic
                 }
             }
         }
+        public static bool UpdateCategoryName(int categoryId, string newCategoryName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string updateQuery = "UPDATE Categories SET CategoryName = @CategoryName WHERE CategoryID = @CategoryID";
+                try
+                {
+                    database.ExecuteNonQuery(updateQuery,
+                        new SqliteParameter("@CategoryName", newCategoryName),
+                        new SqliteParameter("@CategoryID", categoryId));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+        public static bool UpdateSubcategoryName(int subcategoryId, string newSubcategoryName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string updateQuery = "UPDATE Subcategories SET SubcategoryName = @SubcategoryName WHERE SubcategoryID = @SubcategoryID";
+                try
+                {
+                    database.ExecuteNonQuery(updateQuery,
+                        new SqliteParameter("@SubcategoryName", newSubcategoryName),
+                        new SqliteParameter("@SubcategoryID", subcategoryId));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
 
         // Delete Methods
         public static bool DeleteFamily(int familyId)
@@ -323,6 +413,49 @@ namespace Main.Logic
 
                     string deleteFamilyQuery = "DELETE FROM Family WHERE FamilyID = @FamilyID";
                     database.ExecuteNonQuery(deleteFamilyQuery, new SqliteParameter("@FamilyID", familyId));
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+        public static bool DeleteCategory(int categoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                try
+                {
+                    string updateTransactionsQuery = "UPDATE Transactions SET CategoryID = NULL, SubcategoryID = NULL WHERE CategoryID = @CategoryId OR SubcategoryID IN (SELECT SubcategoryID FROM Subcategories WHERE CategoryID = @CategoryId)";
+                    database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@CategoryId", categoryId));
+
+                    string deleteSubcategoriesQuery = "DELETE FROM Subcategories WHERE CategoryID = @CategoryId";
+                    database.ExecuteNonQuery(deleteSubcategoriesQuery, new SqliteParameter("@CategoryId", categoryId));
+
+                    string deleteCategoriesQuery = "DELETE FROM Categories WHERE CategoryID = @CategoryId";
+                    database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@CategoryId", categoryId));
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+        public static bool DeleteSubcategory(int subcategoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                try
+                {
+                    string updateTransactionsQuery = "UPDATE Transactions SET SubcategoryID = NULL WHERE SubcategoryID = @SubcategoryID";
+                    database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@SubcategoryID", subcategoryId));
+
+                    string deleteSubcategoriesQuery = "DELETE FROM Subcategories WHERE SubcategoryID = @SubcategoryID";
+                    database.ExecuteNonQuery(deleteSubcategoriesQuery, new SqliteParameter("@SubcategoryID", subcategoryId));
 
                     return true;
                 }
@@ -408,7 +541,7 @@ namespace Main.Logic
 
             using (DBSqlite database = new DBSqlite())
             {
-                string query = "SELECT JoinRequests.JoinRequestID, Family.FamilyCode, " +
+                string query = "SELECT JoinRequests.JoinRequestID, Family.FamilyName, " +
                                "JoinRequests.JoinRequestDate, RequestStatuses.RequestStatusName " +
                                "FROM JoinRequests " +
                                "INNER JOIN Family ON JoinRequests.FamilyID = Family.FamilyID " +
@@ -422,16 +555,93 @@ namespace Main.Logic
                     JoinRequest request = new JoinRequest
                     {
                         JoinRequestID = Convert.ToInt32(row["JoinRequestID"]),
-                        FamilyCode = row["FamilyCode"].ToString(),
+                        FamilyName = row["FamilyName"].ToString(),
                         JoinRequestDate = DateTime.Parse(row["JoinRequestDate"].ToString()),
                         RequestStatus = row["RequestStatusName"].ToString()
                     };
                     joinRequests.Add(request);
                 }
             }
-
             return joinRequests;
         }
+        public static List<Category> GetCategories(int userId)
+        {
+            List<Category> categories = new List<Category>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT Categories.CategoryID, Categories.CategoryName, Categories.UserID " +
+                               "FROM Categories " +
+                               "WHERE Categories.UserID = @UserID OR Categories.UserID IS NULL";
 
+                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@UserID", userId));
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Category category = new Category
+                    {
+                        CategoryID = Convert.ToInt32(row["CategoryID"]),
+                        CategoryName = row["CategoryName"].ToString(),
+                        UserID = row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"])
+                    };
+                    categories.Add(category);
+                }
+            }
+            return categories;
+        }
+        public static List<Subcategory> GetSubcategoriesByCategoryId(int userId,int categoryId)
+        {
+            List<Subcategory> subcategories = new List<Subcategory>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT Subcategories.SubcategoryID, Subcategories.SubcategoryName, " +
+                               "Subcategories.CategoryID, Subcategories.UserID " +
+                               "FROM Subcategories " +
+                               "WHERE (Subcategories.UserID = @UserID OR Subcategories.UserID IS NULL) AND Subcategories.CategoryID=@CategoryID";
+
+                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@UserID", userId), new SqliteParameter("@CategoryID", categoryId));
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Subcategory subcategory = new Subcategory
+                    {
+                        SubcategoryID = Convert.ToInt32(row["SubcategoryID"]),
+                        SubcategoryName = row["SubcategoryName"].ToString(),
+                        CategoryID = Convert.ToInt32(row["CategoryID"]),
+                        UserID = row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"])
+                    };
+                    subcategories.Add(subcategory);
+                }
+            }
+            return subcategories;
+        }
+
+        public static string GetCategoryNameByCategoryID(int categoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT CategoryName FROM Categories WHERE CategoryID = @CategoryID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@CategoryID", categoryId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["CategoryName"].ToString();
+            }
+        }
+
+        public static string GetSubcategoryNameBySubcategoryID(int subcategoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT SubcategoryName FROM Subcategories WHERE SubcategoryID = @SubcategoryID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@SubcategoryID", subcategoryId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["SubcategoryName"].ToString();
+            }
+        }
     }
 }

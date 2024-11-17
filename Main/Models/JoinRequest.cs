@@ -9,7 +9,7 @@ namespace Main.Logic
     public class JoinRequest
     {
         public int JoinRequestID { get; set; }
-        public string FamilyCode { get; set; }
+        public string FamilyName { get; set; }
         public DateTime JoinRequestDate { get; set; }
         public string RequestStatus { get; set; }
     }

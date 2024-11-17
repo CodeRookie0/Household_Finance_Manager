@@ -83,7 +83,7 @@
                         <StackPanel Orientation="Horizontal">
                             <Button x:Name="CategoriesButton" Style="{StaticResource NoHoverButtonStyle}" Height="46"  Click="CategoriesButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="CategoriesButton_MouseEnter" MouseLeave="CategoriesButton_MouseLeave">
                                 <StackPanel Orientation="Horizontal" Width="205">
-                                    <TextBlock x:Name="CategoriesTextBlock" Text="Kategoria" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="CategoriesTextBlock" Text="Kategorie" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
                         </StackPanel>

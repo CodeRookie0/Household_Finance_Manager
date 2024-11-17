@@ -120,10 +120,11 @@ namespace Main.GUI
             SelectedUserControlTextBlock.Text = GoalsTextBlock.Text;
         }
 
-        private void CategoriesButton_Click(object sender, RoutedEventArgs e)
+        public void CategoriesButton_Click(object sender, RoutedEventArgs e)
         {
             HighlightButton(CategoriesBorder, CategoriesTextBlock);
             buttonActiveStates[CategoriesButton] = true;
+            MainContentArea.Content=new CategoriesControl(userId, this);
             SelectedUserControlTextBlock.Text = CategoriesTextBlock.Text;
         }
 
