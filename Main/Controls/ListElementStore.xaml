@@ -11,10 +11,10 @@
             <TextBlock x:Name="StoreName" Text="Nazwa Sklepu" FontSize="16" FontWeight="Bold" Margin="30"/>
             <StackPanel Orientation="Horizontal" >
                 <Button Content="Edytuj" Style="{StaticResource mainButton}" Click="Edit_Store" Margin="10"/>
-                <Button x:Name="DeleteStore" Content="Usuń" Style="{StaticResource mainButton}" Click="Delete_Store"  Margin="10"/>
+                <Button x:Name="DeleteStore" Content="Usuń" Style="{StaticResource DeleteButton}" Click="Delete_Store"  Margin="10"/>
 
                 <ToggleButton x:Name="HeartToggleButton" Width="100" Height="100" Background="Transparent" BorderThickness="0"
-                              Checked="HeartToggleButton_Checked" Unchecked="HeartToggleButton_Unchecked">
+                              Checked="HeartToggleButton_Checked" Unchecked="HeartToggleButton_Unchecked" Loaded="CheckHeart_Loaded">
                     <ToggleButton.Template>
                         <ControlTemplate TargetType="ToggleButton">
                             <Grid>

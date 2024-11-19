@@ -10,15 +10,18 @@ namespace Main.Models
     {
         private readonly int storeId;
         private readonly int userId;
+        private readonly bool isFavorit;
         public int StoreId { get { return storeId; } }
         public string CategoryName {  get; set; }  
         public string StoryName {  get; set; }
         public int UserId { get { return userId; } }
+        public bool IsFavorite { get { return isFavorit; } }
 
-        public Store(int storeId,int userId)
+        public Store(int storeId,int userId,bool isFavorite)
         {
             this.storeId = storeId;
             this.userId = userId;
+            this.isFavorit = isFavorite;
         }
         
     }

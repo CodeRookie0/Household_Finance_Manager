@@ -52,7 +52,7 @@ namespace Main.Logic
             return resultTable;
         }
 
-        public void ExecuteNonQuery(string query, params SqliteParameter[] parameters)
+        public int ExecuteNonQuery(string query, params SqliteParameter[] parameters)
         {
             using (_connection = new SqliteConnection(_connectionString))
             {
@@ -64,9 +64,10 @@ namespace Main.Logic
                         command.Parameters.AddRange(parameters);
                     }
 
-                    command.ExecuteNonQuery();
+                  return  command.ExecuteNonQuery();
                 }
             }
+          
         }
 
         public object ExecuteScalar(string query, params SqliteParameter[] parameters)

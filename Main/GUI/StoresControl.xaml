@@ -15,7 +15,7 @@
 
         <Border Background="White" Grid.Row="0">
             <StackPanel Grid.Row="0" HorizontalAlignment="Right"  VerticalAlignment="Center">
-                <Button Content="Dodaj Sklep" Margin="10" Style="{StaticResource mainButton}"/>
+                <Button Content="Dodaj Sklep" Margin="10" Style="{StaticResource mainButton}" Click="AddStoresButton_Click"/>
             </StackPanel>
         </Border>
 

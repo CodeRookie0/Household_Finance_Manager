@@ -186,6 +186,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\AddStoreForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\AddSubategoryControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -203,6 +207,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GUI\DashboardControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\EditStoreForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -235,6 +243,9 @@
     <Compile Include="GUI\AddFamilyMemberRequest.xaml.cs">
       <DependentUpon>AddFamilyMemberRequest.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\AddStoreForm.xaml.cs">
+      <DependentUpon>AddStoreForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\AddSubategoryControl.xaml.cs">
       <DependentUpon>AddSubategoryControl.xaml</DependentUpon>
     </Compile>
@@ -249,6 +260,9 @@
     </Compile>
     <Compile Include="GUI\DashboardControl.xaml.cs">
       <DependentUpon>DashboardControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\EditStoreForm.xaml.cs">
+      <DependentUpon>EditStoreForm.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\FamilyMembersControl.xaml.cs">
       <DependentUpon>FamilyMembersControl.xaml</DependentUpon>
@@ -398,6 +412,16 @@
   <ItemGroup>
     <Resource Include="Resources\delete_red.png" />
     <Resource Include="Resources\edit_green.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\AddStore.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\EditStore.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="packages\SQLitePCLRaw.lib.e_sqlite3.2.0.4\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets" Condition="Exists('packages\SQLitePCLRaw.lib.e_sqlite3.2.0.4\build\net461\SQLitePCLRaw.lib.e_sqlite3.targets')" />
