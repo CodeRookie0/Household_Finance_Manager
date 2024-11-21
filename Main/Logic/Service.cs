@@ -216,6 +216,18 @@ namespace Main.Logic
             }
         }
 
+        public static bool IsCategoryFavoriteForUser(int userId, int categoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT COUNT(*) FROM FavoriteCategories WHERE UserID = @UserID AND CategoryID = @CategoryID";
+                var result = database.ExecuteQuery(selectQuery,
+                        new SqliteParameter("@CategoryID", categoryId),
+                        new SqliteParameter("@UserID", userId));
+                int count = Convert.ToInt32(result.Rows[0][0]);
+                return count > 0;
+            }
+        }
 
         // Add Methods
         public static bool AddUser(string userName, string email, string password, string Salt)
@@ -324,23 +336,43 @@ namespace Main.Logic
 
         public static bool AddSubcategory(int categoryId, string subcategoryName, int userId)
         {
-                using (DBSqlite database = new DBSqlite())
-                {
-                    string insertQuery = "INSERT INTO Subcategories (CategoryID, SubcategoryName, UserID) VALUES (@CategoryID, @SubcategoryName, @UserID);";
+            using (DBSqlite database = new DBSqlite())
+            {
+                string insertQuery = "INSERT INTO Subcategories (CategoryID, SubcategoryName, UserID) VALUES (@CategoryID, @SubcategoryName, @UserID);";
 
-                    try
-                    {
-                        database.ExecuteNonQuery(insertQuery,
-                            new SqliteParameter("@CategoryID", categoryId),
-                            new SqliteParameter("@SubcategoryName", subcategoryName),
-                            new SqliteParameter("@UserID", userId));
-                        return true;
-                    }
-                    catch (Exception)
-                    {
-                        return false;
-                    }
+                try
+                {
+                    database.ExecuteNonQuery(insertQuery,
+                        new SqliteParameter("@CategoryID", categoryId),
+                        new SqliteParameter("@SubcategoryName", subcategoryName),
+                        new SqliteParameter("@UserID", userId));
+                    return true;
                 }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool AddCategoryToFavorites(int userId, int categoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string insertQuery = "INSERT INTO FavoriteCategories (UserID, CategoryID) VALUES (@UserID, @CategoryID);";
+
+                try
+                {
+                    database.ExecuteNonQuery(insertQuery,
+                        new SqliteParameter("@CategoryID", categoryId),
+                        new SqliteParameter("@UserID", userId));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
         }
 
         // Update Methods
@@ -457,6 +489,23 @@ namespace Main.Logic
                     string deleteSubcategoriesQuery = "DELETE FROM Subcategories WHERE SubcategoryID = @SubcategoryID";
                     database.ExecuteNonQuery(deleteSubcategoriesQuery, new SqliteParameter("@SubcategoryID", subcategoryId));
 
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool DeleteCategoryFromFavorites(int userId, int categoryId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                try
+                {
+                    string deleteFavoriteCategoryQuery = "DELETE FROM FavoriteCategories WHERE UserID = @UserID AND CategoryID = @CategoryID";
+                    database.ExecuteNonQuery(deleteFavoriteCategoryQuery, new SqliteParameter("@UserID", userId), new SqliteParameter("@CategoryID", categoryId));
                     return true;
                 }
                 catch (Exception)

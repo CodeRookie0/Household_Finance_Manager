@@ -61,6 +61,75 @@ namespace Main.GUI
                     Margin = new Thickness(0, 0, 0, 5)
                 };
 
+                bool isFavorite = Service.IsCategoryFavoriteForUser(userId, category.CategoryID);
+
+                var favoriteButton = new Button
+                {
+                    Content = new Image
+                    {
+                        Source = new BitmapImage(new Uri(isFavorite
+                            ? "pack://application:,,,/Resources/heart_filled.png"
+                            : "pack://application:,,,/Resources/heart_outlined.png")),
+                        Width = 30,
+                        Height = 30
+                    },
+                    Background = Brushes.Transparent,
+                    BorderBrush = Brushes.Transparent,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Padding = new Thickness(5)
+                };
+
+                favoriteButton.MouseEnter += (sender, e) =>
+                {
+                    if (!isFavorite)
+                    {
+                        var button = (Button)sender;
+                        var image = (Image)button.Content;
+                        image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_filled.png"));
+                    }
+                };
+
+                favoriteButton.MouseLeave += (sender, e) =>
+                {
+                    if (!isFavorite)
+                    {
+                        var button = (Button)sender;
+                        var image = (Image)button.Content;
+                        image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_outlined.png"));
+                    }
+                };
+
+                favoriteButton.Click += (sender, e) =>
+                {
+                    var button = (Button)sender;
+                    var image = (Image)button.Content;
+                    if (isFavorite)
+                    {
+                        if(Service.DeleteCategoryFromFavorites(userId, category.CategoryID))
+                        {
+                            image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_outlined.png"));
+                            isFavorite = false;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Wystąpił błąd podczas usuwania kategorii z ulubionych.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    else
+                    {
+                        if(Service.AddCategoryToFavorites(userId, category.CategoryID))
+                        {
+                            image.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_filled.png"));
+                            isFavorite = true;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Wystąpił błąd podczas dodawania kategorii do ulubionych.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                };
+
                 if (category.UserID != -1)
                 {
                     var editButton = new Button
@@ -98,6 +167,7 @@ namespace Main.GUI
                     {
                         headerGrid.Width = 1060;
                         headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
                         headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) }); 
                         headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
 
@@ -109,6 +179,9 @@ namespace Main.GUI
 
                         Grid.SetColumn(deleteButton, 2);
                         headerGrid.Children.Add(deleteButton);
+
+                        Grid.SetColumn(favoriteButton, 3);
+                        headerGrid.Children.Add(favoriteButton);
                     }
 
                     editButton.Click += (sender, e) =>
@@ -136,6 +209,22 @@ namespace Main.GUI
                             }
                         }
                     };
+                }
+                else
+                {
+                    var headerGrid = expander.Header as Grid;
+                    if (headerGrid != null)
+                    {
+                        headerGrid.Width = 1060;
+                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+
+                        var categoryTextBlock = (TextBlock)headerGrid.Children[0];
+                        Grid.SetColumn(categoryTextBlock, 0);
+
+                        Grid.SetColumn(favoriteButton, 1);
+                        headerGrid.Children.Add(favoriteButton);
+                    }
                 }
 
                 List<Subcategory> subcategories = Service.GetSubcategoriesByCategoryId(userId, category.CategoryID);
