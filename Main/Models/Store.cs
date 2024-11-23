@@ -13,7 +13,7 @@ namespace Main.Models
         private readonly bool isFavorit;
         public int StoreId { get { return storeId; } }
         public string CategoryName {  get; set; }  
-        public string StoryName {  get; set; }
+        public string StoreName {  get; set; }
         public int UserId { get { return userId; } }
         public bool IsFavorite { get { return isFavorit; } }
 
@@ -23,6 +23,5 @@ namespace Main.Models
             this.userId = userId;
             this.isFavorit = isFavorite;
         }
-        
     }
 }

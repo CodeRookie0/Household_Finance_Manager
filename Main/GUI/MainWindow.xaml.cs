@@ -28,6 +28,16 @@ namespace Main.GUI
         {
             userId = loggedInUserId;
             InitializeComponent();
+            
+            int userRole=Service.GetRoleIDByUserID(userId);
+            if (userRole == 3)
+            {
+                FamilyMembersBorder.Visibility = Visibility.Collapsed;
+                CategoriesBorder.Visibility = Visibility.Collapsed;
+                StoresBorder.Visibility = Visibility.Collapsed;
+                LimitsBorder.Visibility = Visibility.Collapsed;
+                RecurringPaymentsBorder.Visibility = Visibility.Collapsed;
+            }
 
             buttonActiveStates[TransactionsButton] = false;
             buttonActiveStates[MyTransactionsButton] = false;
@@ -68,6 +78,8 @@ namespace Main.GUI
 
             MyTransactionsTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4EB1B6"));
             buttonActiveStates[MyTransactionsButton] = true;
+
+            MainContentArea.Content = new UserTransactionsControl(userId, this);
             SelectedUserControlTextBlock.Text =MyTransactionsTextBlock.Text;
         }
 
@@ -80,6 +92,9 @@ namespace Main.GUI
 
             FamilyTransactionsTextBlock.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4EB1B6"));
             buttonActiveStates[FamilyTransactionsButton] = true;
+
+
+            MainContentArea.Content = new FamilyTransactionsControl(userId, this);
             SelectedUserControlTextBlock.Text =FamilyTransactionsTextBlock.Text;
         }
 

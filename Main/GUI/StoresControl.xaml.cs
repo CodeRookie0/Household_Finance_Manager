@@ -46,7 +46,7 @@ namespace Main.GUI
                         Int32.Parse(row[0].ToString()),
                         UserId, boolValue);
                     tmpStore.CategoryName = row[1].ToString();
-                    tmpStore.StoryName = row[2].ToString(); 
+                    tmpStore.StoreName = row[2].ToString(); 
                     var StoreElementList = new ListElementStore(tmpStore);
                     StoreElementList.ItemDeleted += UpdateOutSideClick;
                     storeList.Children.Add(StoreElementList);
@@ -78,7 +78,7 @@ namespace Main.GUI
                         UserId,
                         boolValue);
                     tmpStore.CategoryName = row[1].ToString();
-                    tmpStore.StoryName = row[2].ToString();
+                    tmpStore.StoreName = row[2].ToString();
                     var StoreElementList = new ListElementStore(tmpStore);
                     StoreElementList.ItemDeleted += UpdateOutSideClick;
                     storeList.Children.Add(StoreElementList);

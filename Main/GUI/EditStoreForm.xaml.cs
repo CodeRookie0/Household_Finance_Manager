@@ -45,7 +45,7 @@ namespace Main.GUI
             }
             cmbCategory.ItemsSource = stores;
 
-            txtStoreName.Text = argStore.StoryName;
+            txtStoreName.Text = argStore.StoreName;
             cmbCategory.SelectedValue = argStore.CategoryName;
 
 

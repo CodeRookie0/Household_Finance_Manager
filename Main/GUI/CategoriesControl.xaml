@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-                          xmlns:local="clr-namespace:Main.GUI"
+             xmlns:local="clr-namespace:Main.GUI"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1150" d:Background="White">
     <Grid Margin="5">

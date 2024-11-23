@@ -516,6 +516,35 @@ namespace Main.Logic
         }
 
         // GET Methods
+
+        public static string GetUserNameByUserID(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT UserName FROM Users WHERE UserID = @UserID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@UserID", userId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["UserName"].ToString();
+            }
+        }
+
+        public static int GetRoleIDByUserID(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT RoleID FROM Users WHERE UserID = @UserID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@UserID", userId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return -1;
+                }
+                return result.Rows[0]["RoleID"] == DBNull.Value ? -1 : Convert.ToInt32(result.Rows[0]["RoleID"]);
+            }
+        }
+
         public static string GetCodeByFamilyId(int familyId)
         {
             using (DBSqlite database = new DBSqlite())
@@ -567,6 +596,26 @@ namespace Main.Logic
                     return -1;
                 }
                 return Convert.ToInt32(result.Rows[0]["FamilyID"]);
+            }
+        }
+
+        public static int GetFamilyIdByMemberId(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT FamilyID FROM Users WHERE UserID = @MemberID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@MemberID", userId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return -1;
+                }
+                var familyId = result.Rows[0]["FamilyID"];
+                if (familyId == DBNull.Value)
+                {
+                    return -1;
+                }
+
+                return Convert.ToInt32(familyId);
             }
         }
 
@@ -637,6 +686,28 @@ namespace Main.Logic
             }
             return categories;
         }
+
+        public static List<Category> GetFamilyCategories(int familyId)
+        {
+            List<Category> familyCategories = new List<Category>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+                List<Category> userCategories = GetCategories(userId);
+
+                foreach (Category category in userCategories)
+                {
+                    if (!familyCategories.Any(s => s.CategoryID == category.CategoryID))
+                    {
+                        familyCategories.Add(category);
+                    }
+                }
+            }
+            return familyCategories;
+        }
+
         public static List<Subcategory> GetSubcategoriesByCategoryId(int userId,int categoryId)
         {
             List<Subcategory> subcategories = new List<Subcategory>();
@@ -691,6 +762,155 @@ namespace Main.Logic
                 }
                 return result.Rows[0]["SubcategoryName"].ToString();
             }
+        }
+
+        public static string GetStoreNameByStoreID(int storeId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT StoreName FROM Stores WHERE StoreID = @StoreID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@StoreID", storeId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["StoreName"].ToString();
+            }
+        }
+
+        public static List<Transaction> GetUserTransactions(int userId)
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT TransactionID, UserID, Amount, TransactionTypeID, CategoryID, SubcategoryID, StoreID, Note, Date FROM Transactions WHERE UserID = @UserId";
+
+                SqliteParameter userIdParam = new SqliteParameter("@UserId", userId);
+                DataTable result = database.ExecuteQuery(query, userIdParam);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Transaction transaction = new Transaction
+                    {
+                        TransactionID = row["TransactionID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionID"]),
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        Amount = row["Amount"] == DBNull.Value ? 0.0m : Convert.ToDecimal(row["Amount"]), 
+                        TransactionTypeID = row["TransactionTypeID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionTypeID"]),
+                        CategoryID = row["CategoryID"] == DBNull.Value ? -1 : Convert.ToInt32(row["CategoryID"]),
+                        SubcategoryID = row["SubcategoryID"] == DBNull.Value ? -1 : Convert.ToInt32(row["SubcategoryID"]),
+                        StoreID = row["StoreID"] == DBNull.Value ? -1 : Convert.ToInt32(row["StoreID"]),
+                        Note = row["Note"] == DBNull.Value ? null : Convert.ToString(row["Note"]),
+                        Date = row["Date"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["Date"])
+                    };
+                    transactions.Add(transaction);
+                }
+            }
+            return transactions;
+        }
+
+        public static List<Transaction> GetFamilyTransactions(int familyId)
+        {
+            List<Transaction> familyTransactions = new List<Transaction>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+                List<Transaction> userTransactions = GetUserTransactions(userId);
+
+                foreach (Transaction transaction in userTransactions)
+                {
+                    if (!familyTransactions.Any(s => s.TransactionID == transaction.TransactionID))
+                    {
+                        familyTransactions.Add(transaction);
+                    }
+                }
+            }
+            return familyTransactions;
+        }
+
+        public static List<Store> GetUserStores(int userId)
+        {
+            List<Store> stores = new List<Store>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"
+            SELECT 
+                Stores.StoreID, 
+                Stores.StoreName, 
+                Stores.UserID, 
+                Stores.IsFavorite, 
+                Categories.CategoryName
+            FROM 
+                Stores
+            LEFT JOIN 
+                Categories ON Stores.CategoryID = Categories.CategoryID
+            WHERE 
+                Stores.UserID = @UserID OR Stores.UserID IS NULL";
+
+                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@UserID", userId));
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Store store = new Store(
+                        storeId: Convert.ToInt32(row["StoreID"]),
+                        userId: row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"]),
+                        isFavorite: Convert.ToBoolean(row["IsFavorite"])
+                    )
+                    {
+                        StoreName = row["StoreName"].ToString(),
+                        CategoryName = row["CategoryName"] == DBNull.Value ? null : row["CategoryName"].ToString()
+                    };
+
+                    stores.Add(store);
+                }
+            }
+            return stores;
+        }
+
+        public static List<Store> GetFamilyStores(int familyId)
+        {
+            List<Store> familyStores = new List<Store>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+                List<Store> userStores = GetUserStores(userId);
+
+                foreach (Store store in userStores)
+                {
+                    if (!familyStores.Any(s => s.StoreId == store.StoreId))
+                    {
+                        familyStores.Add(store);
+                    }
+                }
+            }
+            return familyStores;
+        }
+
+        public static List<FamilyMember> GetFamilyMembersByFamilyId(int familyId)
+        {
+            List<FamilyMember> familyMembers = new List<FamilyMember>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT UserID, FamilyID, RoleID FROM Users WHERE FamilyID = @FamilyID";
+
+                SqliteParameter familyIdParam = new SqliteParameter("@FamilyID", familyId);
+                DataTable result = database.ExecuteQuery(query, familyIdParam);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    FamilyMember familyMember = new FamilyMember
+                    {
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        FamilyID = row["FamilyID"] == DBNull.Value ? 0 : Convert.ToInt32(row["FamilyID"]),
+                        RoleID = row["RoleID"] == DBNull.Value ? 0 : Convert.ToInt32(row["RoleID"])
+                    };
+                    familyMembers.Add(familyMember);
+                }
+            }
+            return familyMembers;
         }
     }
 }

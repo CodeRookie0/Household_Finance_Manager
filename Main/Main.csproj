@@ -222,6 +222,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\FamilyTransactionsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\JoinFamilyControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -270,6 +274,9 @@
     <Compile Include="GUI\FamilySettingsControl.xaml.cs">
       <DependentUpon>FamilySettingsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\FamilyTransactionsControl.xaml.cs">
+      <DependentUpon>FamilyTransactionsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\JoinFamilyControl.xaml.cs">
       <DependentUpon>JoinFamilyControl.xaml</DependentUpon>
     </Compile>
@@ -305,6 +312,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\UserTransactionsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GUI\MainWindow.xaml.cs">
@@ -328,14 +339,19 @@
     <Compile Include="GUI\StoresControl.xaml.cs">
       <DependentUpon>StoresControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\UserTransactionsControl.xaml.cs">
+      <DependentUpon>UserTransactionsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Logic\DBSqlite.cs" />
     <Compile Include="Models\Category.cs" />
+    <Compile Include="Models\FamilyMember.cs" />
     <Compile Include="Models\JoinRequest.cs" />
     <Compile Include="Logic\Service.cs" />
     <Compile Include="Logic\FamilyCodeGenerator.cs" />
     <Compile Include="Models\PendingUser.cs" />
     <Compile Include="Models\Store.cs" />
     <Compile Include="Models\Subcategory.cs" />
+    <Compile Include="Models\Transaction.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

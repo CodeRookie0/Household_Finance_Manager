@@ -30,7 +30,7 @@ namespace Main.Controls
             InitializeComponent();
             store = argStore;
 
-            StoreName.Text = store.StoryName;
+            StoreName.Text = store.StoreName;
             
 
         }
