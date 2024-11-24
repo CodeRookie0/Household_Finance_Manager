@@ -165,5 +165,40 @@ namespace Main.GUI
             }
             mainWindow.FamilyMembersButton_Click(sender, e);
         }
+
+        private void RemoveFamilyMember_Click(object sender, RoutedEventArgs e)
+        {
+           ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
+           DBSqlite dbsqite=new DBSqlite();
+           DataTable answer=dbsqite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Family ON Users.FamilyID=Family.FamilyID INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.UserID<>Family.PrimaryUserID AND Users.FamilyID=(" +
+                "SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
+                new Microsoft.Data.Sqlite.SqliteParameter("@UserId",userId));
+            if(answer != null)
+            {
+                foreach(DataRow row in answer.Rows) 
+                {
+                    PendingUser tmp = new PendingUser(Int32.Parse(row[0].ToString()));
+                    tmp.Name = row[1].ToString();
+                    tmp.Role = row[2].ToString();
+                    users.Add(tmp);
+
+                }
+            }
+            DeleteFamilyMemberControl deleteFamilyMemberControl = new DeleteFamilyMemberControl(ref users);
+            deleteFamilyMemberControl.Show();
+
+            FamilyMembersListBox.Items.Clear();
+            DataTable updateData = dbsqite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Family ON Users.FamilyID=Family.FamilyID INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.UserID<>Family.PrimaryUserID AND Users.FamilyID=(" +
+                "SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
+                new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
+            if (answer != null)
+            {
+                foreach (DataRow row in updateData.Rows)
+                { 
+
+                }
+            }
+
+        }
     }
 }

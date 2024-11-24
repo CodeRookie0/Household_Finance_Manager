@@ -71,6 +71,10 @@ namespace Main.GUI
                     dBSqlite.ExecuteNonQuery("DELETE FROM JoinRequests WHERE JoinRequests.UserID=@UserID AND JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@MyId)",
                         new SqliteParameter("@UserID", thisUser.Userid),
                         new SqliteParameter("@MyId", userId));
+                    pendingUsers.Remove(thisUser);
+                    ListUser.ItemsSource = null;
+                    ListUser.ItemsSource = pendingUsers;
+
 
                 }
             }

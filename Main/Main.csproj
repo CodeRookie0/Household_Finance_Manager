@@ -174,6 +174,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Controls\FamilyUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ListElementStore.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -210,6 +214,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\DeleteFamilyMemberControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\EditStoreForm.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -238,6 +246,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Controls\FamilyUser.xaml.cs">
+      <DependentUpon>FamilyUser.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ListElementStore.xaml.cs">
       <DependentUpon>ListElementStore.xaml</DependentUpon>
     </Compile>
@@ -264,6 +275,9 @@
     </Compile>
     <Compile Include="GUI\DashboardControl.xaml.cs">
       <DependentUpon>DashboardControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\DeleteFamilyMemberControl.xaml.cs">
+      <DependentUpon>DeleteFamilyMemberControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\EditStoreForm.xaml.cs">
       <DependentUpon>EditStoreForm.xaml</DependentUpon>

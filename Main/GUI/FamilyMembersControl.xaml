@@ -34,7 +34,7 @@
         <Border Background="#ffffff" Grid.Column="1" Grid.Row="1">
             <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center">
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="RemoveMemberButton" Content="Usuń członka" Style="{StaticResource mainButton}"/>
+                    <Button x:Name="RemoveMemberButton" Click="RemoveFamilyMember_Click" Content="Usuń członka" Style="{StaticResource mainButton}"/>
                     <Button x:Name="ModifyPermissionsButton" Click="ChangePermision" Content="Modyfikacja uprawnień" Style="{StaticResource mainButton}"/>
                 </StackPanel>
             </StackPanel>

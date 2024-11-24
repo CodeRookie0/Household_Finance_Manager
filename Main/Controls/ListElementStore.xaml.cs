@@ -1,6 +1,7 @@
 ﻿using Main.GUI;
 using Main.Logic;
 using Main.Models;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,13 +26,19 @@ namespace Main.Controls
     public partial class ListElementStore : UserControl
     {
         private Store store;
-        public ListElementStore(Store argStore)
+        private int userid;
+        public ListElementStore(Store argStore,int argUserId)
         {
             InitializeComponent();
             store = argStore;
+            userid = argUserId;
 
             StoreName.Text = store.StoreName;
-            
+
+           if(store.UserId!=argUserId)
+            {
+                DeleteStore.IsEnabled = false;
+            }
 
         }
 
@@ -85,10 +92,18 @@ namespace Main.Controls
             var HeartPath = (Path)((ToggleButton)sender).Template.FindName("HeartPath",(FrameworkElement)sender);
             if(HeartPath!=null)
             {
-                HeartPath.Fill = Brushes.Red;
                 DBSqlite dBSqlite=new DBSqlite();
-                dBSqlite.ExecuteNonQuery("UPDATE Stores SET IsFavorite=1 WHERE Stores.StoreID=@MyStoreId",
-                    new Microsoft.Data.Sqlite.SqliteParameter("@MyStoreId", store.StoreId));
+                /*dBSqlite.ExecuteNonQuery("UPDATE Stores SET IsFavorite=1 WHERE Stores.StoreID=@MyStoreId",
+                    new Microsoft.Data.Sqlite.SqliteParameter("@MyStoreId", store.StoreId));*/
+               int answer=dBSqlite.ExecuteNonQuery("INSERT INTO FavoriteStores(UserID,StoreID) VALUES(@MyUserId,@MyStoreId)",
+                    new Microsoft.Data.Sqlite.SqliteParameter("@MyUserId", userid),
+                    new SqliteParameter("@MyStoreId",store.StoreId));
+                if(answer>0)
+                {
+                    HeartPath.Fill = Brushes.Red;
+
+                }
+
 
             }
         }
@@ -98,10 +113,17 @@ namespace Main.Controls
             var HeartPath = (Path)((ToggleButton)sender).Template.FindName("HeartPath", (FrameworkElement)sender);
             if (HeartPath != null)
             {
-                HeartPath.Fill = Brushes.Transparent;
+                
                 DBSqlite dBSqlite = new DBSqlite();
-                dBSqlite.ExecuteNonQuery("UPDATE Stores SET IsFavorite=0 WHERE Stores.StoreID=@MyStoreId",
-                    new Microsoft.Data.Sqlite.SqliteParameter("@MyStoreId", store.StoreId));
+                /*dBSqlite.ExecuteNonQuery("UPDATE Stores SET IsFavorite=0 WHERE Stores.StoreID=@MyStoreId",
+                    new Microsoft.Data.Sqlite.SqliteParameter("@MyStoreId", store.StoreId));*/
+               int answer=dBSqlite.ExecuteNonQuery("DELETE FROM FavoriteStores WHERE UserID=@MyUserID AND StoreID=@MyStoreID",
+                    new SqliteParameter("@MyUserID", userid),
+                    new SqliteParameter("@MyStoreID", store.StoreId));
+                if(answer>0) 
+                {
+                    HeartPath.Fill = Brushes.Transparent;
+                }
             }
         }
     }

@@ -256,6 +256,9 @@
                     <Setter Property="Background" Value="#540300"/>
                     <Setter Property="Foreground" Value="White"/>
                 </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background" Value="#2e0003"/>
+                </Trigger>
             </Style.Triggers>
         </Style>
         
