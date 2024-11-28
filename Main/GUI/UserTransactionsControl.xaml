@@ -123,15 +123,34 @@
 
                                     <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="8,5,5,5">
                                         <TextBlock Text="{Binding CategoryName}" FontSize="18" FontWeight="SemiBold" />
-                                        <TextBlock Text="{Binding SubCategoryName}" FontSize="16" Foreground="Gray" />
+                                        <TextBlock Text="{Binding SubcategoryName}" FontSize="16" Foreground="Gray" />
                                     </StackPanel>
 
-                                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" Margin="8,5,5,5">
+                                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" Margin="8,5,10,5">
                                         <TextBlock Text="{Binding StoreName}" FontSize="18" FontWeight="SemiBold" />
                                     </StackPanel>
 
                                     <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="5,5,5,5">
-                                        <TextBlock Text="{Binding Amount}" FontSize="18" FontWeight="SemiBold" Foreground="Green" />
+                                        <StackPanel.Resources>
+                                            <!-- Define DataTrigger to change color based on TransactionTypeID -->
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <!-- Change color to Green if TransactionTypeID is 1 -->
+                                                    <DataTrigger Binding="{Binding TransactionTypeID}" Value="1">
+                                                        <Setter Property="Foreground" Value="Green"/>
+                                                    </DataTrigger>
+
+                                                    <!-- Change color to Red if TransactionTypeID is 2 -->
+                                                    <DataTrigger Binding="{Binding TransactionTypeID}" Value="2">
+                                                        <Setter Property="Foreground" Value="Red"/>
+                                                        <Setter Property="Margin" Value="-8,0,0,0"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </StackPanel.Resources>
+
+                                        <!-- Display the Amount -->
+                                        <TextBlock Text="{Binding FormattedAmount}" FontSize="18" FontWeight="SemiBold" />
                                     </StackPanel>
 
                                     <StackPanel Grid.Row="0" Grid.Column="4" Orientation="Vertical" HorizontalAlignment="Left" Margin="5,5,5,5">

@@ -327,6 +327,22 @@ namespace Main.Logic
             return false;
         }
 
+        public static bool IsChildTransaction(int transactionID)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT u.RoleID FROM Transactions t INNER JOIN Users u ON t.UserID = u.UserID WHERE t.TransactionID = @TransactionID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@TransactionID", transactionID));
+                if (result != null && result.Rows.Count > 0)
+                {
+                    int roleID = Convert.ToInt32(result.Rows[0]["RoleID"]);
+                    return roleID == 3;
+                }
+
+                return false;
+            }
+        }
+
 
         // Add Methods
         public static bool AddUser(string userName, string email, string password, string Salt)

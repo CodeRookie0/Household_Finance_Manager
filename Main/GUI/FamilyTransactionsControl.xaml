@@ -90,7 +90,7 @@
                 </Grid.RowDefinitions>
 
                 <Border Grid.Row="0" Grid.ColumnSpan="7" BorderBrush="#993AA9AD" BorderThickness="2" CornerRadius="5" Margin="0,0,0,0">
-                    <Grid>
+                    <Grid x:Name="HeaderGrid">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="0.5*" />
                             <ColumnDefinition Width="0.6*" />
@@ -123,71 +123,16 @@
                         <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Vertical" HorizontalAlignment="Left" Margin="5">
                             <TextBlock Text="Notatka" FontSize="18" FontWeight="SemiBold" Foreground="DarkSlateGray" Height="25" />
                         </StackPanel>
-
+                        
                         <StackPanel Grid.Row="0" Grid.Column="6" Orientation="Vertical" HorizontalAlignment="Left" Margin="5,5,10,5">
                             <TextBlock Text="Akcje" FontSize="18" FontWeight="SemiBold" Foreground="DarkSlateGray" Height="25" />
                         </StackPanel>
-
                     </Grid>
                 </Border>
                 <Border BorderBrush="#993AA9AD" BorderThickness="0,0,0,2" Grid.Row="1" Grid.ColumnSpan="7" MaxHeight="470">
                     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                        <ItemsControl x:Name="TransactionsList">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="0.5*" />
-                                            <ColumnDefinition Width="0.6*" />
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="0.8*" />
-                                            <ColumnDefinition Width="0.8*" />
-                                            <ColumnDefinition Width="0.7*" />
-                                            <ColumnDefinition Width="0.4*" />
-                                        </Grid.ColumnDefinitions>
-                                        <!-- Transaction Data -->
-                                        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Left" Margin="13,5,5,5">
-                                            <TextBlock Text="{Binding DateFormatted }" FontSize="18" FontWeight="SemiBold" />
-                                            <TextBlock Text="{Binding Time}" FontSize="16" Foreground="Gray" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Vertical" HorizontalAlignment="Left" Margin="8,5,5,5">
-                                            <TextBlock Text="{Binding UserName}" FontSize="18" FontWeight="SemiBold" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical" HorizontalAlignment="Left" Margin="8,5,5,5">
-                                            <TextBlock Text="{Binding CategoryName}" FontSize="18" FontWeight="SemiBold" />
-                                            <TextBlock Text="{Binding SubCategoryName}" FontSize="16" Foreground="Gray" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="3" Orientation="Vertical" HorizontalAlignment="Left" Margin="8,5,5,5">
-                                            <TextBlock Text="{Binding StoreName}" FontSize="18" FontWeight="SemiBold" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="4" Orientation="Vertical" HorizontalAlignment="Left" Margin="5,5,5,5">
-                                            <TextBlock Text="{Binding Amount}" FontSize="18" FontWeight="SemiBold" Foreground="Green" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="5" Orientation="Vertical" HorizontalAlignment="Left" Margin="5,5,5,5">
-                                            <TextBlock Text="{Binding Note}" FontSize="16" FontWeight="Normal" TextWrapping="Wrap" />
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Row="0" Grid.Column="6" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,5,5,5">
-                                            <Button Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5">
-                                                <Button.Content>
-                                                    <Image Source="pack://application:,,,/Resources/edit_green.png" Width="25" Height="25"/>
-                                                </Button.Content>
-                                            </Button>
-                                            <Button Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5">
-                                                <Button.Content>
-                                                    <Image Source="pack://application:,,,/Resources/delete_red.png" Width="25" Height="25"/>
-                                                </Button.Content>
-                                            </Button>
-                                        </StackPanel>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <StackPanel x:Name="TransactionsDataStackPanel">
+                        </StackPanel>
                     </ScrollViewer>
                 </Border>
             </Grid>

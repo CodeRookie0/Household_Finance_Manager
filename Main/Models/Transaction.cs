@@ -1,6 +1,7 @@
 ﻿using Main.Logic;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,5 +28,7 @@ namespace Main.Models
 
         public string DateFormatted => Date.ToString("yyyy-MM-dd");
         public string Time => Date.ToString("HH:mm");
+
+        public string FormattedAmount => Amount.ToString("C");
     }
 }
