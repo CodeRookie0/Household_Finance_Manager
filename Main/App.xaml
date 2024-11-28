@@ -225,7 +225,13 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <Border Background="{TemplateBinding Background}" 
+                        BorderBrush="{TemplateBinding BorderBrush}" 
+                        BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter HorizontalAlignment="Stretch" 
+                                      VerticalAlignment="Stretch" 
+                                      RecognizesAccessKey="True"/>
+                        </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

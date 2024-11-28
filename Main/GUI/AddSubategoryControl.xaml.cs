@@ -28,6 +28,7 @@ namespace Main.GUI
         private bool isEditMode = false;
         private int subcategoryIdToEdit = -1;
         private int categoryId = -1;
+        private string categoryName;
         public AddSubategoryControl(int loggedInUserId, MainWindow mainWindow, bool isEditMode, int subcategoryIdToEdit, int categoryId)
         {
             userId = loggedInUserId;
@@ -36,7 +37,8 @@ namespace Main.GUI
             this.subcategoryIdToEdit = subcategoryIdToEdit;
             this.categoryId = categoryId;
             InitializeComponent();
-            SelectedCategoryNameTextBoxPlaceholder.Content = Service.GetCategoryNameByCategoryID(categoryId);
+            categoryName= Service.GetCategoryNameByCategoryID(categoryId);
+            SelectedCategoryNameTextBoxPlaceholder.Content = categoryName;
             if (isEditMode)
             {
                 AddSubcategoryText.Visibility = Visibility.Collapsed;
@@ -80,17 +82,27 @@ namespace Main.GUI
             subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            TextBox subcategoryTextBox = new TextBox
+            Border textBoxBorder = new Border
             {
                 Width = 300,
                 Height = 45,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                FontSize = 16,
-                Foreground = Brushes.Black,
-                Padding = new Thickness(10,10,35,10),
-                Margin = new Thickness(10, 0, 10, 0),
+                Background = Brushes.White,
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(0.5)
             };
+
+
+            TextBox subcategoryTextBox = new TextBox
+            {
+                Margin = new Thickness(10, 0, 45, 0),
+                Height = 23.28,
+                BorderThickness = new Thickness(0),
+                Background = Brushes.Transparent,
+                FontSize = 16,
+                Foreground = Brushes.Black
+            };
+
+            textBoxBorder.Child = subcategoryTextBox;
 
             Label placeholderLabel = new Label
             {
@@ -136,11 +148,11 @@ namespace Main.GUI
                 subcategoryCount--;
             };
 
-            subcategoryGrid.Children.Add(subcategoryTextBox);
+            subcategoryGrid.Children.Add(textBoxBorder);
             subcategoryGrid.Children.Add(placeholderLabel);
             subcategoryGrid.Children.Add(deleteButton);
 
-            Grid.SetColumn(subcategoryTextBox, 1);
+            Grid.SetColumn(textBoxBorder, 1);
             Grid.SetColumn(placeholderLabel, 1);
             Grid.SetColumn(deleteButton, 2);
 
@@ -153,10 +165,55 @@ namespace Main.GUI
             string subcategoryName = SubcategoryNameTextBox.Text;
             int subcategoryId;
             int minNameLength = 3;
+            HashSet<string> subcategoryNames = new HashSet<string>();
 
             if (subcategoryName.Length < minNameLength)
             {
                 MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            subcategoryNames.Add(subcategoryName);
+
+            if (subcategoryCount > 0)
+            {
+                foreach (UIElement element in SubcategoryContainer.Children)
+                {
+                    if (element is Grid subcategoryGrid)
+                    {
+                        foreach (UIElement child in subcategoryGrid.Children)
+                        {
+                            if (child is Border subcategoryBorder && subcategoryBorder.Child is TextBox subcategoryTextBox)
+                            {
+                                string addedSubcategoryName = subcategoryTextBox.Text;
+
+                                if (addedSubcategoryName.Length < minNameLength)
+                                {
+                                    MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+
+                                if (Service.IsSubcategoryPresentInDefaultOrFamily(userId, categoryName, addedSubcategoryName))
+                                {
+                                    MessageBox.Show("Kategoria '" + categoryName + "' już zawiera podkategorię o tej nazwie : '"+addedSubcategoryName +"'.", "Informacja", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+
+                                if (subcategoryNames.Contains(addedSubcategoryName))
+                                {
+                                    MessageBox.Show("Wprowadzono dwie podkategorie o tej samej nazwie '" + addedSubcategoryName + "'. Proszę podać unikalne nazwy dla każdej podkategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+                                subcategoryNames.Add(addedSubcategoryName);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (Service.IsSubcategoryPresentInDefaultOrFamily(userId, categoryName, subcategoryName))
+            {
+                MessageBox.Show("Kategoria '" + categoryName + "' już zawiera podkategorię o tej nazwie : '" + subcategoryName + "'.", "Informacja", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -197,15 +254,9 @@ namespace Main.GUI
                    {
                        foreach (UIElement child in subcategoryGrid.Children)
                        {
-                           if (child is TextBox subcategoryTextBox)
-                           {
+                            if (child is Border subcategoryBorder && subcategoryBorder.Child is TextBox subcategoryTextBox)
+                            {
                                subcategoryName = subcategoryTextBox.Text;
-
-                               if (subcategoryName.Length < minNameLength)
-                               {
-                                   MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                                   return;
-                               }
 
                                subcategoryAdded = Service.AddSubcategory(categoryId, subcategoryName, userId);
                                if (!subcategoryAdded)

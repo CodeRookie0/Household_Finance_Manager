@@ -24,18 +24,43 @@ namespace Main.GUI
     {
         private MainWindow mainWindow;
         private readonly int userId;
+        private int roleId;
         public CategoriesControl(int loggedInUserId, MainWindow mainWindow)
         {
             userId = loggedInUserId;
             this.mainWindow = mainWindow;
             InitializeComponent();
+            roleId = Service.GetRoleIDByUserID(userId);
             LoadCategories();
         }
         private void LoadCategories()
         {
-            List<Category> categories = Service.GetCategories(userId);
+            List<Category> defaultCategories = Service.GetDefaultCategories();
 
-            foreach (var category in categories)
+            int familyId=Service.GetFamilyIdByMemberId(userId);
+            List<Category> familyCategories;
+            if (familyId > 0)
+            {
+                familyCategories = Service.GetFamilyCategories(familyId);
+            }
+            else
+            {
+                familyCategories = Service.GetUserCategories(userId);
+            }
+
+            List<Category> allCategories = new List<Category>();
+
+            foreach (var category in defaultCategories)
+            {
+                allCategories.Add(category);
+            }
+
+            foreach (var category in familyCategories)
+            {
+                allCategories.Add(category);
+            }
+
+            foreach (var category in allCategories)
             {
                 Expander expander = new Expander
                 {
@@ -132,121 +157,7 @@ namespace Main.GUI
 
                 if (category.UserID != -1)
                 {
-                    var editButton = new Button
-                    {
-                        Content = new Image
-                        {
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/edit_green.png")),
-                            Width = 25,
-                            Height = 25
-                        },
-                        Background = Brushes.Transparent,
-                        BorderBrush = Brushes.Transparent,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Padding = new Thickness(5)
-                    };
-
-                    var deleteButton = new Button
-                    {
-                        Content = new Image
-                        {
-                            Source = new BitmapImage(new Uri("pack://application:,,,/Resources/delete_red.png")),
-                            Width = 25,
-                            Height = 25
-                        },
-                        Background = Brushes.Transparent,
-                        BorderBrush = Brushes.Transparent,
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Padding = new Thickness(5)
-                    };
-
-                    var headerGrid = expander.Header as Grid;
-                    if (headerGrid != null)
-                    {
-                        headerGrid.Width = 1060;
-                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
-                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) }); 
-                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
-
-                        var categoryTextBlock = (TextBlock)headerGrid.Children[0];
-                        Grid.SetColumn(categoryTextBlock, 0);
-
-                        Grid.SetColumn(editButton, 1);
-                        headerGrid.Children.Add(editButton);
-
-                        Grid.SetColumn(deleteButton, 2);
-                        headerGrid.Children.Add(deleteButton);
-
-                        Grid.SetColumn(favoriteButton, 3);
-                        headerGrid.Children.Add(favoriteButton);
-                    }
-
-                    editButton.Click += (sender, e) =>
-                    {
-                        AddCategoryControl addCategoryControl = new AddCategoryControl(userId, mainWindow,true,category.CategoryID);
-                        addCategoryControl.Show();
-                    };
-
-                    deleteButton.Click += (sender, e) =>
-                    {
-                        var result = MessageBox.Show("Czy na pewno chcesz usunąć tę kategorię : "+category.CategoryName+"?\n" + "Wszystkie podkategorie zostaną usunięte razem z kategorią, a transakcje powiązane z nią będą miały kategorię 'Brak kategorii'.", "Potwierdzenie usunięcia",MessageBoxButton.YesNo,MessageBoxImage.Warning);
-
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            bool categoryDeleted = Service.DeleteCategory(category.CategoryID);
-
-                            if (categoryDeleted)
-                            {
-                                MessageBox.Show("Kategoria i podkategorie zostały pomyślnie usunięte.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-                                mainWindow.CategoriesButton_Click(sender, e);
-                            }
-                            else
-                            {
-                                MessageBox.Show("Wystąpił błąd podczas usuwania kategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                            }
-                        }
-                    };
-                }
-                else
-                {
-                    var headerGrid = expander.Header as Grid;
-                    if (headerGrid != null)
-                    {
-                        headerGrid.Width = 1060;
-                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
-
-                        var categoryTextBlock = (TextBlock)headerGrid.Children[0];
-                        Grid.SetColumn(categoryTextBlock, 0);
-
-                        Grid.SetColumn(favoriteButton, 1);
-                        headerGrid.Children.Add(favoriteButton);
-                    }
-                }
-
-                List<Subcategory> subcategories = Service.GetSubcategoriesByCategoryId(userId, category.CategoryID);
-
-                StackPanel subcategoryPanel = new StackPanel { Margin = new Thickness(50, 0, 17, 0) };
-                foreach (var subcategory in subcategories)
-                {
-                    var subcategoryGrid = new Grid
-                    {
-                        Height = 50,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-
-                    subcategoryGrid.Children.Add(new TextBlock
-                    {
-                        Text = subcategory.SubcategoryName,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Padding = new Thickness(5, 20, 10, 20),
-                        HorizontalAlignment = HorizontalAlignment.Left
-                    });
-
-                    if (subcategory.UserID != -1)
+                    if (category.UserID == userId || roleId == 1)
                     {
                         var editButton = new Button
                         {
@@ -278,46 +189,188 @@ namespace Main.GUI
                             Padding = new Thickness(5)
                         };
 
-                        subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                        subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
-                        subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+                        var headerGrid = expander.Header as Grid;
+                        if (headerGrid != null)
+                        {
+                            headerGrid.Width = 1060;
+                            headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+                            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+                            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
 
-                        var subcategoryTextBlock = (TextBlock)subcategoryGrid.Children[0];
-                        Grid.SetColumn(subcategoryTextBlock, 0);
+                            var categoryTextBlock = (TextBlock)headerGrid.Children[0];
+                            Grid.SetColumn(categoryTextBlock, 0);
 
-                        Grid.SetColumn(editButton, 1);
-                        subcategoryGrid.Children.Add(editButton);
+                            Grid.SetColumn(editButton, 1);
+                            headerGrid.Children.Add(editButton);
 
-                        Grid.SetColumn(deleteButton, 2);
-                        subcategoryGrid.Children.Add(deleteButton);
+                            Grid.SetColumn(deleteButton, 2);
+                            headerGrid.Children.Add(deleteButton);
+
+                            Grid.SetColumn(favoriteButton, 3);
+                            headerGrid.Children.Add(favoriteButton);
+                        }
 
                         editButton.Click += (sender, e) =>
                         {
-                            AddSubategoryControl addSubategoryControl = new AddSubategoryControl(userId, mainWindow, true, subcategory.SubcategoryID,category.CategoryID);
-                            addSubategoryControl.Show();
+                            AddCategoryControl addCategoryControl = new AddCategoryControl(userId, mainWindow, true, category.CategoryID);
+                            addCategoryControl.Show();
                         };
 
                         deleteButton.Click += (sender, e) =>
                         {
-                            var result = MessageBox.Show("Czy na pewno chcesz usunąć tę podkategorię : "+subcategory.SubcategoryName+"?\n" + "Transakcje powiązane z nią będą miały kategorię 'Brak kategorii'.", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                            var result = MessageBox.Show("Czy na pewno chcesz usunąć tę kategorię : " + category.CategoryName + "?\n" + "Wszystkie podkategorie zostaną usunięte razem z kategorią, a transakcje powiązane z nią nie będą miały przypisanej żadnej kategorii", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
                             if (result == MessageBoxResult.Yes)
                             {
-                                bool categoryDeleted = Service.DeleteSubcategory(subcategory.SubcategoryID);
+                                bool categoryDeleted = Service.DeleteCategory(category.CategoryID);
 
                                 if (categoryDeleted)
                                 {
-                                    MessageBox.Show("Podkategoria została pomyślnie usunięta.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                                    MessageBox.Show("Kategoria i podkategorie zostały pomyślnie usunięte.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                                     mainWindow.CategoriesButton_Click(sender, e);
                                 }
                                 else
                                 {
-                                    MessageBox.Show("Wystąpił błąd podczas usuwania podkategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    MessageBox.Show("Wystąpił błąd podczas usuwania kategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                                 }
                             }
                         };
                     }
+                    else if (category.UserID != userId && roleId == 2)
+                    {
+                        var headerGrid = expander.Header as Grid;
+                        if (headerGrid != null)
+                        {
+                            headerGrid.Width = 1060;
+                            headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
 
+                            var categoryTextBlock = (TextBlock)headerGrid.Children[0];
+                            Grid.SetColumn(categoryTextBlock, 0);
+
+                            Grid.SetColumn(favoriteButton, 3);
+                            headerGrid.Children.Add(favoriteButton);
+                        }
+                    }
+                }
+                else
+                {
+                    var headerGrid = expander.Header as Grid;
+                    if (headerGrid != null)
+                    {
+                        headerGrid.Width = 1060;
+                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                        headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+
+                        var categoryTextBlock = (TextBlock)headerGrid.Children[0];
+                        Grid.SetColumn(categoryTextBlock, 0);
+
+                        Grid.SetColumn(favoriteButton, 1);
+                        headerGrid.Children.Add(favoriteButton);
+                    }
+                }
+
+                List<Subcategory> subcategories = Service.GetSubcategoriesByCategoryId(category.CategoryID);
+
+                StackPanel subcategoryPanel = new StackPanel { Margin = new Thickness(50, 0, 17, 0) };
+                foreach (var subcategory in subcategories)
+                {
+                    var subcategoryGrid = new Grid
+                    {
+                        Height = 50,
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+
+                    subcategoryGrid.Children.Add(new TextBlock
+                    {
+                        Text = subcategory.SubcategoryName,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Padding = new Thickness(5, 20, 10, 20),
+                        HorizontalAlignment = HorizontalAlignment.Left
+                    });
+
+                    if (subcategory.UserID != -1)
+                    {
+                        if (subcategory.UserID == userId || roleId == 1)
+                        {
+                            var editButton = new Button
+                            {
+                                Content = new Image
+                                {
+                                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/edit_green.png")),
+                                    Width = 25,
+                                    Height = 25
+                                },
+                                Background = Brushes.Transparent,
+                                BorderBrush = Brushes.Transparent,
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Center,
+                                Padding = new Thickness(5)
+                            };
+
+                            var deleteButton = new Button
+                            {
+                                Content = new Image
+                                {
+                                    Source = new BitmapImage(new Uri("pack://application:,,,/Resources/delete_red.png")),
+                                    Width = 25,
+                                    Height = 25
+                                },
+                                Background = Brushes.Transparent,
+                                BorderBrush = Brushes.Transparent,
+                                HorizontalAlignment = HorizontalAlignment.Left,
+                                VerticalAlignment = VerticalAlignment.Center,
+                                Padding = new Thickness(5)
+                            };
+
+                            subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                            subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+                            subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(45) });
+
+                            var subcategoryTextBlock = (TextBlock)subcategoryGrid.Children[0];
+                            Grid.SetColumn(subcategoryTextBlock, 0);
+
+                            Grid.SetColumn(editButton, 1);
+                            subcategoryGrid.Children.Add(editButton);
+
+                            Grid.SetColumn(deleteButton, 2);
+                            subcategoryGrid.Children.Add(deleteButton);
+
+                            editButton.Click += (sender, e) =>
+                            {
+                                AddSubategoryControl addSubategoryControl = new AddSubategoryControl(userId, mainWindow, true, subcategory.SubcategoryID, category.CategoryID);
+                                addSubategoryControl.Show();
+                            };
+
+                            deleteButton.Click += (sender, e) =>
+                            {
+                                var result = MessageBox.Show("Czy na pewno chcesz usunąć tę podkategorię : " + subcategory.SubcategoryName + "?\n" + "Transakcje powiązane z nią będą miały kategorię 'Brak kategorii'.", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                                if (result == MessageBoxResult.Yes)
+                                {
+                                    bool categoryDeleted = Service.DeleteSubcategory(subcategory.SubcategoryID);
+
+                                    if (categoryDeleted)
+                                    {
+                                        MessageBox.Show("Podkategoria została pomyślnie usunięta.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                                        mainWindow.CategoriesButton_Click(sender, e);
+                                    }
+                                    else
+                                    {
+                                        MessageBox.Show("Wystąpił błąd podczas usuwania podkategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    }
+                                }
+                            };
+                        }
+                        else if (subcategory.UserID != userId && roleId == 2)
+                        {
+                            subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition());
+
+                            var subcategoryTextBlock = (TextBlock)subcategoryGrid.Children[0];
+                            Grid.SetColumn(subcategoryTextBlock, 0);
+                        }
+                    }
                     subcategoryPanel.Children.Add(subcategoryGrid);
                 }
 

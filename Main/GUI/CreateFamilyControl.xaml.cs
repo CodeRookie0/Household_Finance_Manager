@@ -37,10 +37,17 @@ namespace Main.GUI
         private void SubmitButton_Click(object sender, RoutedEventArgs e)
         {
             familyName = FamilyNameTextBox.Text.Trim();
+            int minNameLength = 3;
 
             if (string.IsNullOrWhiteSpace(familyName))
             {
                 MessageBox.Show("Nazwa rodziny nie może być pusta.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (familyName.Length < 3)
+            {
+                MessageBox.Show("Nazwa rodziny musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

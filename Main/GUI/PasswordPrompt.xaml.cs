@@ -35,7 +35,6 @@ namespace Main.GUI
         {
             EnteredPassword = PasswordInput.Password;
             this.DialogResult = true;
-            this.Close();
         }
 
         private void Grid_MouseDown(object sender, MouseButtonEventArgs e)

@@ -26,6 +26,8 @@ namespace Main.GUI
     {
         private MainWindow mainWindow;
         private readonly int userId;
+        private int failedAttempts = 0;
+        private DateTime? blockUntil = null;
         public FamilyMembersControl(int loggedInUserId, MainWindow mainWindow)
         {
             userId = loggedInUserId;
@@ -130,6 +132,13 @@ namespace Main.GUI
 
         private void LeaveFamilyButton_Click(object sender, RoutedEventArgs e)
         {
+            if (blockUntil.HasValue && DateTime.Now < blockUntil.Value)
+            {
+                var remainingTime = blockUntil.Value - DateTime.Now;
+                MessageBox.Show($"Za dużo nieudanych prób. Spróbuj ponownie za {remainingTime.Seconds} sekundy.", "Blokada", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             PasswordPrompt passwordWindow = new PasswordPrompt();
             bool? result = passwordWindow.ShowDialog();
 
@@ -160,10 +169,19 @@ namespace Main.GUI
                 }
                 else
                 {
-                    MessageBox.Show("Wprowadzone hasło jest niepoprawne. Spróbuj ponownie.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    failedAttempts++;
+
+                    if (failedAttempts >= 3)
+                    {
+                        blockUntil = DateTime.Now.AddSeconds(30);
+                        MessageBox.Show("Wprowadzone hasło jest niepoprawne. Za dużo prób. Spróbuj ponownie za 30 sekund.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Wprowadzone hasło jest niepoprawne. Spróbuj ponownie.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
-            mainWindow.FamilyMembersButton_Click(sender, e);
         }
 
         private void RemoveFamilyMember_Click(object sender, RoutedEventArgs e)

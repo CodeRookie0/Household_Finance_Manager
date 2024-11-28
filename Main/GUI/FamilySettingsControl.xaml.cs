@@ -30,6 +30,9 @@ namespace Main.GUI
         private string familyCreatedAt;
         private readonly DispatcherTimer codeDisplayTimer;
         private readonly RotateTransform rotateTransform;
+        public string newFamilyName { get; private set; }
+        private int failedAttempts = 0; 
+        private DateTime? blockUntil = null;
         public FamilySettingsControl(int loggedInUserId,int userFamilyId,MainWindow mainWindow)
         {
             userId = loggedInUserId;
@@ -123,6 +126,15 @@ namespace Main.GUI
 
         private void SaveChangesButton_Click(object sender, RoutedEventArgs e)
         {
+            newFamilyName = FamilyNameInput.Text.Trim();
+            int minNameLength = 3;
+
+            if (newFamilyName.Length < 3)
+            {
+                MessageBox.Show("Nazwa rodziny musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             if (Service.UpdateFamilyName(familyId, FamilyNameInput.Text))
             {
                 familyName = Service.GetFamilyNameByFamilyId(familyId);
@@ -140,6 +152,13 @@ namespace Main.GUI
 
         private void DeleteFamilyButton_Click(object sender, RoutedEventArgs e)
         {
+            if (blockUntil.HasValue && DateTime.Now < blockUntil.Value)
+            {
+                var remainingTime = blockUntil.Value - DateTime.Now;
+                MessageBox.Show($"Za dużo nieudanych prób. Spróbuj ponownie za {remainingTime.Seconds} sekundy.", "Blokada", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             PasswordPrompt passwordWindow = new PasswordPrompt();
             bool? result = passwordWindow.ShowDialog();
 
@@ -171,7 +190,17 @@ namespace Main.GUI
                 }
                 else
                 {
-                    MessageBox.Show("Wprowadzone hasło jest niepoprawne. Spróbuj ponownie.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    failedAttempts++; 
+                    Console.WriteLine(failedAttempts.ToString());
+                    if (failedAttempts >= 3)
+                    {
+                        blockUntil = DateTime.Now.AddSeconds(30);
+                        MessageBox.Show("Wprowadzone hasło jest niepoprawne. Za dużo prób. Spróbuj ponownie za 30 sekund.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Wprowadzone hasło jest niepoprawne. Spróbuj ponownie.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
         }

@@ -75,17 +75,27 @@ namespace Main.GUI
             subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             subcategoryGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            TextBox subcategoryTextBox = new TextBox
+            Border textBoxBorder = new Border
             {
                 Width = 280,
                 Height = 45,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                FontSize = 16,
-                Foreground = Brushes.Black,
-                Padding = new Thickness(10,10,35,10),
-                Margin = new Thickness(20, 0, 0, 0)
+                Margin = new Thickness(20, 0, 0, 0),
+                Background = Brushes.White,
+                BorderBrush = Brushes.Gray,
+                BorderThickness = new Thickness(0.5)
             };
+
+            TextBox subcategoryTextBox = new TextBox
+            {
+                Margin = new Thickness(10, 0, 45, 0),
+                Height = 23.28,
+                BorderThickness = new Thickness(0),
+                Background = Brushes.Transparent,
+                FontSize = 16,
+                Foreground = Brushes.Black
+            };
+
+            textBoxBorder.Child = subcategoryTextBox;
 
             Label placeholderLabel = new Label
             {
@@ -131,11 +141,11 @@ namespace Main.GUI
                 subcategoryCount--;
             };
 
-            subcategoryGrid.Children.Add(subcategoryTextBox);
+            subcategoryGrid.Children.Add(textBoxBorder);
             subcategoryGrid.Children.Add(placeholderLabel);
             subcategoryGrid.Children.Add(deleteButton);
 
-            Grid.SetColumn(subcategoryTextBox, 1);
+            Grid.SetColumn(textBoxBorder, 1);
             Grid.SetColumn(placeholderLabel, 1);
             Grid.SetColumn(deleteButton, 2);
 
@@ -145,13 +155,50 @@ namespace Main.GUI
 
         private void AddCategoryButton_Click(object sender, RoutedEventArgs e)
         {
-            string categoryName = CategoryNameTextBox.Text;
+            string categoryName = CategoryNameTextBox.Text.Trim();
             int categoryId;
             int minNameLength = 3;
+            HashSet<string> subcategoryNames = new HashSet<string>();
 
             if (categoryName.Length < minNameLength)
             {
                 MessageBox.Show("Nazwa kategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (subcategoryCount > 0)
+            {
+                foreach (UIElement element in SubcategoryContainer.Children)
+                {
+                    if (element is Grid subcategoryGrid)
+                    {
+                        foreach (UIElement child in subcategoryGrid.Children)
+                        {
+                            if (child is Border subcategoryBorder && subcategoryBorder.Child is TextBox subcategoryTextBox)
+                            {
+                                string subcategoryName = subcategoryTextBox.Text.Trim();
+
+                                if (subcategoryName.Length < minNameLength)
+                                {
+                                    MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+
+                                if (subcategoryNames.Contains(subcategoryName))
+                                {
+                                    MessageBox.Show("Wprowadzono dwie podkategorie o tej samej nazwie '" + subcategoryName + "'. Proszę podać unikalne nazwy dla każdej podkategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    return;
+                                }
+                                subcategoryNames.Add(subcategoryName);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (Service.IsCategoryPresentInDefaultOrFamily(userId, categoryName))
+            {
+                MessageBox.Show("Kategoria o tej nazwie już znajduje się na liście.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -186,16 +233,9 @@ namespace Main.GUI
                                 {
                                     foreach (UIElement child in subcategoryGrid.Children)
                                     {
-                                        if (child is TextBox subcategoryTextBox)
+                                        if (child is Border subcategoryBorder && subcategoryBorder.Child is TextBox subcategoryTextBox)
                                         {
                                             string subcategoryName = subcategoryTextBox.Text;
-
-                                            if (subcategoryName.Length < minNameLength)
-                                            {
-                                                MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
-                                                return;
-                                            }
-
                                             bool subcategoryAdded = Service.AddSubcategory(categoryId, subcategoryName, userId);
                                             if (!subcategoryAdded)
                                             {
@@ -212,6 +252,7 @@ namespace Main.GUI
                             mainWindow.CategoriesButton_Click(sender, e);
                             CategoryNameTextBox.Text = "";
                             SubcategoryContainer.Children.Clear();
+                            this.Close();
                         }
                         else
                         {
@@ -220,10 +261,11 @@ namespace Main.GUI
                     }
                     else
                     {
-                        MessageBox.Show("Kategoria zostaa pomyślnie dodana.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Kategoria została pomyślnie dodana.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                         mainWindow.CategoriesButton_Click(sender, e);
                         CategoryNameTextBox.Text = "";
                         SubcategoryContainer.Children.Clear();
+                        this.Close();
                     }
                 }
                 else

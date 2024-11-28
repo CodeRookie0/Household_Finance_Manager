@@ -40,11 +40,34 @@ namespace Main.GUI
         {
             var transactions = Service.GetUserTransactions(userId);
             TransactionsList.ItemsSource = transactions;
-           
 
-            var categories = Service.GetCategories(userId); 
-            CategoryComboBox.ItemsSource = categories;
-            categoryList = categories;
+            List<Category> defaultCategories = Service.GetDefaultCategories();
+
+            int familyId = Service.GetFamilyIdByMemberId(userId);
+            List<Category> familyCategories;
+            if (familyId > 0)
+            {
+                familyCategories = Service.GetFamilyCategories(familyId);
+            }
+            else
+            {
+                familyCategories = Service.GetUserCategories(userId);
+            }
+
+            List<Category> allCategories = new List<Category>();
+
+            foreach (var category in defaultCategories)
+            {
+                allCategories.Add(category);
+            }
+
+            foreach (var category in familyCategories)
+            {
+                allCategories.Add(category);
+            }
+
+            CategoryComboBox.ItemsSource = allCategories;
+            categoryList = allCategories;
 
             var stores = Service.GetUserStores(userId);
             StoreComboBox.ItemsSource = stores;

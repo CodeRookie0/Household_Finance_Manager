@@ -229,6 +229,105 @@ namespace Main.Logic
             }
         }
 
+        public static bool IsCategoryPresentInDefaultOrFamily(int userId, string categoryName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT COUNT(*) FROM Categories WHERE UserID IS NULL AND CategoryName = @CategoryName";
+                var result = database.ExecuteQuery(selectQuery,
+                        new SqliteParameter("@CategoryName", categoryName));
+                int count = Convert.ToInt32(result.Rows[0][0]);
+                if (count > 0)
+                {
+                    return true;
+                }
+            }
+
+            int familyId = GetFamilyIdByMemberId(userId);
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT COUNT(*) FROM Categories WHERE UserID = @UserID AND CategoryName = @CategoryName";
+                foreach (var familyMember in familyMembers)
+                {
+                    var result = database.ExecuteQuery(selectQuery,
+                            new SqliteParameter("@CategoryName", categoryName),
+                            new SqliteParameter("@UserID", familyMember.UserID));
+                    int count = Convert.ToInt32(result.Rows[0][0]);
+
+                    if (count > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public static bool IsSubcategoryPresentInDefaultOrFamily(int userId, string categoryName, string subcategoryName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string getCategoryIdQuery = "SELECT CategoryID FROM Categories WHERE UserID IS NULL AND CategoryName = @CategoryName";
+                var categoryResult = database.ExecuteQuery(getCategoryIdQuery,
+                        new SqliteParameter("@CategoryName", categoryName));
+
+                if (categoryResult.Rows.Count > 0)
+                {
+                    int categoryId = Convert.ToInt32(categoryResult.Rows[0]["CategoryID"]);
+
+                    string subcategoryQuery = "SELECT COUNT(*) FROM Subcategories WHERE CategoryID = @CategoryID AND SubcategoryName = @SubcategoryName";
+                    var subcategoryResult = database.ExecuteQuery(subcategoryQuery,
+                            new SqliteParameter("@CategoryID", categoryId),
+                            new SqliteParameter("@SubcategoryName", subcategoryName));
+                    int subcategoryCount = Convert.ToInt32(subcategoryResult.Rows[0][0]);
+                    return subcategoryCount > 0;
+                }
+            }
+
+            int familyId = GetFamilyIdByMemberId(userId);
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT COUNT(*) FROM Categories WHERE UserID = @UserID AND CategoryName = @CategoryName";
+                foreach (var familyMember in familyMembers)
+                {
+                    var result = database.ExecuteQuery(selectQuery,
+                            new SqliteParameter("@CategoryName", categoryName),
+                            new SqliteParameter("@UserID", familyMember.UserID));
+                    int count = Convert.ToInt32(result.Rows[0][0]);
+
+                    if (count > 0)
+                    {
+                        string getCategoryIdQueryFamily = "SELECT CategoryID FROM Categories WHERE UserID = @UserID AND CategoryName = @CategoryName";
+                        var categoryResultFamily = database.ExecuteQuery(getCategoryIdQueryFamily,
+                                new SqliteParameter("@CategoryName", categoryName),
+                                new SqliteParameter("@UserID", familyMember.UserID));
+
+                        if (categoryResultFamily.Rows.Count > 0)
+                        {
+                            int categoryId = Convert.ToInt32(categoryResultFamily.Rows[0]["CategoryID"]);
+
+                            string subcategoryQuery = "SELECT COUNT(*) FROM Subcategories WHERE CategoryID = @CategoryID AND SubcategoryName = @SubcategoryName";
+                            var subcategoryResult = database.ExecuteQuery(subcategoryQuery,
+                                    new SqliteParameter("@CategoryID", categoryId),
+                                    new SqliteParameter("@SubcategoryName", subcategoryName));
+                            int subcategoryCount = Convert.ToInt32(subcategoryResult.Rows[0][0]);
+                            if (subcategoryCount > 0)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+
         // Add Methods
         public static bool AddUser(string userName, string email, string password, string Salt)
         {
@@ -662,16 +761,42 @@ namespace Main.Logic
             }
             return joinRequests;
         }
-        public static List<Category> GetCategories(int userId)
+
+        public static List<Category> GetUserCategories(int userId)
         {
             List<Category> categories = new List<Category>();
             using (DBSqlite database = new DBSqlite())
             {
                 string query = "SELECT Categories.CategoryID, Categories.CategoryName, Categories.UserID " +
                                "FROM Categories " +
-                               "WHERE Categories.UserID = @UserID OR Categories.UserID IS NULL";
+                               "WHERE Categories.UserID = @UserID";
 
                 DataTable result = database.ExecuteQuery(query, new SqliteParameter("@UserID", userId));
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Category category = new Category
+                    {
+                        CategoryID = Convert.ToInt32(row["CategoryID"]),
+                        CategoryName = row["CategoryName"].ToString(),
+                        UserID = row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"])
+                    };
+                    categories.Add(category);
+                }
+            }
+            return categories;
+        }
+
+        public static List<Category> GetDefaultCategories()
+        {
+            List<Category> categories = new List<Category>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT Categories.CategoryID, Categories.CategoryName, Categories.UserID " +
+                               "FROM Categories " +
+                               "WHERE Categories.UserID IS NULL";
+
+                DataTable result = database.ExecuteQuery(query);
 
                 foreach (DataRow row in result.Rows)
                 {
@@ -695,7 +820,7 @@ namespace Main.Logic
             foreach (FamilyMember member in familyMembers)
             {
                 int userId = member.UserID;
-                List<Category> userCategories = GetCategories(userId);
+                List<Category> userCategories = GetUserCategories(userId);
 
                 foreach (Category category in userCategories)
                 {
@@ -708,7 +833,7 @@ namespace Main.Logic
             return familyCategories;
         }
 
-        public static List<Subcategory> GetSubcategoriesByCategoryId(int userId,int categoryId)
+        public static List<Subcategory> GetSubcategoriesByCategoryId(int categoryId)
         {
             List<Subcategory> subcategories = new List<Subcategory>();
 
@@ -717,9 +842,9 @@ namespace Main.Logic
                 string query = "SELECT Subcategories.SubcategoryID, Subcategories.SubcategoryName, " +
                                "Subcategories.CategoryID, Subcategories.UserID " +
                                "FROM Subcategories " +
-                               "WHERE (Subcategories.UserID = @UserID OR Subcategories.UserID IS NULL) AND Subcategories.CategoryID=@CategoryID";
+                               "WHERE Subcategories.CategoryID=@CategoryID";
 
-                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@UserID", userId), new SqliteParameter("@CategoryID", categoryId));
+                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@CategoryID", categoryId));
 
                 foreach (DataRow row in result.Rows)
                 {

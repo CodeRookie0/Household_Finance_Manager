@@ -37,6 +37,7 @@ namespace Main.GUI
                 StoresBorder.Visibility = Visibility.Collapsed;
                 LimitsBorder.Visibility = Visibility.Collapsed;
                 RecurringPaymentsBorder.Visibility = Visibility.Collapsed;
+                FamilyTransactionsBorder.Visibility = Visibility.Collapsed;
             }
 
             buttonActiveStates[TransactionsButton] = false;
@@ -72,6 +73,7 @@ namespace Main.GUI
         private void MyTransactionsButton_Click(object sender, RoutedEventArgs e)
         {
             ResetButtonStyles();
+            buttonActiveStates[TransactionsButton] = true;
             TransactionsBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4EB1B6"));
             TransactionsTextBlock.Foreground = Brushes.White;
             ArrowImage.Source = new BitmapImage(new Uri("../Resources/arrow_down_white.png", UriKind.Relative));
@@ -86,6 +88,7 @@ namespace Main.GUI
         private void FamilyTransactionsButton_Click(object sender, RoutedEventArgs e)
         {
             ResetButtonStyles();
+            buttonActiveStates[TransactionsButton] = true;
             TransactionsBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#4EB1B6"));
             TransactionsTextBlock.Foreground = Brushes.White;
             ArrowImage.Source = new BitmapImage(new Uri("../Resources/arrow_down_white.png", UriKind.Relative));
