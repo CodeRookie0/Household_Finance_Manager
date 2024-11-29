@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Main.Models;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Main.Logic
 {
@@ -949,6 +950,79 @@ namespace Main.Logic
             return transactions;
         }
 
+        public static List<Transaction> GetFilteredUserTransactions(int? userId = null,DateTime? dateFrom = null,DateTime? dateTo = null,int? categoryId = null,int? storeId = null,int? transactionTypeId = null,double? amountFrom = null,double? amountTo = null)
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT TransactionID, UserID, Amount, TransactionTypeID, CategoryID, SubcategoryID, StoreID, Note, Date FROM Transactions WHERE 1 = 1";
+                List<SqliteParameter> parameters = new List<SqliteParameter>();
+
+                if (userId.HasValue)
+                {
+                    query += " AND UserID = @UserId";
+                    parameters.Add(new SqliteParameter("@UserId", userId.Value));
+                }
+                if (dateFrom.HasValue)
+                {
+                    DateTime startDate = dateFrom.Value.Date;
+                    query += " AND Date >= @DateFrom";
+                    parameters.Add(new SqliteParameter("@DateFrom", startDate));
+                }
+                if (dateTo.HasValue)
+                {
+                    DateTime endDate = dateTo.Value.Date.AddDays(1).AddTicks(-1);
+                    query += " AND Date <= @DateTo";
+                    parameters.Add(new SqliteParameter("@DateTo", endDate));
+                }
+                if (categoryId.HasValue)
+                {
+                    query += " AND CategoryID = @CategoryID";
+                    parameters.Add(new SqliteParameter("@CategoryID", categoryId.Value));
+                }
+                if (storeId.HasValue)
+                {
+                    query += " AND StoreID = @StoreID";
+                    parameters.Add(new SqliteParameter("@StoreID", storeId.Value));
+                }
+                if (transactionTypeId.HasValue)
+                {
+                    query += " AND TransactionTypeID = @TransactionTypeID";
+                    parameters.Add(new SqliteParameter("@TransactionTypeID", transactionTypeId.Value));
+                }
+                if (amountFrom.HasValue)
+                {
+                    query += " AND Amount >= @AmountFrom";
+                    parameters.Add(new SqliteParameter("@AmountFrom", amountFrom.Value));
+                }
+                if (amountTo.HasValue)
+                {
+                    query += " AND Amount <= @AmountTo";
+                    parameters.Add(new SqliteParameter("@AmountTo", amountTo.Value));
+                }
+
+                DataTable result = database.ExecuteQuery(query, parameters.ToArray());
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Transaction transaction = new Transaction
+                    {
+                        TransactionID = row["TransactionID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionID"]),
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        Amount = row["Amount"] == DBNull.Value ? 0.0m : Convert.ToDecimal(row["Amount"]),
+                        TransactionTypeID = row["TransactionTypeID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionTypeID"]),
+                        CategoryID = row["CategoryID"] == DBNull.Value ? -1 : Convert.ToInt32(row["CategoryID"]),
+                        SubcategoryID = row["SubcategoryID"] == DBNull.Value ? -1 : Convert.ToInt32(row["SubcategoryID"]),
+                        StoreID = row["StoreID"] == DBNull.Value ? -1 : Convert.ToInt32(row["StoreID"]),
+                        Note = row["Note"] == DBNull.Value ? null : Convert.ToString(row["Note"]),
+                        Date = row["Date"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["Date"])
+                    };
+                    transactions.Add(transaction);
+                }
+            }
+            return transactions;
+        }
+
         public static List<Transaction> GetFamilyTransactions(int familyId)
         {
             List<Transaction> familyTransactions = new List<Transaction>();
@@ -964,6 +1038,40 @@ namespace Main.Logic
                     if (!familyTransactions.Any(s => s.TransactionID == transaction.TransactionID))
                     {
                         familyTransactions.Add(transaction);
+                    }
+                }
+            }
+            return familyTransactions;
+        }
+        public static List<Transaction> GetFilteredFamilyTransactions(int familyId, int? filterUserId = null, DateTime? startDate = null, DateTime? endDate = null, int? categoryId = null, int? storeId = null, int? transactionTypeId = null, double? amountFrom = null, double? amountTo = null)
+        {
+            List<Transaction> familyTransactions = new List<Transaction>();
+
+            if (filterUserId.HasValue)
+            {
+                int userId = filterUserId.Value;
+                List<Transaction> userTransactions = GetFilteredUserTransactions(userId: userId, dateFrom: startDate, dateTo: endDate, categoryId: categoryId, storeId: storeId, transactionTypeId: transactionTypeId, amountFrom: amountFrom, amountTo: amountTo);
+
+                foreach (Transaction transaction in userTransactions)
+                {
+                    familyTransactions.Add(transaction);
+                }
+            }
+            else
+            {
+                List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+                foreach (FamilyMember member in familyMembers)
+                {
+                    int userId = member.UserID;
+                    List<Transaction> userTransactions = GetFilteredUserTransactions(userId: userId, dateFrom: startDate, dateTo: endDate, categoryId: categoryId, storeId: storeId, transactionTypeId: transactionTypeId, amountFrom: amountFrom, amountTo: amountTo);
+
+                    foreach (Transaction transaction in userTransactions)
+                    {
+                        if (!familyTransactions.Any(s => s.TransactionID == transaction.TransactionID))
+                        {
+                            familyTransactions.Add(transaction);
+                        }
                     }
                 }
             }
@@ -1052,6 +1160,29 @@ namespace Main.Logic
                 }
             }
             return familyMembers;
+        }
+
+        public static List<TransactionType> GetTransactionTypes()
+        {
+            List<TransactionType> transactionTypes = new List<TransactionType>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT TransactionTypeID, TypeName FROM TransactionTypes";
+
+                DataTable result = database.ExecuteQuery(query);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    TransactionType transactionType = new TransactionType
+                    {
+                        TransactionTypeID = row["TransactionTypeID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionTypeID"]),
+                        TypeName = row["TypeName"] == DBNull.Value ? null : Convert.ToString(row["TypeName"])
+                    };
+                    transactionTypes.Add(transactionType);
+                }
+            }
+            return transactionTypes;
         }
     }
 }

@@ -367,6 +367,7 @@
     <Compile Include="GUI\StoresControl.xaml.cs">
       <DependentUpon>StoresControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\TransactionsViewModel.cs" />
     <Compile Include="GUI\UserTransactionsControl.xaml.cs">
       <DependentUpon>UserTransactionsControl.xaml</DependentUpon>
     </Compile>
@@ -380,6 +381,7 @@
     <Compile Include="Models\Store.cs" />
     <Compile Include="Models\Subcategory.cs" />
     <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Models\TransactionType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -87,6 +87,8 @@ namespace Main.GUI
             string note = InputNote.Text;
             string date = InputData.SelectedDate?.ToString("yyyy-MM-dd");
 
+            amount = amount.Replace(",", ".");
+
             StringBuilder query = new StringBuilder("INSERT INTO Transactions (UserID,Amount, Note, Date,TransactionTypeID");
 
           

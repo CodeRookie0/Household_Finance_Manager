@@ -150,6 +150,8 @@ namespace Main.GUI
             int transactionId = transaction.TransactionID;   // Tutaj ustaw ID transakcji, którą chcesz zaktualizować
             string transactionType = (InpuTypeTransaction.SelectedIndex + 1).ToString(); // Przykład z TransactionType
 
+            amount = amount.Replace(",", ".");
+
             // Rozpoczęcie budowania zapytania SQL
             StringBuilder query = new StringBuilder("UPDATE Transactions SET ");
             query.Append("Amount = '" + amount + "', ");

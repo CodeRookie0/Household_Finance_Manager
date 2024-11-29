@@ -9,7 +9,7 @@ namespace Main.Models
 {
     public class FamilyMember
     {
-        public int UserID;
+        public int UserID { get; set; }
         public int FamilyID { get; set; }
         public int RoleID { get; set; }
 

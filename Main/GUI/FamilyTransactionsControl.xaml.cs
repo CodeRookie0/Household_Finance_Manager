@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +28,7 @@ namespace Main.GUI
         private MainWindow mainWindow;
         private readonly int userId;
         private int userRole;
+        private int familyId;
 
         public FamilyTransactionsControl(int loggedInUserId, MainWindow mainWindow)
         {
@@ -34,16 +37,20 @@ namespace Main.GUI
             InitializeComponent();
 
             userRole = Service.GetRoleIDByUserID(userId);
+            familyId = Service.GetFamilyIdByMemberId(userId);
+
             if (userRole != 1)
             {
                 HeaderGrid.ColumnDefinitions[6].Width = new GridLength(0);
             }
+
             LoadTransactions();
+            LoadComboBoxValues();
         }
 
         private void LoadTransactions()
         {
-            int familyId = Service.GetFamilyIdByMemberId(userId);
+            TransactionsDataStackPanel.Children.Clear();
             if (familyId < 0)
             {
                 EmptyGrid.Visibility = Visibility.Visible;
@@ -52,17 +59,64 @@ namespace Main.GUI
             else
             {
                 var transactions = Service.GetFamilyTransactions(familyId);
-                    Grid grid = CreateTransactionGrid(transactions);
-                    TransactionsDataStackPanel.Children.Add(grid);
+                Grid grid = CreateTransactionGrid(transactions);
+                TransactionsDataStackPanel.Children.Add(grid);
+
+                TransactionSummaryViewModel transactionSummaryViewModel = new TransactionSummaryViewModel(transactions);
+                this.DataContext = transactionSummaryViewModel;
+            }
+        }
+
+        private void LoadTransactions(List<Transaction> transactions)
+        {
+            TransactionsDataStackPanel.Children.Clear();
+            if (familyId < 0)
+            {
+                EmptyGrid.Visibility = Visibility.Visible;
+                FilledGrid.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                Grid grid = CreateTransactionGrid(transactions);
+                TransactionsDataStackPanel.Children.Add(grid);
+
+                TransactionSummaryViewModel transactionSummaryViewModel = new TransactionSummaryViewModel(transactions);
+                this.DataContext = transactionSummaryViewModel;
+            }
+        }
+
+        private void LoadComboBoxValues()
+        {
+            if (familyId < 0)
+            {
+                EmptyGrid.Visibility = Visibility.Visible;
+                FilledGrid.Visibility = Visibility.Hidden;
+            }
+            else
+            {
+                List<Category> defaultCategories = Service.GetDefaultCategories();
+                List<Category> familyCategories = familyId > 0 ? Service.GetFamilyCategories(familyId) : Service.GetUserCategories(userId);
+
+                List<Category> allCategories = new List<Category>();
+                foreach (var category in defaultCategories)
+                {
+                    allCategories.Add(category);
+                }
+
+                foreach (var category in familyCategories)
+                {
+                    allCategories.Add(category);
+                }
+                CategoryComboBox.ItemsSource = allCategories;
 
                 var users = Service.GetFamilyMembersByFamilyId(familyId);
                 UserComboBox.ItemsSource = users;
 
-                var categories = Service.GetFamilyCategories(familyId);
-                CategoryComboBox.ItemsSource = categories;
-
                 var stores = Service.GetFamilyStores(familyId);
                 StoreComboBox.ItemsSource = stores;
+
+                List<TransactionType> transactionTypes = Service.GetTransactionTypes();
+                TransactionTypeComboBox.ItemsSource = transactionTypes;
             }
         }
         private Grid CreateTransactionGrid(List<Transaction> transactions)
@@ -245,6 +299,182 @@ namespace Main.GUI
                 }
             }
             return grid;
+        }
+
+        private void FilterButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dateFrom = StartDatePicker.SelectedDate;
+            var dateTo = EndDatePicker.SelectedDate;
+            var filterUserId = UserComboBox.SelectedValue as int?;
+            var categoryId = CategoryComboBox.SelectedValue as int?;
+            var storeId = StoreComboBox.SelectedValue as int?;
+            var transactionTypeId = TransactionTypeComboBox.SelectedValue as int?;
+            var amountFromText = AmountFromTextBox.Text;
+            var amountToText = AmountToTextBox.Text;
+
+            double? amountFrom = null;
+            double? amountTo = null;
+
+            if (dateFrom.HasValue && dateTo.HasValue && dateTo < dateFrom)
+            {
+                MessageBox.Show("Data 'do' nie może być wcześniejsza niż data 'od'.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(amountFromText) && double.TryParse(amountFromText, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedAmountFrom))
+            {
+                amountFrom = parsedAmountFrom;
+            }
+
+            if (!string.IsNullOrWhiteSpace(amountToText) && double.TryParse(amountToText, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedAmountTo))
+            {
+                amountTo = parsedAmountTo;
+            }
+
+            if (amountTo.HasValue && amountFrom.HasValue && amountTo < amountFrom)
+            {
+                MessageBox.Show("Kwota 'do' nie może być mniejsza niż kwota 'od'.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            List<Transaction> transactions = Service.GetFilteredFamilyTransactions(familyId, filterUserId: filterUserId, startDate: dateFrom, endDate: dateTo, categoryId: categoryId, storeId: storeId, transactionTypeId: transactionTypeId, amountFrom: amountFrom, amountTo: amountTo);
+
+            LoadTransactions(transactions);
+        }
+
+        private void CleaFiltersButton_Click(object sender, RoutedEventArgs e)
+        {
+            StartDatePicker.SelectedDate = null;
+            EndDatePicker.SelectedDate = null;
+            CategoryComboBox.SelectedIndex = -1;
+            StoreComboBox.SelectedIndex = -1;
+            TransactionTypeComboBox.SelectedIndex = -1;
+            AmountFromTextBox.Clear();
+            AmountToTextBox.Clear();
+        }
+
+        private void AmountFromTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string currentText = ((TextBox)sender).Text;
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+            if (e.Text == "." || e.Text == ",")
+            {
+                if (currentText.Contains(".") || currentText.Contains(","))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            e.Handled = !isDigitOrSeparator;
+        }
+
+        private void AmountToTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string currentText = ((TextBox)sender).Text;
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+            if (e.Text == "." || e.Text == ",")
+            {
+                if (currentText.Contains(".") || currentText.Contains(","))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            e.Handled = !isDigitOrSeparator;
+        }
+
+        private void AmountFromTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+
+            if (text.Contains(","))
+            {
+                text = text.Replace(",", ".");
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                if (text.Contains("."))
+                {
+                    string[] parts = text.Split('.');
+
+                    if (string.IsNullOrEmpty(parts[0]))
+                    {
+                        parts[0] = "0";
+                    }
+
+                    if (parts.Length > 1 && parts[1].Length > 2)
+                    {
+                        parts[1] = parts[1].Substring(0, 2);
+                    }
+
+                    text = parts[0] + "." + parts[1];
+                }
+                else
+                {
+                    text = text + ".00";
+                }
+
+                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                {
+                    textBox.Text = text;
+                }
+                else
+                {
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    textBox.Text = "";
+                }
+            }
+        }
+
+        private void AmountToTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+
+            if (text.Contains(","))
+            {
+                text = text.Replace(",", ".");
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                if (text.Contains("."))
+                {
+                    string[] parts = text.Split('.');
+
+                    if (string.IsNullOrEmpty(parts[0]))
+                    {
+                        parts[0] = "0";
+                    }
+
+                    if (parts.Length > 1 && parts[1].Length > 2)
+                    {
+                        parts[1] = parts[1].Substring(0, 2);
+                    }
+
+                    text = parts[0] + "." + parts[1];
+                }
+                else
+                {
+                    text = text + ".00";
+                }
+
+                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                {
+                    textBox.Text = text;
+                }
+                else
+                {
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    textBox.Text = "";
+                }
+            }
         }
     }
 }
