@@ -23,7 +23,7 @@ namespace Main.GUI
     public partial class DeleteFamilyMemberControl : Window
     {
         private ObservableCollection<PendingUser> pendinguser;
-        public DeleteFamilyMemberControl(ref ObservableCollection<PendingUser> argUser)
+        public DeleteFamilyMemberControl(ObservableCollection<PendingUser> argUser)
         {
             InitializeComponent();
             pendinguser = argUser;

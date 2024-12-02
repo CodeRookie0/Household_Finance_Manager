@@ -44,17 +44,23 @@ namespace Main.Controls
         private void DeleteFromFamily_Click(object sender, RoutedEventArgs e)
         {
             DBSqlite dBSqlite = new DBSqlite();
-            int answer=dBSqlite.ExecuteNonQuery("UPDATE Users SET FamilyID=NULL  ,RoleID=1 WHERE UserID=@MyId",
-                new SqliteParameter("@MyId", pendinguser.Userid));
-            if (answer > 0)
-            {
-                MessageBox.Show("Użytkownik " + pendinguser.Name + " został usniety z rodziny", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                OnItemDeleted(pendinguser);
-            }
-            else
-            {
-                MessageBox.Show("Użytkownik nie został usunięty z rodziny", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
 
+            MessageBoxResult Confirmation=MessageBox.Show("Czy na pewno chcesz usunąć użytkownika "+pendinguser.Name+" ?","Komunikat",MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (Confirmation == MessageBoxResult.Yes)
+            {
+
+                int answer = dBSqlite.ExecuteNonQuery("UPDATE Users SET FamilyID=NULL  ,RoleID=1 WHERE UserID=@MyId",
+                    new SqliteParameter("@MyId", pendinguser.Userid));
+                if (answer > 0)
+                {
+                    MessageBox.Show("Użytkownik " + pendinguser.Name + " został usniety z rodziny", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                    OnItemDeleted(pendinguser);
+                }
+                else
+                {
+                    MessageBox.Show("Użytkownik nie został usunięty z rodziny", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                }
             }
 
         }

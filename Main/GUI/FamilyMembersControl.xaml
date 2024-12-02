@@ -21,14 +21,14 @@
 
         <TextBlock Grid.Row="0" Text="Członkowie:" FontSize="20" FontWeight="Bold" Margin="20,15,20,15"/>
         <ListBox Grid.Row="1" x:Name="FamilyMembersListBox" Background="#F3F3F3" BorderThickness="0" 
-                 Padding="5" Margin="20,0,20,0">
+                 Padding="5" Margin="20,0,20,0" DisplayMemberPath="Name">
         </ListBox>
 
         <TextBlock x:Name="JoinRequestsTextBlock" Grid.Row="2" Text="Prośby o dołączenie:" FontSize="20" FontWeight="Bold" Margin="20,15,20,15" />
         <Button x:Name="FamilySettingsButton"  Grid.Row="0" Grid.Column="1" Content="Ustawienia rodziny" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource mainButton}" Margin="0" Click="FamilySettingsButton_Click"/>
         <Button x:Name="LeaveFamilyButton"  Grid.Row="0" Grid.Column="1" Content="Opuść rodzinę" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource Button2}" Margin="0" Click="LeaveFamilyButton_Click" Visibility="Collapsed"/>
         <ListBox Grid.Row="3" x:Name="JoinRequestsListBox" Background="#F3F3F3" BorderThickness="0" 
-                 Padding="5" Margin="20,0,20,15">
+                 Padding="5" Margin="20,0,20,15" DisplayMemberPath="Name">
         </ListBox>
 
         <Border Background="#ffffff" Grid.Column="1" Grid.Row="1">

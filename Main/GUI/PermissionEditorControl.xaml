@@ -31,8 +31,8 @@
                     <DataGridTemplateColumn Header="Role">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox ItemsSource="{Binding DataContext.ComboBoxItems,RelativeSource={RelativeSource AncestorType=Window}}"
-                                          SelectedItem="{Binding Role, Mode=TwoWay , UpdateSourceTrigger=PropertyChanged}"
+                                <ComboBox  ItemsSource="{Binding DataContext.ComboBoxItems ,RelativeSource={RelativeSource AncestorType=Window}}"
+                                          SelectedItem="{Binding Role}"
                                           SelectionChanged="ChangeRole"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

@@ -28,6 +28,9 @@ namespace Main.GUI
         private readonly int userId;
         private int failedAttempts = 0;
         private DateTime? blockUntil = null;
+
+        private ObservableCollection<PendingUser> members {  get; set; }
+        private ObservableCollection<PendingUser> joinRequestMembers { get; set; }
         public FamilyMembersControl(int loggedInUserId, MainWindow mainWindow)
         {
             userId = loggedInUserId;
@@ -44,14 +47,19 @@ namespace Main.GUI
                 FamilySettingsButton.Visibility=Visibility.Collapsed;
                 LeaveFamilyButton.Visibility = Visibility.Visible;
             }
-            DBSqlite dBSqlite = new DBSqlite();
+            
+            joinRequestMembers = new ObservableCollection<PendingUser>(GeneratePendingUser());
+            JoinRequestsListBox.ItemsSource = joinRequestMembers;
+            JoinRequestsTextBlock.DataContext = joinRequestMembers;
+           /* DBSqlite dBSqlite = new DBSqlite();
             var answerJoinReqeust = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users INNER JOIN JoinRequests ON Users.UserID=JoinRequests.UserID WHERE JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId",userId));
 
             
              foreach(DataRow row in answerJoinReqeust.Rows) 
              {
-                  StringBuilder stringBuilder = new StringBuilder();
+                
+                  /*StringBuilder stringBuilder = new StringBuilder();
                 stringBuilder.Append(row[0].ToString());
                 stringBuilder.Append(" ");
                 stringBuilder.Append(row[1].ToString());
@@ -61,30 +69,27 @@ namespace Main.GUI
                 listBoxItem.Content = stringBuilder.ToString();
                 JoinRequestsListBox.Items.Add(listBoxItem);
 
-             }
-
-
-            var answerFamilyMemebers = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users WHERE FamilyID=(SELECT FamilyID FROM Users WHERE UserID=@UserId) AND UserID!=@UserId",
+             }*/
+            
+            DBSqlite dBSqlite = new DBSqlite();
+            members = new ObservableCollection<PendingUser>();
+            var answerFamilyMemebers = dBSqlite.ExecuteQuery("SELECT UserID,UserName,RoleID FROM Users WHERE FamilyID=(SELECT FamilyID FROM Users WHERE UserID=@UserId) AND UserID!=@UserId",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
 
             foreach (DataRow row in answerFamilyMemebers.Rows)
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.Append(row[0].ToString());
-                stringBuilder.Append(" ");
-                stringBuilder.Append(row[1].ToString());
-                ListBoxItem listBoxItem = new ListBoxItem();
-                listBoxItem.Padding = new Thickness(10);
-                listBoxItem.FontSize = 16;
-                listBoxItem.Content = stringBuilder.ToString();
-                FamilyMembersListBox.Items.Add(listBoxItem);
-
+                PendingUser tmp = new PendingUser(int.Parse(row[0].ToString()));
+                tmp.Name= row[1].ToString();
+                tmp.Role = row[2].ToString();
+                members.Add(tmp);
             }
+            FamilyMembersListBox.DataContext = members;
+            FamilyMembersListBox.ItemsSource = members;
         }
 
         private void ChangePermision(object sender, RoutedEventArgs e)
         {
-            ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
+           /* ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
             DBSqlite dBSqlite = new DBSqlite();
             DataTable answer = dBSqlite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@MyId) AND Users.UserID!=@MyId"
                 , new Microsoft.Data.Sqlite.SqliteParameter("@MyId", userId));
@@ -96,32 +101,65 @@ namespace Main.GUI
                 tmp.Role = row["RoleName"].ToString();
                 users.Add(tmp);
 
-            }
-            PermissionEditorControl permissionEditor = new PermissionEditorControl(users);
+            }*/
+            PermissionEditorControl permissionEditor = new PermissionEditorControl(members);
             permissionEditor.ShowDialog();
+        }
+
+
+        private string GetRoleName(int id)
+        {
+            if(id==1)
+            {
+                return "Admin";
+            }
+            else if(id==2) 
+            {
+                return "Partner";
+            }
+            else
+            {
+                return "Child";
+            }
         }
 
 
         private List<PendingUser> GeneratePendingUser()
         {
             DBSqlite dBSqlite = new DBSqlite();
-            var answerJoinReqeust = dBSqlite.ExecuteQuery("SELECT Users.UserID,UserName,Email FROM Users INNER JOIN JoinRequests ON Users.UserID=JoinRequests.UserID WHERE JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
+            var answerJoinReqeust = dBSqlite.ExecuteQuery("SELECT Users.UserID,UserName,Email,RoleID FROM Users INNER JOIN JoinRequests ON Users.UserID=JoinRequests.UserID WHERE JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId) AND JoinRequests.RequestStatusID=1",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
 
             List<PendingUser> localList= new List<PendingUser>();   
             foreach (DataRow row in answerJoinReqeust.Rows)
             {
                 
-                localList.Add(new PendingUser(Int32.Parse(row[0].ToString())) { Name = row[1].ToString(), Role = "Partner" });
+                localList.Add(new PendingUser(Int32.Parse(row[0].ToString())) { Name = row[1].ToString()});
             }
             return localList;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e) //Rozpatrzenie próśb
         {
-            List<PendingUser> answer = GeneratePendingUser();
-            AddFamilyMemberRequest addFamilyMemberRequest = new AddFamilyMemberRequest(answer,userId);
+            //List<PendingUser> answer = GeneratePendingUser();
+            AddFamilyMemberRequest addFamilyMemberRequest = new AddFamilyMemberRequest(joinRequestMembers,userId);
             addFamilyMemberRequest.ShowDialog();
+
+            members.Clear();
+            DBSqlite dBSqlite = new DBSqlite();
+            var answerFamilyMemebers = dBSqlite.ExecuteQuery("SELECT UserID,UserName,RoleID FROM Users WHERE FamilyID=(SELECT FamilyID FROM Users WHERE UserID=@UserId) AND UserID!=@UserId",
+                new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
+
+            foreach (DataRow row in answerFamilyMemebers.Rows)
+            {
+                PendingUser tmp = new PendingUser(int.Parse(row[0].ToString()));
+                tmp.Name = row[1].ToString();
+                tmp.Role = row[2].ToString();
+                members.Add(tmp);
+            }
+            FamilyMembersListBox.DataContext = members;
+            FamilyMembersListBox.ItemsSource = members;
+
         }
 
         private void FamilySettingsButton_Click(object sender, RoutedEventArgs e)
@@ -186,7 +224,7 @@ namespace Main.GUI
 
         private void RemoveFamilyMember_Click(object sender, RoutedEventArgs e)
         {
-           ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
+           /*ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
            DBSqlite dbsqite=new DBSqlite();
            DataTable answer=dbsqite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Family ON Users.FamilyID=Family.FamilyID INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.UserID<>Family.PrimaryUserID AND Users.FamilyID=(" +
                 "SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
@@ -201,21 +239,11 @@ namespace Main.GUI
                     users.Add(tmp);
 
                 }
-            }
-            DeleteFamilyMemberControl deleteFamilyMemberControl = new DeleteFamilyMemberControl(ref users);
+            }*/
+            DeleteFamilyMemberControl deleteFamilyMemberControl = new DeleteFamilyMemberControl(members);
             deleteFamilyMemberControl.Show();
 
-            FamilyMembersListBox.Items.Clear();
-            DataTable updateData = dbsqite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Family ON Users.FamilyID=Family.FamilyID INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.UserID<>Family.PrimaryUserID AND Users.FamilyID=(" +
-                "SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
-            if (answer != null)
-            {
-                foreach (DataRow row in updateData.Rows)
-                { 
-
-                }
-            }
+          
 
         }
     }

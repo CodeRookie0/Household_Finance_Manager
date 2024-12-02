@@ -33,12 +33,13 @@
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Name}" Margin="0,0,10,0"/>
-                            <ComboBox x:Name="Roles"  SelectedItem="{Binding Role}" Width="120">
+                            <ComboBox x:Name="Roles"   SelectedItem="{Binding Role}" Width="120">
+                                <ComboBoxItem Content="Wybierz" IsSelected="True"/>
                                 <ComboBoxItem Content="Admin"/>
-                                <ComboBoxItem Content="Partner" IsSelected="True"/>
+                                <ComboBoxItem Content="Partner"/>
                                 <ComboBoxItem Content="Child"/>
                             </ComboBox>
-                            <Button Content="Akceptuj" Click="Button_Click" Background="Green" Foreground="White" Width="120" Margin="10"/>
+                            <Button x:Name="AddUser" Content="Akceptuj" Click="Button_Click" Background="Green" Foreground="White" Width="120" Margin="10"/>
                             <Button Content="Odrzuć" Click="Button_Click_1" Background="Red" Foreground="White" Width="120" Margin="10"/>
                         </StackPanel>
                     </DataTemplate>

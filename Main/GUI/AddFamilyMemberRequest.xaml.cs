@@ -3,6 +3,9 @@ using Main.Models;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,14 +25,16 @@ namespace Main.GUI
     /// </summary>
     public partial class AddFamilyMemberRequest : Window
     {
-        private List<PendingUser> pendingUsers;
+        private ObservableCollection<PendingUser> pendingUsers;
         private readonly int userId;
-        public AddFamilyMemberRequest(List<PendingUser> argUser,int userId)
+        public AddFamilyMemberRequest(ObservableCollection<PendingUser> argUser, int userId)
         {
             InitializeComponent();
             pendingUsers = argUser;
             this.userId = userId;
             ListUser.ItemsSource = argUser;
+
+
 
         }
 
@@ -61,19 +66,41 @@ namespace Main.GUI
                     ComboBox cb = FindDescendant<ComboBox>(item);
                     ComboBoxItem tmp = (ComboBoxItem)cb.SelectedValue;
                     string content = (string)tmp.Content;
+                    if(content=="Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać odpowiednie uprawnienia","Komunikat",MessageBoxButton.OK,MessageBoxImage.Warning);
+                        return;
+                    }
                     int idRole = GetNumberPermision(content);
 
                     DBSqlite dBSqlite = new DBSqlite();
-                    dBSqlite.ExecuteNonQuery("UPDATE Users SET RoleID=@NewRole , FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserID) WHERE Users.UserID=@MyId",
-                        new SqliteParameter("@NewRole", idRole),
-                        new SqliteParameter("@UserID", userId),
-                        new SqliteParameter("@MyId", thisUser.Userid));
-                    dBSqlite.ExecuteNonQuery("DELETE FROM JoinRequests WHERE JoinRequests.UserID=@UserID AND JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@MyId)",
-                        new SqliteParameter("@UserID", thisUser.Userid),
-                        new SqliteParameter("@MyId", userId));
-                    pendingUsers.Remove(thisUser);
-                    ListUser.ItemsSource = null;
-                    ListUser.ItemsSource = pendingUsers;
+
+
+                    DataTable answer = dBSqlite.ExecuteQuery("SELECT FamilyID FROM Users WHERE Users.UserID=@MyId", new SqliteParameter("@MyId", userId));
+
+                    if (answer != null)
+                    {
+                        int idFamily;
+                        DataRow row = answer.Rows[0];
+                        idFamily = int.Parse(row["FamilyID"].ToString());
+
+
+                        dBSqlite.ExecuteNonQuery("UPDATE JoinRequests SET RequestStatusID=2 WHERE JoinRequests.UserId=@UserId AND JoinRequests.FamilyID=@FamilyID AND RequestStatusID = 1",
+                             new SqliteParameter("@UserId", thisUser.Userid),
+                             new SqliteParameter("@FamilyID", idFamily));
+
+
+
+                        dBSqlite.ExecuteNonQuery("UPDATE Users SET RoleID=@NewRole , FamilyID=@FamilyID WHERE Users.UserID=@MyId",
+                            new SqliteParameter("@NewRole", idRole),
+                            new SqliteParameter("@FamilyID", idFamily),
+                            new SqliteParameter("@MyId", thisUser.Userid));
+
+                        pendingUsers.Remove(thisUser);
+                        ListUser.ItemsSource = null;
+                        ListUser.ItemsSource = pendingUsers;
+                        MessageBox.Show("Użytkownik dodany do rodziny " + thisUser.Name, "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
 
 
                 }
@@ -119,13 +146,28 @@ namespace Main.GUI
 
             if (thisUser != null)
             {
+                /* DBSqlite dBSqlite = new DBSqlite();
+                 dBSqlite.ExecuteNonQuery("DELETE FROM JoinRequests WHERE JoinRequests.UserId=@UserId AND JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId1)",
+                     new Microsoft.Data.Sqlite.SqliteParameter("@UserId", thisUser.Userid),
+                     new SqliteParameter("@UserId1",userId));*/
+
                 DBSqlite dBSqlite = new DBSqlite();
-                dBSqlite.ExecuteNonQuery("DELETE FROM JoinRequests WHERE JoinRequests.UserId=@UserId AND JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId1)",
-                    new Microsoft.Data.Sqlite.SqliteParameter("@UserId", thisUser.Userid),
-                    new SqliteParameter("@UserId1",userId));
-                pendingUsers.Remove(thisUser);
-                ListUser.ItemsSource = null;
-                ListUser.ItemsSource = pendingUsers;
+                DataTable answer = dBSqlite.ExecuteQuery("SELECT FamilyID FROM Users WHERE Users.UserID=@MyId", new SqliteParameter("@MyId", userId));
+
+                if (answer != null)
+                {
+                    int idFamily;
+                    DataRow row = answer.Rows[0];
+                    idFamily = int.Parse(row["FamilyID"].ToString());
+
+
+                    dBSqlite.ExecuteNonQuery("UPDATE JoinRequests SET RequestStatusID=3 WHERE JoinRequests.UserId=@UserId AND JoinRequests.FamilyID=@FamilyID AND RequestStatusID = 1",
+                        new SqliteParameter("@UserId", thisUser.Userid),
+                        new SqliteParameter("@FamilyID", idFamily));
+                    pendingUsers.Remove(thisUser);
+                    ListUser.ItemsSource = null;
+                    ListUser.ItemsSource = pendingUsers;
+                }
             }
         }
 
@@ -133,6 +175,9 @@ namespace Main.GUI
         {
             this.Close();
         }
-    }
 
+
+    }
 }
+
+

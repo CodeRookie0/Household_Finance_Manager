@@ -130,14 +130,18 @@ namespace Main.GUI
 
         private void RefreshData()
         {
-           storeList.Children.Clear();
-            DBSqlite dBSqlite = new DBSqlite();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                storeList.Children.Clear();
+            });
 
+            DBSqlite dBSqlite = new DBSqlite();
             if (IsFamily)
             {
                 DataTable ListFavorite = dBSqlite.ExecuteQuery("SELECT StoreID FROM FavoriteStores WHERE UserID=@MyId",
-                           new Microsoft.Data.Sqlite.SqliteParameter("@MyId", UserId));
+                            new Microsoft.Data.Sqlite.SqliteParameter("@MyId", UserId));
                 List<int> storeIdFavorite = new List<int>();
+
                 if (ListFavorite != null)
                 {
                     foreach (DataRow dataRow in ListFavorite.Rows)
@@ -146,7 +150,9 @@ namespace Main.GUI
                     }
                 }
 
-                var answer = dBSqlite.ExecuteQuery("SELECT Stores.StoreID,Categories.CategoryName,Stores.StoreName,Stores.UserID FROM Stores INNER JOIN Categories ON  Stores.CategoryID=Categories.CategoryID;");
+                string IdList = string.Join(",", familyIdUsers);
+
+                var answer = dBSqlite.ExecuteQuery($"SELECT Stores.StoreID,Categories.CategoryName,Stores.StoreName,Stores.UserID FROM Stores INNER JOIN Categories ON  Stores.CategoryID=Categories.CategoryID WHERE Stores.UserID IN ({IdList});");
                 if (answer != null)
                 {
                     foreach (DataRow row in answer.Rows)
@@ -159,8 +165,7 @@ namespace Main.GUI
 
                         Store tmpStore = new Store(
                             Int32.Parse(row[0].ToString()),
-                            int.Parse(row[3].ToString()),
-                            boolValue);
+                            int.Parse(row[3].ToString()), boolValue);
                         tmpStore.CategoryName = row[1].ToString();
                         tmpStore.StoreName = row[2].ToString();
                         var StoreElementList = new ListElementStore(tmpStore, UserId);
@@ -169,6 +174,45 @@ namespace Main.GUI
                     }
                 }
             }
+            else
+            {
+                DataTable ListFavorite = dBSqlite.ExecuteQuery("SELECT StoreID FROM FavoriteStores WHERE UserID=@MyId",
+                           new Microsoft.Data.Sqlite.SqliteParameter("@MyId", UserId));
+                List<int> storeIdFavorite = new List<int>();
+
+                if (ListFavorite != null)
+                {
+                    foreach (DataRow dataRow in ListFavorite.Rows)
+                    {
+                        storeIdFavorite.Add(int.Parse(dataRow[0].ToString()));
+                    }
+                }
+
+                var answer = dBSqlite.ExecuteQuery("SELECT Stores.StoreID,Categories.CategoryName,Stores.StoreName,Stores.UserID FROM Stores INNER JOIN Categories ON  Stores.CategoryID=Categories.CategoryID WHERE Stores.UserID=@MyUserId",
+                    new Microsoft.Data.Sqlite.SqliteParameter("@MyUserId", UserId));
+                if (answer != null)
+                {
+                    foreach (DataRow row in answer.Rows)
+                    {
+                        bool boolValue = false;
+                        if (storeIdFavorite.Contains(int.Parse(row[0].ToString())))
+                        {
+                            boolValue = true;
+                        }
+
+                        Store tmpStore = new Store(
+                            Int32.Parse(row[0].ToString()),
+                            int.Parse(row[3].ToString()), boolValue);
+                        tmpStore.CategoryName = row[1].ToString();
+                        tmpStore.StoreName = row[2].ToString();
+                        var StoreElementList = new ListElementStore(tmpStore, UserId);
+                        StoreElementList.ItemDeleted += UpdateOutSideClick;
+                        storeList.Children.Add(StoreElementList);
+                    }
+                }
+
+            }
+
 
         }
 

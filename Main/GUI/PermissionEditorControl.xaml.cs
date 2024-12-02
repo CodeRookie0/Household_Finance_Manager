@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,11 +27,15 @@ namespace Main.GUI
     {
         public ObservableCollection<PendingUser> pendingUsers { get; set; }
         public ObservableCollection<string> ComboBoxItems { get; set; }
+
+
+        private bool firstWindow = true;
+      
         public PermissionEditorControl(ObservableCollection<PendingUser> argList)
         {
             InitializeComponent();
             pendingUsers = argList;
-
+            
 
 
 
@@ -43,8 +48,9 @@ namespace Main.GUI
                 "Partner",
                 "Child"
             };
-
+            
             DataContext = this;
+            
         }
 
         private void CloseDialog(object sender, MouseButtonEventArgs e)
@@ -67,20 +73,39 @@ namespace Main.GUI
         }
         private void ChangeRole(object sender, SelectionChangedEventArgs e)
         {
-            if (sender is ComboBox comboBox && comboBox.SelectedItem is string selectedRole)
+            if (!firstWindow)
             {
-                var currentUser = (PendingUser)comboBox.DataContext;
-                int role = GetNumberRole(currentUser.Role);
-                if (MessageBox.Show("Czy chcesz zmienić uprawnienia ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+  
+                if (sender is ComboBox comboBox)
                 {
-                    DBSqlite dBSqlite = new DBSqlite();
-                    dBSqlite.ExecuteNonQuery("UPDATE Users SET RoleID=@NewRole WHERE UserID=@UserId",
-                        new Microsoft.Data.Sqlite.SqliteParameter("@NewRole", role),
-                        new SqliteParameter("@UserId", currentUser.Userid.ToString()));
-                }
 
+                    var currentUser = (PendingUser)comboBox.DataContext;
+                    int role = GetNumberRole(currentUser.Role);
+                    if (MessageBox.Show("Czy chcesz zmienić uprawnienia dla użytkownika ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        
+                        DBSqlite dBSqlite = new DBSqlite();
+                        dBSqlite.ExecuteNonQuery("UPDATE Users SET RoleID=@NewRole WHERE UserID=@UserId",
+                            new Microsoft.Data.Sqlite.SqliteParameter("@NewRole", role),
+                            new SqliteParameter("@UserId", currentUser.Userid.ToString()));
+                    }
+                    else
+                    {
+                       
+                    }
+                    
+
+                }
+            }
+            else
+            {
+
+                firstWindow = false;
+                return;
             }
         }
+
+        
     }
 }
 

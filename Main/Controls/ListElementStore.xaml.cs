@@ -65,7 +65,7 @@ namespace Main.Controls
 
         private void Edit_Store(object sender, RoutedEventArgs e)
         {
-            EditStoreForm editStoreForm = new EditStoreForm(store);
+            EditStoreForm editStoreForm = new EditStoreForm(store,userid);
             editStoreForm.ShowDialog();
             OnItemDeleted();
             
@@ -73,17 +73,28 @@ namespace Main.Controls
 
         private void Delete_Store(object sender, RoutedEventArgs e)
         {
-            DBSqlite dBSqlite = new DBSqlite();
-            int answer=dBSqlite.ExecuteNonQuery("DELETE FROM Stores WHERE Stores.StoreID=@CurrentStoreID",
-                new Microsoft.Data.Sqlite.SqliteParameter("@CurrentStoreID", store.StoreId));
-            if(answer>0)
+            if (MessageBox.Show("Czy na pewno chcesz usunąć sklep " + store.StoreName + " ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                MessageBox.Show("Sklep został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                OnItemDeleted();
-            }
-            else
-            {
-                MessageBox.Show("Sklep nie został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                DBSqlite dBSqlite = new DBSqlite();
+                int answer1 = dBSqlite.ExecuteNonQuery("UPDATE Transactions SET StoreID=NULL WHERE StoreID=@MyStoreId",
+                  new SqliteParameter("@MyStoreId", store.StoreId));
+                if (answer1 > 0)
+                {
+
+                    int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Stores WHERE Stores.StoreID=@CurrentStoreID",
+                        new Microsoft.Data.Sqlite.SqliteParameter("@CurrentStoreID", store.StoreId));
+
+                    if (answer > 0)
+                    {
+                        MessageBox.Show("Sklep został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        OnItemDeleted();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Sklep nie został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+
             }
         }
 
