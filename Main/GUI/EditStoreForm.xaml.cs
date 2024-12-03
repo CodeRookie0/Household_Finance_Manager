@@ -69,7 +69,7 @@ namespace Main.GUI
             }
             else if (!IsStore(txtStoreName.Text, CategoryId))
             {
-                MessageBox.Show("Instnieje taki sklep", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Istnieje taki sklep", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {

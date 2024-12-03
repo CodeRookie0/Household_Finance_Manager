@@ -2,6 +2,8 @@
 using Main.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
@@ -242,6 +244,7 @@ namespace Main.GUI
                         Padding = new Thickness(5)
                     };
                     editButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/edit_green.png")), Width = 25, Height = 25 };
+                    editButton.Click += EditTransactionFamily_Click;
                     actionPanel.Children.Add(editButton);
 
                     // Delete Button
@@ -254,6 +257,7 @@ namespace Main.GUI
                         Padding = new Thickness(5)
                     };
                     deleteButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/delete_red.png")), Width = 25, Height = 25 };
+                    deleteButton.Click += DeleteTransactionFamily_Click;
                     actionPanel.Children.Add(deleteButton);
 
                     Grid.SetRow(actionPanel, grid.RowDefinitions.Count - 1);
@@ -277,8 +281,10 @@ namespace Main.GUI
                             Height = 35,
                             Width = 35,
                             Padding = new Thickness(5)
+                            
                         };
                         editButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/edit_green.png")), Width = 25, Height = 25 };
+                        editButton.Click += EditTransactionFamily_Click;
                         actionPanel.Children.Add(editButton);
 
                         Button deleteButton = new Button
@@ -290,6 +296,7 @@ namespace Main.GUI
                             Padding = new Thickness(5)
                         };
                         deleteButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/delete_red.png")), Width = 25, Height = 25 };
+                        deleteButton.Click += DeleteTransactionFamily_Click;
                         actionPanel.Children.Add(deleteButton);
 
                         Grid.SetRow(actionPanel, grid.RowDefinitions.Count - 1);
@@ -475,6 +482,103 @@ namespace Main.GUI
                     textBox.Text = "";
                 }
             }
+        }
+
+        private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
+        {
+            ObservableCollection<Category> categories = new ObservableCollection<Category>();
+            ObservableCollection<Store> store= new ObservableCollection<Store>();   
+
+            foreach(var item in CategoryComboBox.Items)
+            {
+                Category category = item as Category;
+                if (category != null)
+                {
+                    categories.Add(category);
+                }
+            }
+
+
+            foreach(var item in StoreComboBox.Items)
+            {
+                Store thisStore = item as Store;
+                
+                if (thisStore != null)
+                {
+                    store.Add(thisStore);
+                }
+            }
+
+
+            AddTransactionControl addTransaction = new AddTransactionControl(categories, store, userId);
+            addTransaction.ShowDialog();
+            LoadTransactions();
+
+        }
+
+        private void DeleteTransactionFamily_Click(object sender, RoutedEventArgs e)
+        {
+           
+            var button = sender as Button;
+            Transaction transaction = button?.DataContext as Transaction;
+            if (transaction != null)
+            {
+                MessageBoxResult answerQuestion = MessageBox.Show("Czy na pewno chcesz usunąć transakcję o kwocie "
+                    + transaction.Amount + " zrealizowaną w dniu " + transaction.Date, "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (answerQuestion == MessageBoxResult.Yes)
+                {
+                    DBSqlite dBSqlite = new DBSqlite();
+                    int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
+                        new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
+                    if (answer > 0)
+                    {
+                        MessageBox.Show("Transakcja została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadTransactions();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Transakcja nie została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    }
+                }
+            }
+        }
+
+        private void EditTransactionFamily_Click(object sender, RoutedEventArgs e) 
+        {
+            ObservableCollection<Category> categories = new ObservableCollection<Category>();
+            ObservableCollection<Store> store = new ObservableCollection<Store>();
+
+            foreach (var item in CategoryComboBox.Items)
+            {
+                Category category = item as Category;
+                if (category != null)
+                {
+                    categories.Add(category);
+                }
+            }
+
+
+            foreach (var item in StoreComboBox.Items)
+            {
+                Store thisStore = item as Store;
+
+                if (thisStore != null)
+                {
+                    store.Add(thisStore);
+                }
+            }
+            
+
+            var button = sender as Button;
+            Transaction transaction = button?.DataContext as Transaction;
+            if(transaction != null) 
+            {
+                EditTransactionControl editTransaction = new EditTransactionControl(categories, store, userId, transaction);
+                editTransaction.ShowDialog();
+                LoadTransactions();
+            }
+           
         }
     }
 }

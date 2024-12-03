@@ -57,7 +57,7 @@
 
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="Kwota" Margin="0,0,0,10"/>
-                        <TextBox x:Name="InputAmount" Width="160" Margin="10,0,0,10"/>
+                        <TextBox x:Name="InputAmount" Width="160" Margin="10,0,0,10" KeyDown="AddInputAmount_KeyDown" />
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal">

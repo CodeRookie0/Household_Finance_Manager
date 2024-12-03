@@ -920,9 +920,9 @@ namespace Main.Logic
             }
         }
 
-        public static List<Transaction> GetUserTransactions(int userId)
+        public static ObservableCollection<Transaction> GetUserTransactions(int userId)
         {
-            List<Transaction> transactions = new List<Transaction>();
+            ObservableCollection<Transaction> transactions = new ObservableCollection<Transaction>();
             using (DBSqlite database = new DBSqlite())
             {
                 string query = "SELECT TransactionID, UserID, Amount, TransactionTypeID, CategoryID, SubcategoryID, StoreID, Note, Date FROM Transactions WHERE UserID = @UserId";
@@ -1031,7 +1031,7 @@ namespace Main.Logic
             foreach (FamilyMember member in familyMembers)
             {
                 int userId = member.UserID;
-                List<Transaction> userTransactions = GetUserTransactions(userId);
+                ObservableCollection<Transaction> userTransactions = GetUserTransactions(userId);
 
                 foreach (Transaction transaction in userTransactions)
                 {
@@ -1078,9 +1078,9 @@ namespace Main.Logic
             return familyTransactions;
         }
 
-        public static List<Store> GetUserStores(int userId)
+        public static ObservableCollection<Store> GetUserStores(int userId)
         {
-            List<Store> stores = new List<Store>();
+            ObservableCollection<Store> stores = new ObservableCollection<Store>();
             using (DBSqlite database = new DBSqlite())
             {
                 string query = @"
@@ -1125,7 +1125,7 @@ namespace Main.Logic
             foreach (FamilyMember member in familyMembers)
             {
                 int userId = member.UserID;
-                List<Store> userStores = GetUserStores(userId);
+                ObservableCollection<Store> userStores = GetUserStores(userId);
 
                 foreach (Store store in userStores)
                 {

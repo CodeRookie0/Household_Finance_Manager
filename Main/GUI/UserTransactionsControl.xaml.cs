@@ -28,8 +28,10 @@ namespace Main.GUI
     {
         private MainWindow mainWindow;
         private readonly int userId;
-        private List<Category> categoryList {  get; set; }
-        private List<Store> storeList { get; set; }
+        private ObservableCollection<Category> categoryList {  get; set; }
+        private ObservableCollection<Store> storeList { get; set; }
+
+        
 
         public UserTransactionsControl(int loggedInUserId, MainWindow mainWindow)
         {
@@ -45,8 +47,10 @@ namespace Main.GUI
             var transactions = Service.GetUserTransactions(userId);
             TransactionsList.ItemsSource = transactions;
 
-            TransactionSummaryViewModel transactionSummaryViewModel = new TransactionSummaryViewModel(transactions);
+
+            TransactionSummaryViewModel transactionSummaryViewModel = new TransactionSummaryViewModel(transactions.ToList());
             this.DataContext = transactionSummaryViewModel;
+            
         }
 
         private void LoadTransactions(List<Transaction> transactions)
@@ -64,19 +68,20 @@ namespace Main.GUI
             int familyId = Service.GetFamilyIdByMemberId(userId);
             List<Category> familyCategories = familyId > 0 ? Service.GetFamilyCategories(familyId) : Service.GetUserCategories(userId);
 
-            List<Category> allCategories = new List<Category>();
+            //ObservableCollection<Category> allCategories = new ObservableCollection<Category>();
+            categoryList= new ObservableCollection<Category>();
             foreach (var category in defaultCategories)
             {
-                allCategories.Add(category);
+                categoryList.Add(category);
             }
 
             foreach (var category in familyCategories)
             {
-                allCategories.Add(category);
+                categoryList.Add(category);
             }
 
-            CategoryComboBox.ItemsSource = allCategories;
-            categoryList = allCategories;
+            CategoryComboBox.ItemsSource = categoryList;
+           
 
             var stores = Service.GetUserStores(userId);
             StoreComboBox.ItemsSource = stores;
@@ -90,6 +95,7 @@ namespace Main.GUI
         {
             AddTransactionControl addTransactionControl = new AddTransactionControl(categoryList,storeList,userId);
             addTransactionControl.ShowDialog();
+            LoadTransactions();
 
         }
 
@@ -102,6 +108,7 @@ namespace Main.GUI
                 EditTransactionControl editTransactionControl = new EditTransactionControl(categoryList, storeList, userId, transaction);
                 editTransactionControl.ShowDialog();
             }
+            LoadTransactions();
         }
 
         private void DeleteTransactionButton_Click(object sender, RoutedEventArgs e)
@@ -110,17 +117,23 @@ namespace Main.GUI
             Transaction transaction = button?.DataContext as Transaction;
             if(transaction != null)
             {
-                DBSqlite dBSqlite = new DBSqlite();
-                int answer=dBSqlite.ExecuteNonQuery("DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
-                    new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
-                if(answer > 0) 
+                MessageBoxResult answerQuestion = MessageBox.Show("Czy na pewno chcesz usunąć transakcję o kwocie "
+                    + transaction.Amount + " zrealizowaną w dniu " + transaction.Date, "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (answerQuestion == MessageBoxResult.Yes)
                 {
-                    MessageBox.Show("Transakcja została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-                else
-                {
-                    MessageBox.Show("Transakcja nie została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                    DBSqlite dBSqlite = new DBSqlite();
+                    int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
+                        new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
+                    if (answer > 0)
+                    {
+                        MessageBox.Show("Transakcja została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadTransactions();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Transakcja nie została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
 
+                    }
                 }
             }
         }

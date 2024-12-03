@@ -2,7 +2,9 @@
 using Main.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,22 +24,23 @@ namespace Main.GUI
     /// </summary>
     public partial class EditTransactionControl : Window
     {
-        private List<Category> Listcategories { get; set; }
-        private List<Store> Liststores { get; set; }
-        private List<Subcategory> Listsubcategory { get; set; }
+        private ObservableCollection<Category> Listcategories { get; set; }
+        private ObservableCollection<Store> Liststores { get; set; }
+        private ObservableCollection<Subcategory> Listsubcategory { get; set; }
         private readonly int userid;
         private readonly Transaction transaction;
-        public EditTransactionControl(List<Category> argcategoryList, List<Store> argStore, int userId, Transaction argtransaction)
+        public EditTransactionControl(ObservableCollection<Category> argcategoryList, ObservableCollection<Store> argStore, int userId, Transaction argtransaction)
         {
             InitializeComponent();
             Listcategories = argcategoryList;
             Liststores = argStore;
-            Listsubcategory = new List<Subcategory>();
+            Listsubcategory = new ObservableCollection<Subcategory>();
             transaction = argtransaction;
 
             ComboBoxCategory.ItemsSource = Listcategories;
 
-            var thisCategory = argcategoryList.Find(c => c.CategoryID == transaction.CategoryID);
+            // var thisCategory = argcategoryList.Find(c => c.CategoryID == transaction.CategoryID);
+            var thisCategory = argcategoryList.FirstOrDefault(x => x.CategoryID == transaction.CategoryID);
 
             if (thisCategory != null)
             {
@@ -64,7 +67,7 @@ namespace Main.GUI
                     ComboSubCategory.ItemsSource = Listsubcategory;
                     ComboSubCategory.DisplayMemberPath = "SubcategoryName";
 
-                    var thisSubCategory = Listsubcategory.Find(c => c.SubcategoryID == transaction.SubcategoryID);
+                    var thisSubCategory = Listsubcategory.FirstOrDefault(c => c.SubcategoryID == transaction.SubcategoryID);
                     if (thisSubCategory != null)
                     {
                         ComboSubCategory.IsEnabled = true;
@@ -76,7 +79,7 @@ namespace Main.GUI
 
             ComobBoxStore.ItemsSource = Liststores;
 
-            var thisStore = argStore.Find(c => c.StoreId == transaction.StoreID);
+            var thisStore = argStore.FirstOrDefault(c => c.StoreId == transaction.StoreID);
             if (thisStore != null)
             {
                 ComobBoxStore.SelectedIndex = argStore.IndexOf(thisStore);
@@ -93,7 +96,7 @@ namespace Main.GUI
 
             userid = userId;
 
-            Listsubcategory = new List<Subcategory>();
+            Listsubcategory = new ObservableCollection<Subcategory>();
 
 
             InputAmount.Text = transaction.Amount.ToString();
@@ -149,6 +152,16 @@ namespace Main.GUI
             string date = InputData.SelectedDate?.ToString("yyyy-MM-dd");
             int transactionId = transaction.TransactionID;   // Tutaj ustaw ID transakcji, którą chcesz zaktualizować
             string transactionType = (InpuTypeTransaction.SelectedIndex + 1).ToString(); // Przykład z TransactionType
+            if(date==null)
+            {
+                MessageBox.Show("Proszę wybrać datę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            else if (string.IsNullOrEmpty(amount))
+            {
+                MessageBox.Show("Prosze podać kwotę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             amount = amount.Replace(",", ".");
 
@@ -160,10 +173,13 @@ namespace Main.GUI
             query.Append("TransactionTypeID = '" + transactionType + "'");
 
             // Dodawanie wartości dla opcjonalnych pól
-            if (category != null)
+            if (category == null)
             {
-                query.Append(", CategoryID = '" + category.CategoryID + "'");
+                MessageBox.Show("Proszę wybrać kategorię", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
+            query.Append(", CategoryID = '" + category.CategoryID + "'");
+
             if (subcategory != null)
             {
                 query.Append(", SubCategoryID = '" + subcategory.SubcategoryID + "'");
@@ -190,6 +206,20 @@ namespace Main.GUI
                 MessageBox.Show("Transakcja nie została zaktualizowana w bazie danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
+        }
+
+        private void EditInputAmount_KeyDown(object sender, KeyEventArgs e)
+        {
+           
+            if ((e.Key < Key.D0 || e.Key > Key.D9) &&
+                (e.Key < Key.NumPad0 || e.Key > Key.NumPad9)
+                && e.Key != Key.OemPeriod
+                && e.Key != Key.Decimal)
+            {
+                e.Handled = true;
+                
+            }
+            
         }
     }
 }

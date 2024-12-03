@@ -2,6 +2,7 @@
 using Main.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -22,21 +23,23 @@ namespace Main.GUI
     /// </summary>
     public partial class AddTransactionControl : Window
     {
-        private List<Category> Listcategories {  get; set; }
-        private List<Store> Liststores { get; set; }
-        private List<Subcategory> Listsubcategory { get; set; }
+        private ObservableCollection<Category> Listcategories {  get; set; }
+        private ObservableCollection<Store> Liststores { get; set; }
+        private ObservableCollection<Subcategory> Listsubcategory { get; set; }
+       
         private readonly int userid;
         
-        public AddTransactionControl(List<Category> argcategoryList,List<Store> argStore,int userId)
+        public AddTransactionControl(ObservableCollection<Category> argcategoryList,ObservableCollection<Store> argStore,int userId)
         {
             InitializeComponent();
+           
            Listcategories = argcategoryList;
             Liststores = argStore;
            ComboBoxCategory.ItemsSource = Listcategories;
            ComobBoxStore.ItemsSource = Liststores;
             userid = userId;
 
-            Listsubcategory = new List<Subcategory>();
+            Listsubcategory = new ObservableCollection<Subcategory>();
             
         } 
 
@@ -86,6 +89,16 @@ namespace Main.GUI
             string amount = InputAmount.Text;
             string note = InputNote.Text;
             string date = InputData.SelectedDate?.ToString("yyyy-MM-dd");
+            if(date==null)
+            {
+                MessageBox.Show("Proszę wybrać datę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            else if(string.IsNullOrEmpty(amount)) 
+            {
+                MessageBox.Show("Prosze podać kwotę","Komunikat",MessageBoxButton.OK,MessageBoxImage.Warning);
+                return;
+            }
 
             amount = amount.Replace(",", ".");
 
@@ -93,10 +106,13 @@ namespace Main.GUI
 
           
 
-            if (category != null)
+            if (category == null)
             {
-                query.Append(",CategoryID");
+                MessageBox.Show("Proszę wybrać kategorię","Komunikat",MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
             }
+            query.Append(",CategoryID");
+
             if (subcategory != null)
             {
                 query.Append(",SubCategoryID");
@@ -109,10 +125,8 @@ namespace Main.GUI
             query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + date + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
 
             // Dodajemy wartości dla opcjonalnych pól
-            if (category != null)
-            {
-                query.Append(", '" + category.CategoryID + "'");
-            }
+             query.Append(", '" + category.CategoryID + "'");
+            
             if (subcategory != null)
             {
                 query.Append(", '" + subcategory.SubcategoryID + "'");
@@ -136,6 +150,18 @@ namespace Main.GUI
             {
                 MessageBox.Show("Transakcja nie została dodana do bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+        }
+
+        private void AddInputAmount_KeyDown(object sender, KeyEventArgs e)
+        {
+            if((e.Key<Key.D0 || e.Key >Key.D9)&&
+                (e.Key<Key.NumPad0 || e.Key>Key.NumPad9)
+                && e.Key!=Key.OemPeriod
+                && e.Key!=Key.Decimal)
+            {
+                e.Handled = true;
+            }
+            
         }
     }
 }
