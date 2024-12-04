@@ -44,14 +44,15 @@ namespace Main.Controls
 
         private void CheckHeart_Loaded(object sender, RoutedEventArgs e)
         {
-            var HeartPath = (Path)((ToggleButton)sender).Template.FindName("HeartPath", (FrameworkElement)sender);
+            var toggleButton = (ToggleButton)sender;
+            var heartImage = (Image)toggleButton.Template.FindName("HeartImage", toggleButton);
             if(store.IsFavorite)
             {
-                HeartPath.Fill = Brushes.Red;
+                heartImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_filled.png"));
             }
             else
             {
-                HeartPath.Fill = Brushes.Transparent;
+                heartImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_outlined.png"));
             }
         }
 
@@ -100,8 +101,10 @@ namespace Main.Controls
 
         private void HeartToggleButton_Checked(object sender, RoutedEventArgs e)
         {
-            var HeartPath = (Path)((ToggleButton)sender).Template.FindName("HeartPath",(FrameworkElement)sender);
-            if(HeartPath!=null)
+            var toggleButton = (ToggleButton)sender;
+            var heartImage = (Image)toggleButton.Template.FindName("HeartImage", toggleButton);
+            heartImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_filled.png"));
+            if (heartImage != null)
             {
                 DBSqlite dBSqlite=new DBSqlite();
                 /*dBSqlite.ExecuteNonQuery("UPDATE Stores SET IsFavorite=1 WHERE Stores.StoreID=@MyStoreId",
@@ -111,8 +114,7 @@ namespace Main.Controls
                     new SqliteParameter("@MyStoreId",store.StoreId));
                 if(answer>0)
                 {
-                    HeartPath.Fill = Brushes.Red;
-
+                    heartImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_filled.png"));
                 }
 
 
@@ -121,8 +123,9 @@ namespace Main.Controls
 
         private void HeartToggleButton_Unchecked(object sender, RoutedEventArgs e)
         {
-            var HeartPath = (Path)((ToggleButton)sender).Template.FindName("HeartPath", (FrameworkElement)sender);
-            if (HeartPath != null)
+            var toggleButton = (ToggleButton)sender;
+            var heartImage = (Image)toggleButton.Template.FindName("HeartImage", toggleButton);
+            if (heartImage != null)
             {
                 
                 DBSqlite dBSqlite = new DBSqlite();
@@ -131,9 +134,9 @@ namespace Main.Controls
                int answer=dBSqlite.ExecuteNonQuery("DELETE FROM FavoriteStores WHERE UserID=@MyUserID AND StoreID=@MyStoreID",
                     new SqliteParameter("@MyUserID", userid),
                     new SqliteParameter("@MyStoreID", store.StoreId));
-                if(answer>0) 
+                if(answer>0)
                 {
-                    HeartPath.Fill = Brushes.Transparent;
+                    heartImage.Source = new BitmapImage(new Uri("pack://application:,,,/Resources/heart_outlined.png"));
                 }
             }
         }

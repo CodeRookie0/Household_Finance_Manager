@@ -122,6 +122,12 @@ namespace Main.GUI
                 if (answerQuestion == MessageBoxResult.Yes)
                 {
                     DBSqlite dBSqlite = new DBSqlite();
+
+                    int updateHistory = dBSqlite.ExecuteNonQuery(
+                        "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID AND TransactionID=NULL AND ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
+                        new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 3),
+                        new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
+
                     int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
                         new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
                     if (answer > 0)

@@ -201,7 +201,14 @@ namespace Main.GUI
             query.Append(" WHERE TransactionID = '" + transactionId + "';");
 
             // Uruchomienie zapytania SQL
-            DBSqlite dBSqlite = new DBSqlite();
+            DBSqlite dBSqlite = new DBSqlite(); 
+
+            int updateHistory = dBSqlite.ExecuteNonQuery(
+                "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID AND Amount = @Amount AND ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
+                new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 2),
+                new Microsoft.Data.Sqlite.SqliteParameter("@Amount", amount),
+                new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
+
             int answer = dBSqlite.ExecuteNonQuery(query.ToString());
 
             if (answer > 0)

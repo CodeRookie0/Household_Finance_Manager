@@ -41,11 +41,6 @@ namespace Main.GUI
             userRole = Service.GetRoleIDByUserID(userId);
             familyId = Service.GetFamilyIdByMemberId(userId);
 
-            if (userRole != 1)
-            {
-                HeaderGrid.ColumnDefinitions[6].Width = new GridLength(0);
-            }
-
             LoadTransactions();
             LoadComboBoxValues();
         }
@@ -531,8 +526,14 @@ namespace Main.GUI
                 if (answerQuestion == MessageBoxResult.Yes)
                 {
                     DBSqlite dBSqlite = new DBSqlite();
+
+                    int updateHistory = dBSqlite.ExecuteNonQuery(
+                        "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID AND TransactionID=NULL AND ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
+                        new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 3),
+                        new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
+
                     int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
-                        new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
+                            new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
                     if (answer > 0)
                     {
                         MessageBox.Show("Transakcja została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);

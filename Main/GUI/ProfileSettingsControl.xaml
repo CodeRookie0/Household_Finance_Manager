@@ -4,43 +4,86 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Main.GUI"
-        mc:Ignorable="d"
-        Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
-        Title="SettingProifl" Height="600" Width="1000" BorderThickness="3" BorderBrush="#3AA9AD">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Border Background="#ffffff" Grid.Row="0" Grid.ColumnSpan="2">
-            <StackPanel Orientation="Vertical" Grid.Row="0">
-                <Image Source="../Resources/logo_PNG.png" Grid.Column="0" Grid.Row="0" Width="220" Height="220" Margin="50 50 50 50"/>
-            </StackPanel>
-        </Border>
-        <Border Background="#ffffff" Grid.Row="1">
-            <StackPanel VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <Label x:Name="MovingLabel1" Content="E-mail" FontSize="32" MouseEnter="MovingLabel1_MouseEnter"  MouseLeave="MovingLabel1_MouseLeave" Margin="0,0,0,0"/>
-                    <TextBox x:Name="InputEmail" Width="200" FontSize="32"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                    <Label  x:Name="MovingLabel" Content="Nazwa Uzytkownika" HorizontalAlignment="Left" VerticalAlignment="Top" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave" FontSize="32" Margin="0,0,0,0"/>
-                    <TextBox x:Name="InputUserName" Width="177" FontSize="32"/>
-                </StackPanel>
-            </StackPanel>
-        </Border>
-        <Border Background="#ffffff" Grid.Column="1" Grid.Row="1">
-            <StackPanel VerticalAlignment="Center">
-                <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                    <Button x:Name="ChangeDataButton" Content="Zmień Dane" Background="#3aa9ad" Style="{StaticResource mainButton}" MouseEnter="ChangeDataButton_MouseEnter" MouseLeave="ChangeDataButton_MouseLeave" Click="ChangeDataButton_Click"/>
-                    <Button x:Name="CloseButton" Content="Zamknij" Background="#3aa9ad" Style="{StaticResource mainButton}" MouseLeave="CloseButton_MouseLeave" MouseEnter="Button_MouseEnter" Click="Button_Click"/>
-                </StackPanel>
-
-            </StackPanel>
+                mc:Ignorable="d"
+Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+Title="SettingProifl" Height="700" Width="410">
+    <Grid MouseDown="Grid_MouseDown">
+        <Border BorderBrush="#4EB1B6" BorderThickness="3">
+            <Grid Background="#ffffff">
+                <Button x:Name="CloseButton" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
+                    <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+                </Button>
+                <Border Background="#333AA9AD" Margin="10,75,10,10" CornerRadius="20">
+                    <StackPanel VerticalAlignment="Center" Margin="15,0,15,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="45" Margin="0,40,0,0">
+                            <Label x:Name="UserDataLabel" Content="Dane użytkownika" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" Margin="0,0,0,0" Width="190"/>
+                            <Button x:Name="ChangeUserDataButton" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{StaticResource NoHoverButtonStyle}" Width="49" Margin="0,3,10,15" Click="ChangeUserDataButton_Click">
+                                <Image x:Name="ChangeUserDataImage" Source="../Resources/edit.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Width="27" Height="27"/>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,5">
+                                    <Label x:Name="UserNameLabel" Content="Nazwa uzytkownika" FontSize="18" HorizontalAlignment="Left" Margin="0,0,0,0"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="35">
+                                        <TextBox x:Name="UserNameTextBox"  FontSize="21" IsEnabled="False" Margin="5,0,5,0" Width="340" HorizontalAlignment="Left" Height="29.93"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,5,0,5">
+                                    <Label x:Name="EmailLabel" Content="Email" FontSize="18" HorizontalAlignment="Left" Margin="0,0,0,0"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="35">
+                                        <TextBox x:Name="EmailTextBox"  FontSize="21" IsEnabled="False" Margin="5,0,5,0" Width="340" HorizontalAlignment="Left" Height="29.93"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,10,0" VerticalAlignment="Bottom">
+                                <StackPanel x:Name="EditUserDataButtonsPanel" Orientation="Vertical" Visibility="Collapsed">
+                                    <Button x:Name="CancelUserDataChangesButton" Content="Anuluj" VerticalAlignment="Bottom" Style="{StaticResource Button2}" Width="120" Height="50"  Margin="0,0,0,25" Click="CancelUserDataChangesButton_Click" />
+                                    <Button x:Name="ApproveUserDataButton" Content="Zapisz" Style="{StaticResource mainButton2}"  Width="120" Height="50" Click="SaveUserDataChangesButton_Click" Margin="0,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Margin="0,5,0,5">
+                            <Label  x:Name="CreatedAtLabel" Content="Data stworzenia" FontSize="18" HorizontalAlignment="Left" Margin="0,0,0,0"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="35">
+                                <TextBox x:Name="CreatedAtTextBox"  FontSize="21" IsEnabled="False" Margin="5,0,5,0" Width="340" HorizontalAlignment="Left" Height="29.93"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="45" Margin="0,5,0,0">
+                            <Label x:Name="PasswordDataLabel" Content="Zmiana hasła" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" Margin="0,0,0,0" Width="140"/>
+                            <Button x:Name="ChangePasswordDataButton" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{StaticResource NoHoverButtonStyle}" Width="49" Margin="0,3,10,15" Click="ChangePasswordDataButton_Click">
+                                <Image x:Name="ChangePasswordDataImage" Source="../Resources/edit.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Width="27" Height="27"/>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel Orientation="Vertical">
+                                <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,5">
+                                    <Label x:Name="PasswordLabel" Content="Hasło" FontSize="18" HorizontalAlignment="Left" Margin="0,0,0,0"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="35">
+                                        <TextBox x:Name="PasswordTextBox"  FontSize="21" IsEnabled="False" Margin="5,0,5,0" Width="340" HorizontalAlignment="Left" Height="29.93"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <StackPanel x:Name="ConfirmPasswordStackPanel" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,0,5" Visibility="Collapsed">
+                                    <Label x:Name="ConfirmPasswordLabel" Content="Potwierdź hasło" FontSize="18" HorizontalAlignment="Left" Margin="0,0,0,0"/>
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="35">
+                                        <TextBox x:Name="ConfirmPasswordTextBox"  FontSize="21" IsEnabled="False" Margin="5,0,5,0" Width="340" HorizontalAlignment="Left" Height="29.93"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20,0,10,0" VerticalAlignment="Bottom">
+                                <StackPanel x:Name="EditPasswordButtonsPanel" Orientation="Vertical" Visibility="Collapsed">
+                                    <Button x:Name="CancelPasswordChangesButton" Content="Anuluj" VerticalAlignment="Bottom" Style="{StaticResource Button2}" Width="120" Height="50"  Margin="0,0,0,25" Click="CancelPasswordChangesButton_Click" />
+                                    <Button x:Name="ApprovePasswordDataButton" Content="Zapisz" Style="{StaticResource mainButton2}"  Width="120" Height="50" Click="SavePasswordChangesButton_Click" Margin="0,0,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10,10,10,0">
+                            <Button x:Name="DeleteAccountButton" Content="Usuń konto" VerticalAlignment="Bottom" Style="{StaticResource Button2}" Width="150" Height="50" Margin="0,0,0,0" Click="DeleteAccountButton_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                <Image Source="../Resources/logo_PNG.png" Width="130" Height="130" VerticalAlignment="Top" Margin="10"/>
+            </Grid>
         </Border>
     </Grid>
 </Window>
