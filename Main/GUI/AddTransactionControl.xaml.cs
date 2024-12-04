@@ -29,14 +29,14 @@ namespace Main.GUI
        
         private readonly int userid;
         
-        public AddTransactionControl(ObservableCollection<Category> argcategoryList,ObservableCollection<Store> argStore,int userId)
+        public AddTransactionControl(ObservableCollection<Category> argCategoryList,ObservableCollection<Store> argStore,int userId)
         {
             InitializeComponent();
            
-           Listcategories = argcategoryList;
+            Listcategories = argCategoryList;
             Liststores = argStore;
-           ComboBoxCategory.ItemsSource = Listcategories;
-           ComobBoxStore.ItemsSource = Liststores;
+            ComboBoxCategory.ItemsSource = Listcategories;
+            ComobBoxStore.ItemsSource = Liststores;
             userid = userId;
 
             Listsubcategory = new ObservableCollection<Subcategory>();
@@ -121,8 +121,14 @@ namespace Main.GUI
             {
                 query.Append(",StoreID");
             }
-
-            query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + date + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
+            if(InpuTypeTransaction.SelectedIndex == 0)
+            {
+                query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + date + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
+            }
+            else if (InpuTypeTransaction.SelectedIndex == 1)
+            {
+                query.Append(") VALUES ('" + userid.ToString() + "',-" + amount + ", '" + note + "', '" + date + "','" + (InpuTypeTransaction.SelectedIndex + 1) + "'");
+            }
 
             // Dodajemy wartości dla opcjonalnych pól
              query.Append(", '" + category.CategoryID + "'");

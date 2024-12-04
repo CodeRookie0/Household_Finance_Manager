@@ -241,7 +241,8 @@ namespace Main.GUI
                         BorderBrush = new SolidColorBrush(Colors.Transparent),
                         Height=35,
                         Width=35,
-                        Padding = new Thickness(5)
+                        Padding = new Thickness(5),
+                        DataContext=transaction
                     };
                     editButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/edit_green.png")), Width = 25, Height = 25 };
                     editButton.Click += EditTransactionFamily_Click;
@@ -254,7 +255,8 @@ namespace Main.GUI
                         BorderBrush = new SolidColorBrush(Colors.Transparent),
                         Height = 35,
                         Width = 35,
-                        Padding = new Thickness(5)
+                        Padding = new Thickness(5),
+                        DataContext = transaction
                     };
                     deleteButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/delete_red.png")), Width = 25, Height = 25 };
                     deleteButton.Click += DeleteTransactionFamily_Click;
@@ -280,8 +282,8 @@ namespace Main.GUI
                             BorderBrush = new SolidColorBrush(Colors.Transparent),
                             Height = 35,
                             Width = 35,
-                            Padding = new Thickness(5)
-                            
+                            Padding = new Thickness(5),
+                            DataContext = transaction
                         };
                         editButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/edit_green.png")), Width = 25, Height = 25 };
                         editButton.Click += EditTransactionFamily_Click;
@@ -293,7 +295,8 @@ namespace Main.GUI
                             BorderBrush = new SolidColorBrush(Colors.Transparent),
                             Height = 35,
                             Width = 35,
-                            Padding = new Thickness(5)
+                            Padding = new Thickness(5),
+                            DataContext = transaction
                         };
                         deleteButton.Content = new Image { Source = new BitmapImage(new Uri("pack://application:,,,/Resources/delete_red.png")), Width = 25, Height = 25 };
                         deleteButton.Click += DeleteTransactionFamily_Click;

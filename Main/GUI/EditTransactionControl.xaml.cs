@@ -99,7 +99,7 @@ namespace Main.GUI
             Listsubcategory = new ObservableCollection<Subcategory>();
 
 
-            InputAmount.Text = transaction.Amount.ToString();
+            InputAmount.Text = Math.Abs(transaction.Amount).ToString();
             InputData.Text = transaction.Date.ToString();
             InputNote.Text = transaction.Note.ToString();
         }
@@ -167,7 +167,15 @@ namespace Main.GUI
 
             // Rozpoczęcie budowania zapytania SQL
             StringBuilder query = new StringBuilder("UPDATE Transactions SET ");
-            query.Append("Amount = '" + amount + "', ");
+            if (InpuTypeTransaction.SelectedIndex == 0)
+            {
+                query.Append("Amount = '" + amount + "', ");
+            }
+            else if (InpuTypeTransaction.SelectedIndex == 1)
+            {
+                query.Append("Amount = -" + amount + ", ");
+            }
+
             query.Append("Note = '" + note + "', ");
             query.Append("Date = '" + date + "', ");
             query.Append("TransactionTypeID = '" + transactionType + "'");
