@@ -48,7 +48,7 @@ namespace Main.GUI
                 return;
             }
 
-            if (Service.IsEmailExistis(email))
+            if (Service.IsEmailExistis(email,-1))
             {
                 MessageBox.Show("Ten adres e-mail jest już zarejestrowany.", "Błąd rejestracji", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;

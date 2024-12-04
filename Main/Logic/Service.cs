@@ -24,12 +24,21 @@ namespace Main.Logic
     public static class Service
     {
         // Validation Methods
-        public static bool IsEmailExistis(string email)
+        public static bool IsEmailExistis(string email,int userId)
         {
             using (DBSqlite database = new DBSqlite())
             {
-                string selectQuery = "SELECT COUNT(*) FROM Users WHERE Email=@Email";
-                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@Email", email));
+                DataTable result;
+                if (userId >0)
+                {
+                    string selectQuery = "SELECT COUNT(*) FROM Users WHERE Email=@Email AND UserID != @UserID";
+                    result = database.ExecuteQuery(selectQuery, new SqliteParameter("@Email", email), new SqliteParameter("@UserID", userId));
+                }
+                else
+                {
+                    string selectQuery = "SELECT COUNT(*) FROM Users WHERE Email=@Email";
+                    result = database.ExecuteQuery(selectQuery, new SqliteParameter("@Email", email));
+                }
                 return result.Rows.Count > 0 && Convert.ToInt32(result.Rows[0][0]) > 0;
             }
         }
@@ -547,6 +556,53 @@ namespace Main.Logic
                 }
             }
         }
+        public static bool UpdateUserEmailAndUsername(int userId, string newEmail, string newUsername)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string updateQuery = @"
+                    UPDATE Users 
+                    SET Email = @Email, UserName = @UserName 
+                    WHERE UserID = @UserID";
+
+                var parameters = new[]
+                {
+                    new SqliteParameter("@Email", newEmail),
+                    new SqliteParameter("@UserName", newUsername),
+                    new SqliteParameter("@UserID", userId)
+                };
+
+                int rowsAffected = database.ExecuteNonQuery(updateQuery, parameters);
+
+                return rowsAffected > 0;
+            }
+        }
+
+        public static bool UpdateUserPassword(int userId, string newPassword)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string newSalt = GenerateSalt();
+                string hashNewPassword = HashPassword(Encoding.UTF8.GetBytes(newPassword), Encoding.UTF8.GetBytes(newSalt));
+
+                string updateQuery = @"
+                    UPDATE Users 
+                    SET PasswordHash = @PasswordHash, Salt = @Salt 
+                    WHERE UserID = @UserID";
+
+                var parameters = new[]
+                {
+                    new SqliteParameter("@PasswordHash", hashNewPassword),
+                    new SqliteParameter("@Salt", newSalt),
+                    new SqliteParameter("@UserID", userId)
+                };
+
+                int rowsAffected = database.ExecuteNonQuery(updateQuery, parameters);
+
+                return rowsAffected > 0;
+            }
+        }
+
 
 
         // Delete Methods
@@ -631,7 +687,105 @@ namespace Main.Logic
             }
         }
 
+        public static bool DeleteUser(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                try
+                {
+                    string deleteFavoriteCategoriesQuery = "DELETE FROM FavoriteCategories WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteFavoriteCategoriesQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteFavouriteStoresQuery = "DELETE FROM FavoriteStores WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteFavouriteStoresQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteNotificationsQuery = "DELETE FROM Notifications WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteNotificationsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteGoalsQuery = "DELETE FROM Goals WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteGoalsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteLimitsQuery = "DELETE FROM Limits WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteLimitsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteReccuringPaymentHistoryQuery = "DELETE FROM RecurringPaymentHistory WHERE RecurringPaymentID IN (SELECT RecurringPaymentID FROM RecurringPayments WHERE UserID = @UserID);";
+                    database.ExecuteNonQuery(deleteReccuringPaymentHistoryQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteRecurringPaymentsQuery = "DELETE FROM RecurringPayments WHERE UserID = @UserID OR CreatedByUserID = @UserID;";
+                    database.ExecuteNonQuery(deleteRecurringPaymentsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteTransactionsQuery = "DELETE FROM Transactions WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteTransactionsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteJoinRequestssQuery = "DELETE FROM JoinRequests WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteJoinRequestssQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteStoresQuery = "DELETE FROM Stores WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteStoresQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteSubcategoriesQuery = "DELETE FROM Subcategories WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteSubcategoriesQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteCategoriesQuery = "DELETE FROM Categories WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@UserID", userId));
+
+                    string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = (SELECT FROM Family WHERE PrimaryUserID = @UserID);";
+                    database.ExecuteNonQuery(updateUsersQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteFamilyGoalsQuery = "DELETE FROM Goals WHERE FamilyID = @FamilyID;\r\n";
+                    database.ExecuteNonQuery(deleteFamilyGoalsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteFamilyLimitsQuery = "DELETE FROM Limits WHERE FamilyID = @FamilyID;\r\n";
+                    database.ExecuteNonQuery(deleteFamilyLimitsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteFamilyJoinRequestsQuery = "DELETE FROM JoinRequests WHERE FamilyID = @FamilyID;\r\n";
+                    database.ExecuteNonQuery(deleteFamilyJoinRequestsQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteFamilyQuery = "DELETE FROM Family WHERE PrimaryUserID = @UserID;";
+                    database.ExecuteNonQuery(deleteFamilyQuery, new SqliteParameter("@UserID", userId));
+
+                    string deleteUserQuery = "DELETE FROM Users WHERE UserID = @UserID;\r\n";
+                    database.ExecuteNonQuery(deleteUserQuery, new SqliteParameter("@UserID", userId));
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
         // GET Methods
+
+        public static User GetUserByUserID(int userId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT * FROM Users WHERE UserID = @UserID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@UserID", userId));
+
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null; 
+                }
+
+                var row = result.Rows[0];
+
+                return new User
+                {
+                    UserID = Convert.ToInt32(row["UserID"]),
+                    UserName = row["UserName"].ToString(),
+                    Email = row["Email"].ToString(),
+                    PasswordHash = row["PasswordHash"].ToString(),
+                    Salt = row["Salt"].ToString(),
+                    RoleID = Convert.ToInt32(row["RoleID"]),
+                    FamilyID = row["FamilyID"] != DBNull.Value ? (int?)Convert.ToInt32(row["FamilyID"]) : null,
+                    CreatedAt = Convert.ToDateTime(row["CreatedAt"]),
+                    ProfileSettings = row["ProfileSettings"]?.ToString()
+                };
+            }
+        }
 
         public static string GetUserNameByUserID(int userId)
         {

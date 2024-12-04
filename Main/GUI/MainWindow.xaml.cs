@@ -442,7 +442,7 @@ namespace Main.GUI
 
         private void ProfileSettingsIconImage_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            ProfileSettingsControl profileSettings = new ProfileSettingsControl(userId);
+            ProfileSettingsControl profileSettings = new ProfileSettingsControl(userId,this);
             profileSettings.ShowDialog();
         }
     }
