@@ -11,7 +11,8 @@ namespace Main.Models
     {
         private readonly int userid;
         public string Name {  get; set; }   
-        public string Role {  get; set; }   
+        public string Role {  get; set; }
+        public string RoleName { get; set; }
 
         public int Userid {
             get 

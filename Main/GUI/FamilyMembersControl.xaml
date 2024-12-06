@@ -20,27 +20,35 @@
         </Grid.ColumnDefinitions>
 
         <TextBlock Grid.Row="0" Text="Członkowie:" FontSize="20" FontWeight="Bold" Margin="20,15,20,15"/>
-        <ListBox Grid.Row="1" x:Name="FamilyMembersListBox" Background="#F3F3F3" BorderThickness="0" 
-                 Padding="5" Margin="20,0,20,0" DisplayMemberPath="Name">
-        </ListBox>
+        <DataGrid Grid.Row="1" x:Name="FamilyMembersDataGrid" Background="#F3F3F3" BorderThickness="0"
+          Padding="2" Margin="20,0,20,0" AutoGenerateColumns="False" HeadersVisibility="Column" FontSize="16" IsReadOnly="True" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nazwa użytkownika" Binding="{Binding Name}" Width="*"/>
+                <DataGridTextColumn Header="Rola użytkownika" Binding="{Binding RoleName}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
 
         <TextBlock x:Name="JoinRequestsTextBlock" Grid.Row="2" Text="Prośby o dołączenie:" FontSize="20" FontWeight="Bold" Margin="20,15,20,15" />
-        <Button x:Name="FamilySettingsButton"  Grid.Row="0" Grid.Column="1" Content="Ustawienia rodziny" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource mainButton}" Margin="0" Click="FamilySettingsButton_Click"/>
-        <Button x:Name="LeaveFamilyButton"  Grid.Row="0" Grid.Column="1" Content="Opuść rodzinę" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource Button2}" Margin="0" Click="LeaveFamilyButton_Click" Visibility="Collapsed"/>
-        <ListBox Grid.Row="3" x:Name="JoinRequestsListBox" Background="#F3F3F3" BorderThickness="0" 
-                 Padding="5" Margin="20,0,20,15" DisplayMemberPath="Name">
-        </ListBox>
+        <Button x:Name="FamilySettingsButton"  Grid.Row="0" Grid.Column="1" Content="Ustawienia rodziny" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource PrimaryActionButtonStyle}" Margin="0" Click="FamilySettingsButton_Click" FontSize="16" Width="210"/>
+        <Button x:Name="LeaveFamilyButton"  Grid.Row="0" Grid.Column="1" Content="Opuść rodzinę" VerticalAlignment="Center" HorizontalAlignment="Right" Style="{StaticResource TransparentGreenButtonStyle}" Margin="0" Click="LeaveFamilyButton_Click" Visibility="Collapsed"/>
+        <DataGrid Grid.Row="3" x:Name="JoinRequestsDataGrid" Background="#F3F3F3" BorderThickness="0" 
+          Padding="2" Margin="20,0,20,15" AutoGenerateColumns="False" HeadersVisibility="Column" FontSize="16"  IsReadOnly="True" SelectionMode="Single">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Nazwa użytkownika" Binding="{Binding UserName}" Width="*" />
+                <DataGridTextColumn Header="Data zgłoszenia" Binding="{Binding JoinRequestDate, StringFormat=MM/dd/yyyy}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
 
         <Border Background="#ffffff" Grid.Column="1" Grid.Row="1">
             <StackPanel VerticalAlignment="Center"  HorizontalAlignment="Center">
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="RemoveMemberButton" Click="RemoveFamilyMember_Click" Content="Usuń członka" Style="{StaticResource mainButton}"/>
-                    <Button x:Name="ModifyPermissionsButton" Click="ChangePermision" Content="Modyfikacja uprawnień" Style="{StaticResource mainButton}"/>
+                    <Button x:Name="RemoveMemberButton" Click="RemoveFamilyMember_Click" Content="Usuwanie członka" Style="{StaticResource PrimaryActionButtonStyle}" FontSize="16" Width="210"/>
+                    <Button x:Name="ModifyPermissionsButton" Click="ChangePermision" Content="Modyfikacja uprawnień" Style="{StaticResource PrimaryActionButtonStyle}" FontSize="16" Width="210"/>
                 </StackPanel>
             </StackPanel>
         </Border>
-        <StackPanel Grid.Row="4" Grid.Column="1" Background="#ffffff" Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="80">
-            <Button x:Name="ReviewRequestsButton" Content="Rozaptrzenie próśb"  Style="{StaticResource mainButton}" Click="Button_Click"/>
+        <StackPanel Grid.Row="4" Grid.Column="1" Background="#ffffff" Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Button x:Name="ReviewRequestsButton" Content="Rozaptrzenie próśb"  Style="{StaticResource PrimaryActionButtonStyle}" Click="Button_Click" FontSize="16" Width="210"/>
         </StackPanel>
     </Grid>
 </UserControl>

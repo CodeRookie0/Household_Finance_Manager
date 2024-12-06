@@ -30,7 +30,7 @@ namespace Main.Controls
             InitializeComponent();
             pendinguser = argPendingUser;
             UserName.Text = pendinguser.Name;
-            Role.Text = pendinguser.Role;
+            Role.Text =Service.GetRoleNameByRoleID(Convert.ToInt16(pendinguser.Role));
         }
 
         public event EventHandler<PendingUser> UserPending;

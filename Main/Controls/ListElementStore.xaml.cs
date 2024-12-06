@@ -27,17 +27,36 @@ namespace Main.Controls
     {
         private Store store;
         private int userid;
-        public ListElementStore(Store argStore,int argUserId)
+        private bool IsFamily;
+        public ListElementStore(Store argStore,int argUserId,bool IsFamily)
         {
             InitializeComponent();
             store = argStore;
             userid = argUserId;
+            this.IsFamily = IsFamily;
 
             StoreName.Text = store.StoreName;
-
-           if(store.UserId!=argUserId)
+            CategoryName.Text = store.CategoryName;
+            if (IsFamily)
             {
-                DeleteStore.IsEnabled = false;
+                UsereName.Text = "Stworzony przez: " + store.CreatedBy;
+            }
+            else
+            {
+                UsereName.Text = "";
+            }
+            int roleId = Service.GetRoleIDByUserID(userid);
+            if(store.UserId!=userid && roleId!=1)
+            {
+                EditStore.Visibility = Visibility.Collapsed;
+                DeleteStore.Visibility = Visibility.Collapsed;
+                ActionPanel.Margin= new Thickness(135,0,0,0);
+            }
+            else
+            {
+                EditStore.Visibility = Visibility.Visible;
+                DeleteStore.Visibility = Visibility.Visible;
+                ActionPanel.Margin = new Thickness(25, 0, 0, 0);
             }
 
         }
@@ -74,28 +93,17 @@ namespace Main.Controls
 
         private void Delete_Store(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Czy na pewno chcesz usunąć sklep " + store.StoreName + " ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Czy na pewno chcesz usunąć sklep " + store.StoreName + ", stworzony przez "+store.CreatedBy+ "?\nPo usunięciu sklepu wszystkie transakcje z nim powiązane utracą przypisanie do tego sklepu.", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
-                DBSqlite dBSqlite = new DBSqlite();
-                int answer1 = dBSqlite.ExecuteNonQuery("UPDATE Transactions SET StoreID=NULL WHERE StoreID=@MyStoreId",
-                  new SqliteParameter("@MyStoreId", store.StoreId));
-                if (answer1 > 0)
+                if (Service.DeleteStore(store.StoreId))
                 {
-
-                    int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Stores WHERE Stores.StoreID=@CurrentStoreID",
-                        new Microsoft.Data.Sqlite.SqliteParameter("@CurrentStoreID", store.StoreId));
-
-                    if (answer > 0)
-                    {
-                        MessageBox.Show("Sklep został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                        OnItemDeleted();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Sklep nie został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
+                    MessageBox.Show("Sklep został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                    OnItemDeleted();
                 }
-
+                else
+                {
+                    MessageBox.Show("Sklep nie został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
         }
 

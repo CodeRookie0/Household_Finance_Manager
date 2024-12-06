@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Main.Logic;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ namespace Main.Models
         public string StoreName {  get; set; }
         public int UserId { get { return userId; } }
         public bool IsFavorite { get { return isFavorit; } }
+        public string CreatedBy => Service.GetUserNameByUserID(UserId);
 
         public Store(int storeId,int userId,bool isFavorite)
         {

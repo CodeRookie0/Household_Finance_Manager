@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -37,14 +39,14 @@ namespace Main.GUI
             Listsubcategory = new ObservableCollection<Subcategory>();
             transaction = argtransaction;
 
-            ComboBoxCategory.ItemsSource = Listcategories;
+            CategoryComboBox.ItemsSource = Listcategories;
 
             // var thisCategory = argcategoryList.Find(c => c.CategoryID == transaction.CategoryID);
             var thisCategory = argcategoryList.FirstOrDefault(x => x.CategoryID == transaction.CategoryID);
 
             if (thisCategory != null)
             {
-                ComboBoxCategory.SelectedIndex = argcategoryList.IndexOf(thisCategory);
+                CategoryComboBox.SelectedIndex = argcategoryList.IndexOf(thisCategory);
 
                 DBSqlite dBSqlite = new DBSqlite();
                 DataTable answer = dBSqlite.ExecuteQuery("SELECT SubCategoryID,CategoryID,SubcategoryName,UserID FROM SubCategories WHERE CategoryID=@MyCategoryId",
@@ -52,7 +54,7 @@ namespace Main.GUI
                 if (answer != null)
                 {
 
-                    ComboSubCategory.ItemsSource = null;
+                    SubategoryComboBox.ItemsSource = null;
                     Listsubcategory.Clear();
 
                     foreach (DataRow row in answer.Rows)
@@ -64,32 +66,32 @@ namespace Main.GUI
                         subcategory.UserID = (row.IsNull(3) == true) ? -1 : int.Parse(row[3].ToString());
                         Listsubcategory.Add(subcategory);
                     }
-                    ComboSubCategory.ItemsSource = Listsubcategory;
-                    ComboSubCategory.DisplayMemberPath = "SubcategoryName";
+                    SubategoryComboBox.ItemsSource = Listsubcategory;
+                    SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
 
                     var thisSubCategory = Listsubcategory.FirstOrDefault(c => c.SubcategoryID == transaction.SubcategoryID);
                     if (thisSubCategory != null)
                     {
-                        ComboSubCategory.IsEnabled = true;
-                        ComboSubCategory.SelectedIndex = Listsubcategory.IndexOf(thisSubCategory);
+                        SubategoryComboBox.IsEnabled = true;
+                        SubategoryComboBox.SelectedIndex = Listsubcategory.IndexOf(thisSubCategory);
                     }
                 }
             }
 
 
-            ComobBoxStore.ItemsSource = Liststores;
+            StoreComboBox.ItemsSource = Liststores;
 
             var thisStore = argStore.FirstOrDefault(c => c.StoreId == transaction.StoreID);
             if (thisStore != null)
             {
-                ComobBoxStore.SelectedIndex = argStore.IndexOf(thisStore);
+                StoreComboBox.SelectedIndex = argStore.IndexOf(thisStore);
             }
 
             InpuTypeTransaction.SelectedIndex = (transaction.TransactionTypeID - 1);
 
             if (transaction.SubcategoryID != -1)
             {
-                ComboBoxCategory.IsEnabled = true;
+                CategoryComboBox.IsEnabled = true;
 
 
             }
@@ -111,7 +113,7 @@ namespace Main.GUI
 
         private void ComboBoxCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var item = ComboBoxCategory.SelectedItem as Category;
+            var item = CategoryComboBox.SelectedItem as Category;
             if (item != null)
             {
 
@@ -120,8 +122,8 @@ namespace Main.GUI
                     new Microsoft.Data.Sqlite.SqliteParameter("@MyCategoryId", item.CategoryID));
                 if (answer != null)
                 {
-                    ComboSubCategory.IsEnabled = true;
-                    ComboSubCategory.ItemsSource = null;
+                    SubategoryComboBox.IsEnabled = true;
+                    SubategoryComboBox.ItemsSource = null;
                     Listsubcategory.Clear();
 
                     foreach (DataRow row in answer.Rows)
@@ -133,8 +135,8 @@ namespace Main.GUI
                         subcategory.UserID = (row.IsNull(3) == true) ? -1 : int.Parse(row[3].ToString());
                         Listsubcategory.Add(subcategory);
                     }
-                    ComboSubCategory.ItemsSource = Listsubcategory;
-                    ComboSubCategory.DisplayMemberPath = "SubcategoryName";
+                    SubategoryComboBox.ItemsSource = Listsubcategory;
+                    SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
 
                 }
             }
@@ -143,26 +145,33 @@ namespace Main.GUI
         private void EditTransaction_Click(object sender, RoutedEventArgs e) //Miejsce gdzie można wykorzystać sql injection
         {
             // Pobranie wybranych wartości z ComboBoxów i innych kontrolek
-            Category category = ComboBoxCategory.SelectedItem as Category;
-            Subcategory subcategory = ComboSubCategory.SelectedItem as Subcategory;
-            Store store = ComobBoxStore.SelectedItem as Store;
+            Category category = CategoryComboBox.SelectedItem as Category;
+            Subcategory subcategory = SubategoryComboBox.SelectedItem as Subcategory;
+            Store store = StoreComboBox.SelectedItem as Store;
 
             string amount = InputAmount.Text;
             string note = InputNote.Text;
-            string date = InputData.SelectedDate?.ToString("yyyy-MM-dd");
+            string datePart = InputData.SelectedDate?.ToString("yyyy-MM-dd");
+            string timePart = InputTime.Text;
             int transactionId = transaction.TransactionID;   // Tutaj ustaw ID transakcji, którą chcesz zaktualizować
-            string transactionType = (InpuTypeTransaction.SelectedIndex + 1).ToString(); // Przykład z TransactionType
-            if(date==null)
-            {
-                MessageBox.Show("Proszę wybrać datę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            else if (string.IsNullOrEmpty(amount))
+
+            if (string.IsNullOrEmpty(amount))
             {
                 MessageBox.Show("Prosze podać kwotę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
+            if(datePart==null)
+            {
+                MessageBox.Show("Proszę wybrać datę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (string.IsNullOrEmpty(timePart))
+            {
+                MessageBox.Show("Proszę wybrać czas", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
+            string transactionType = (InpuTypeTransaction.SelectedIndex + 1).ToString(); // Przykład z TransactionType
             amount = amount.Replace(",", ".");
 
             // Rozpoczęcie budowania zapytania SQL
@@ -177,7 +186,14 @@ namespace Main.GUI
             }
 
             query.Append("Note = '" + note + "', ");
-            query.Append("Date = '" + date + "', ");
+            if (DateTime.TryParseExact($"{datePart} {timePart}", "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime combinedDateTime))
+            {
+                query.Append("Date = '" + combinedDateTime + "', ");
+            }
+            else
+            {
+                MessageBox.Show("Nieprawidłowy format czasu. Upewnij się, że wpisujesz czas w formacie HH:mm. Zakres wartości: od 00:00 do 23:59.", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
             query.Append("TransactionTypeID = '" + transactionType + "'");
 
             // Dodawanie wartości dla opcjonalnych pól
@@ -235,6 +251,36 @@ namespace Main.GUI
                 
             }
             
+        }
+
+        private void InputTime_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9:]");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+        private void InputTime_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string text = (string)e.DataObject.GetData(typeof(string));
+                if (!Regex.IsMatch(text, @"^([01]\d|2[0-3]):([0-5]\d)$"))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
+            }
+        }
+
+        private void InputTime_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!Regex.IsMatch(InputTime.Text, @"^([01]\d|2[0-3]):[0-5]\d$"))
+            {
+                MessageBox.Show("Nieprawidłowy format czasu! Użyj formatu HH:mm.", "Błąd walidacji", MessageBoxButton.OK, MessageBoxImage.Error);
+                InputTime.Text = "00:00";
+            }
         }
     }
 }

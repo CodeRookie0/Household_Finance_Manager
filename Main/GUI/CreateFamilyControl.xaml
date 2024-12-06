@@ -12,7 +12,7 @@
             <Button x:Name="CloseButton" 
                     VerticalAlignment="Top" HorizontalAlignment="Right"
                     Margin="0,0,0,0" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
-                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource CloseButtonImageStyle}" Margin="0"/>
             </Button>
             <TextBlock Text="Wprowadź nazwę rodziny:" 
                        VerticalAlignment="Top" 

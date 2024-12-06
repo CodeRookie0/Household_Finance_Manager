@@ -18,7 +18,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource imgClose}"/>
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource CloseButtonImageStyle}"/>
         <Border Background="#ffffff" Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="#3AA9AD">
 
             <TextBlock Text="Prośby o dodanie do rodziny" Grid.ColumnSpan="2" Grid.Row="0"

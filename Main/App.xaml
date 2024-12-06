@@ -20,7 +20,24 @@
             <Setter Property="Foreground" Value="#ffffff"/>
         </Style>
 
-        <Style x:Key="Button" TargetType="Button">
+        <Style x:Key="textHint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Grid.Column" Value="1"/>
+            <Setter Property="Panel.ZIndex" Value="1"/>
+            <Setter Property="Margin" Value="10 0 0 0"/>
+            <Setter Property="Foreground" Value="#acb0af"/>
+        </Style>
+
+        <Style x:Key="InputPanelLogin" TargetType="Control">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Grid.Column" Value="1"/>
+            <Setter Property="Margin" Value="10 0 0 0"/>
+            <Setter Property="Foreground" Value="#878787"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style x:Key="TransparentWhiteButtonStyle" TargetType="Button">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Width" Value="170"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -47,76 +64,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="ButtonCircle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Margin" Value="8 0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="30" BorderThickness="1" BorderBrush="#878787" Padding="15">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#d9d9d9"/>
-
-                </Trigger>
-                <Trigger Property="IsMouseCaptured" Value="True">
-                    <Setter Property="Background" Value="#c4c4c4"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="textHint" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Grid.Column" Value="1"/>
-            <Setter Property="Panel.ZIndex" Value="1"/>
-            <Setter Property="Margin" Value="10 0 0 0"/>
-            <Setter Property="Foreground" Value="#acb0af"/>
-        </Style>
-
-        <Style x:Key="InputPanelLogin" TargetType="Control">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Grid.Column" Value="1"/>
-            <Setter Property="Margin" Value="10 0 0 0"/>
-            <Setter Property="Foreground" Value="#878787"/>
-            <Setter Property="BorderBrush" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-        </Style>
-
-        <Style x:Key="mainButton" TargetType="Button">
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="Width" Value="200"/>
-            <Setter Property="Margin" Value="0 20 0 0"/>
-            <Setter Property="Background" Value="#3Ab19B"/>
-            <Setter Property="Foreground" Value="#fdfefe"/>
-            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="25" BorderThickness="1" BorderBrush="#49B7A3" Padding="15">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#339685"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-                <Trigger Property="IsMouseCaptured" Value="True">
-                    <Setter Property="Background" Value="#2d7a6c"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="mainButton2" TargetType="Button">
+        <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Width" Value="200"/>
             <Setter Property="Margin" Value="0 20 0 0"/>
@@ -144,7 +92,31 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="Button2" TargetType="Button">
+        <Style x:Key="CircleButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="Margin" Value="8 0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="30" BorderThickness="1" BorderBrush="#878787" Padding="15">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#d9d9d9"/>
+
+                </Trigger>
+                <Trigger Property="IsMouseCaptured" Value="True">
+                    <Setter Property="Background" Value="#c4c4c4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TransparentGreenButtonStyle" TargetType="Button">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Width" Value="170"/>
             <Setter Property="Background" Value="Transparent"/>
@@ -171,7 +143,7 @@
             </Style.Triggers>
         </Style>
 
-        <Style x:Key="imgClose" TargetType="Image">
+        <Style x:Key="CloseButtonImageStyle" TargetType="Image">
             <Setter Property="Width" Value="30"/>
             <Setter Property="Height" Value="30"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
@@ -407,7 +379,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        
     </Application.Resources>
 </Application>
 

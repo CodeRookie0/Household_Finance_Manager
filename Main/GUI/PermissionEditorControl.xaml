@@ -18,17 +18,17 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource imgClose}"/>
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource CloseButtonImageStyle}"/>
 
-        <Border Background="#ffffff" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="#3AA9AD" BorderThickness="3">
+        <Border Background="#ffffff" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="#3AA9AD" BorderThickness="0,0,0,3">
             <TextBlock Grid.ColumnSpan="2" Grid.Row="0" FontSize="32" HorizontalAlignment="Center" Margin="20" Text="Uprawnienia twojej rodziny"/>
         </Border>
 
-        <Border Background="#ffffff" Grid.Row="1" Grid.ColumnSpan="2" BorderBrush="#3AA9AD" BorderThickness="3">
-            <DataGrid x:Name="dataGridUserMyFamily" AutoGenerateColumns="False" ItemsSource="{Binding pendingUsers}">
+        <Border Background="#ffffff" Grid.Row="1" Grid.ColumnSpan="2">
+            <DataGrid x:Name="dataGridUserMyFamily" AutoGenerateColumns="False" ItemsSource="{Binding pendingUsers}" FontSize="20">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="User Name" Binding="{Binding Name}"/>
-                    <DataGridTemplateColumn Header="Role">
+                    <DataGridTextColumn Header="User Name" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTemplateColumn Header="Role" Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ComboBox  ItemsSource="{Binding DataContext.ComboBoxItems ,RelativeSource={RelativeSource AncestorType=Window}}"
@@ -37,7 +37,6 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-
                 </DataGrid.Columns>
             </DataGrid>
         </Border>

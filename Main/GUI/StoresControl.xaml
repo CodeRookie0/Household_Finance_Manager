@@ -5,27 +5,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Main.GUI"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             mc:Ignorable="d" Background="White"
+             d:DesignHeight="650" d:DesignWidth="1150">
+    <Grid Margin="5">
         <Grid.RowDefinitions>
-            <RowDefinition Height="0.2*"/>
+            <RowDefinition Height="51"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <Border Background="White" Grid.Row="0">
-            <StackPanel Grid.Row="0" HorizontalAlignment="Right"  VerticalAlignment="Center">
-                <Button Content="Dodaj Sklep" Margin="10" Style="{StaticResource mainButton}" Click="AddStoresButton_Click"/>
+        <Border x:Name="AddStoreBorder" Grid.Row="0" BorderThickness="0" Background="#3AA9AD" CornerRadius="15" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="AddStoreButton" Style="{StaticResource NoHoverButtonStyle}" Height="46" Click="AddStoreButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" MouseEnter="AddStoreButton_MouseEnter" MouseLeave="AddStoreButton_MouseLeave">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="AddStoreTextBlock" Text="+ Nowy sklep" FontSize="18" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20,0"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </Border>
-
-        <Border Background="White" Grid.Row="1">
+        <Border Background="White" Grid.Row="1" BorderBrush="#993AA9AD" BorderThickness="0,1,0,0">
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <StackPanel x:Name="storeList"  Grid.Row="1">
-             
-            </StackPanel>
+                <StackPanel x:Name="storeList"  Grid.Row="1" Margin="10">
+                </StackPanel>
             </ScrollViewer>
         </Border>
-
     </Grid>
 </UserControl>

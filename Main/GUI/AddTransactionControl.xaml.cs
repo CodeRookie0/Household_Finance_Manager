@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,8 +37,8 @@ namespace Main.GUI
            
             Listcategories = argCategoryList;
             Liststores = argStore;
-            ComboBoxCategory.ItemsSource = Listcategories;
-            ComobBoxStore.ItemsSource = Liststores;
+            CategoryComboBox.ItemsSource = Listcategories;
+            StoreComboBox.ItemsSource = Liststores;
             userid = userId;
 
             Listsubcategory = new ObservableCollection<Subcategory>();
@@ -51,7 +53,7 @@ namespace Main.GUI
         private void ComboBoxCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
            
-            var item=ComboBoxCategory.SelectedItem as Category;
+            var item=CategoryComboBox.SelectedItem as Category;
             if (item != null)
             {
                 
@@ -60,8 +62,8 @@ namespace Main.GUI
                     new Microsoft.Data.Sqlite.SqliteParameter("@MyCategoryId", item.CategoryID));
                 if (answer != null) 
                 {
-                    ComboSubCategory.IsEnabled = true;
-                    ComboSubCategory.ItemsSource = null;
+                    SubategoryComboBox.IsEnabled = true;
+                    SubategoryComboBox.ItemsSource = null;
                     Listsubcategory.Clear();
 
                     foreach(DataRow row in answer.Rows) 
@@ -73,8 +75,8 @@ namespace Main.GUI
                         subcategory.UserID = (row.IsNull(3) == true) ? -1 : int.Parse(row[3].ToString()); 
                         Listsubcategory.Add(subcategory);
                     }
-                    ComboSubCategory.ItemsSource = Listsubcategory;
-                    ComboSubCategory.DisplayMemberPath = "SubcategoryName";
+                    SubategoryComboBox.ItemsSource = Listsubcategory;
+                    SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
 
                 }
             }
@@ -82,24 +84,29 @@ namespace Main.GUI
 
         private void AddTransaction(object sender, RoutedEventArgs e) //Miejsce gdzie można wykorzystać sql injection
         {
-            Category category = ComboBoxCategory.SelectedItem as Category;
-            Subcategory subcategory = ComboSubCategory.SelectedItem as Subcategory;
-            Store store=ComobBoxStore.SelectedItem as Store;
+            Category category = CategoryComboBox.SelectedItem as Category;
+            Subcategory subcategory = SubategoryComboBox.SelectedItem as Subcategory;
+            Store store=StoreComboBox.SelectedItem as Store;
 
             string amount = InputAmount.Text;
             string note = InputNote.Text;
-            string date = InputData.SelectedDate?.ToString("yyyy-MM-dd");
-            if(date==null)
-            {
-                MessageBox.Show("Proszę wybrać datę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            else if(string.IsNullOrEmpty(amount)) 
+            string datePart = InputData.SelectedDate?.ToString("yyyy-MM-dd");
+            string timePart = InputTime.Text;
+            if(string.IsNullOrEmpty(amount)) 
             {
                 MessageBox.Show("Prosze podać kwotę","Komunikat",MessageBoxButton.OK,MessageBoxImage.Warning);
                 return;
             }
-
+            if (string.IsNullOrEmpty(timePart))
+            {
+                MessageBox.Show("Proszę wybrać czas", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (datePart == null)
+            {
+                MessageBox.Show("Proszę wybrać datę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             amount = amount.Replace(",", ".");
 
             StringBuilder query = new StringBuilder("INSERT INTO Transactions (UserID,Amount, Note, Date,TransactionTypeID");
@@ -123,11 +130,25 @@ namespace Main.GUI
             }
             if(InpuTypeTransaction.SelectedIndex == 0)
             {
-                query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + date + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
+                if (DateTime.TryParseExact($"{datePart} {timePart}", "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime combinedDateTime))
+                {
+                    query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + combinedDateTime + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
+                }
+                else
+                {
+                    MessageBox.Show("Nieprawidłowy format czasu. Upewnij się, że wpisujesz czas w formacie HH:mm. Zakres wartości: od 00:00 do 23:59.", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
             else if (InpuTypeTransaction.SelectedIndex == 1)
             {
-                query.Append(") VALUES ('" + userid.ToString() + "',-" + amount + ", '" + note + "', '" + date + "','" + (InpuTypeTransaction.SelectedIndex + 1) + "'");
+                if (DateTime.TryParseExact($"{datePart} {timePart}", "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime combinedDateTime))
+                {
+                    query.Append(") VALUES ('" + userid.ToString() + "',-" + amount + ", '" + note + "', '" + combinedDateTime + "','" + (InpuTypeTransaction.SelectedIndex + 1) + "'");
+                }
+                else
+                {
+                    MessageBox.Show("Nieprawidłowy format czasu. Upewnij się, że wpisujesz czas w formacie HH:mm. Zakres wartości: od 00:00 do 23:59.", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
             }
 
             // Dodajemy wartości dla opcjonalnych pól
@@ -167,7 +188,37 @@ namespace Main.GUI
             {
                 e.Handled = true;
             }
-            
+
+        }
+
+        private void InputTime_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9:]");
+            e.Handled = regex.IsMatch(e.Text);
+        }
+        private void InputTime_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string text = (string)e.DataObject.GetData(typeof(string));
+                if (!Regex.IsMatch(text, @"^([01]\d|2[0-3]):([0-5]\d)$"))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
+            }
+        }
+
+        private void InputTime_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (!Regex.IsMatch(InputTime.Text, @"^([01]\d|2[0-3]):[0-5]\d$"))
+            {
+                MessageBox.Show("Nieprawidłowy format czasu! Użyj formatu HH:mm.", "Błąd walidacji", MessageBoxButton.OK, MessageBoxImage.Error);
+                InputTime.Text = "00:00";
+            }
         }
     }
 }

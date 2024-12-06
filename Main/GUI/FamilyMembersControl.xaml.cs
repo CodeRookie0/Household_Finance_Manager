@@ -39,7 +39,7 @@ namespace Main.GUI
             if (!Service.IsPrimaryUser(userId))
             {
                 FamilySettingsButton.Visibility = Visibility.Collapsed;
-                JoinRequestsListBox.Visibility = Visibility.Collapsed;
+                JoinRequestsDataGrid.Visibility = Visibility.Collapsed;
                 JoinRequestsTextBlock.Visibility = Visibility.Collapsed;
                 ReviewRequestsButton.Visibility = Visibility.Collapsed;
                 ModifyPermissionsButton.Visibility = Visibility.Collapsed;
@@ -49,7 +49,9 @@ namespace Main.GUI
             }
             
             joinRequestMembers = new ObservableCollection<PendingUser>(GeneratePendingUser());
-            JoinRequestsListBox.ItemsSource = joinRequestMembers;
+            var familyId = Service.GetFamilyIdByMemberId(userId);
+            var joinRequests = Service.GetPendingJoinRequestsByFamilyId(familyId);
+            JoinRequestsDataGrid.ItemsSource = joinRequests;
             JoinRequestsTextBlock.DataContext = joinRequestMembers;
            /* DBSqlite dBSqlite = new DBSqlite();
             var answerJoinReqeust = dBSqlite.ExecuteQuery("SELECT UserName,Email FROM Users INNER JOIN JoinRequests ON Users.UserID=JoinRequests.UserID WHERE JoinRequests.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
@@ -81,10 +83,11 @@ namespace Main.GUI
                 PendingUser tmp = new PendingUser(int.Parse(row[0].ToString()));
                 tmp.Name= row[1].ToString();
                 tmp.Role = row[2].ToString();
+                tmp.RoleName = Service.GetRoleNameByRoleID(Convert.ToInt32(row[2]));
                 members.Add(tmp);
             }
-            FamilyMembersListBox.DataContext = members;
-            FamilyMembersListBox.ItemsSource = members;
+            FamilyMembersDataGrid.DataContext = members;
+            FamilyMembersDataGrid.ItemsSource = members;
         }
 
         private void ChangePermision(object sender, RoutedEventArgs e)
@@ -133,7 +136,6 @@ namespace Main.GUI
             List<PendingUser> localList= new List<PendingUser>();   
             foreach (DataRow row in answerJoinReqeust.Rows)
             {
-                
                 localList.Add(new PendingUser(Int32.Parse(row[0].ToString())) { Name = row[1].ToString()});
             }
             return localList;
@@ -157,8 +159,8 @@ namespace Main.GUI
                 tmp.Role = row[2].ToString();
                 members.Add(tmp);
             }
-            FamilyMembersListBox.DataContext = members;
-            FamilyMembersListBox.ItemsSource = members;
+            FamilyMembersDataGrid.DataContext = members;
+            FamilyMembersDataGrid.ItemsSource = members;
 
         }
 
@@ -242,9 +244,6 @@ namespace Main.GUI
             }*/
             DeleteFamilyMemberControl deleteFamilyMemberControl = new DeleteFamilyMemberControl(members);
             deleteFamilyMemberControl.Show();
-
-          
-
         }
     }
 }

@@ -755,6 +755,26 @@ namespace Main.Logic
                 }
             }
         }
+        public static bool DeleteStore(int storeId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                try
+                {
+                    string updateTransactionsQuery = "UPDATE Transactions SET StoreID = NULL WHERE StoreID = @StoreID";
+                    database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@StoreID", storeId));
+
+                    string deleteCategoriesQuery = "DELETE FROM Stores WHERE StoreID = @StoreID";
+                    database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@StoreID", storeId));
+
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
 
         // GET Methods
 
@@ -812,6 +832,20 @@ namespace Main.Logic
                     return -1;
                 }
                 return result.Rows[0]["RoleID"] == DBNull.Value ? -1 : Convert.ToInt32(result.Rows[0]["RoleID"]);
+            }
+        }
+
+        public static string GetRoleNameByRoleID(int roleId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT RoleName FROM Roles WHERE RoleID = @RoleID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@RoleID", roleId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["RoleName"].ToString();
             }
         }
 
@@ -932,6 +966,40 @@ namespace Main.Logic
             }
             return joinRequests;
         }
+
+        public static List<JoinRequest> GetPendingJoinRequestsByFamilyId(int familyId)
+        {
+            List<JoinRequest> joinRequests = new List<JoinRequest>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT JoinRequests.JoinRequestID, Family.FamilyName, " +
+                       "JoinRequests.JoinRequestDate, RequestStatuses.RequestStatusName, JoinRequests.UserID " +
+                       "FROM JoinRequests " +
+                       "INNER JOIN Family ON JoinRequests.FamilyID = Family.FamilyID " +
+                       "INNER JOIN RequestStatuses ON JoinRequests.RequestStatusID = RequestStatuses.RequestStatusID " +
+                       "WHERE JoinRequests.FamilyID = @FamilyID " +
+                       "AND JoinRequests.RequestStatusID = 1"; 
+
+                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@FamilyID", familyId));
+
+                foreach (DataRow row in result.Rows)
+                {
+                    JoinRequest request = new JoinRequest
+                    {
+                        JoinRequestID = Convert.ToInt32(row["JoinRequestID"]),
+                        FamilyName = row["FamilyName"].ToString(),
+                        UserID = Convert.ToInt32(row["UserID"]),
+                        JoinRequestDate = DateTime.Parse(row["JoinRequestDate"].ToString()),
+                        RequestStatus = row["RequestStatusName"].ToString()
+                    };
+                    joinRequests.Add(request);
+                }
+            }
+
+            return joinRequests;
+        }
+
 
         public static List<Category> GetUserCategories(int userId)
         {

@@ -13,7 +13,7 @@
             <ColumnDefinition Width="1.5*"/>
         </Grid.ColumnDefinitions>
 
-        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" Style="{StaticResource imgClose}" MouseUp="CloseImage_MouseUp"/>
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" Style="{StaticResource CloseButtonImageStyle}" MouseUp="CloseImage_MouseUp"/>
 
         <Border CornerRadius="10 0 0 10">
             <Border.Background>
@@ -35,7 +35,7 @@
                     <TextBlock x:Name="LoginTitleText" Text="Logowanie" Style="{StaticResource titleText}"/>
                     <TextBlock x:Name="LoginDescriptionText" Text="Zarządzaj swoimi finansami! Zarejestruj się, aby ustawić cele i oszczędzać. Dołącz do nas!" Style="{StaticResource normalText}"
                                Opacity="0.8" Margin="20 30"/>
-                    <Button x:Name="LoginButton" Content="Załoguj się" Style="{StaticResource Button}" Click="LoginButton_Click"/>
+                    <Button x:Name="LoginButton" Content="Załoguj się" Style="{StaticResource TransparentWhiteButtonStyle}" Click="LoginButton_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -88,7 +88,7 @@
                     </Grid>
                 </Border>
 
-                <Button x:Name="CompleteRegistrationButton" Content="Zarejestruj się"  Click="CompleteRegistrationButton_Click" Background="#3aa9ad" Style="{StaticResource mainButton}" MouseEnter="CompleteRegistrationButton_MouseEnter" MouseLeave="CompleteRegistrationButton_MouseLeave"/>
+                <Button x:Name="CompleteRegistrationButton" Content="Zarejestruj się"  Click="CompleteRegistrationButton_Click" Background="#3aa9ad" Style="{StaticResource PrimaryActionButtonStyle}" MouseEnter="CompleteRegistrationButton_MouseEnter" MouseLeave="CompleteRegistrationButton_MouseLeave"/>
             </StackPanel>
         </Border>
 

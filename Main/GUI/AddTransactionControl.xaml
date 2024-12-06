@@ -18,67 +18,77 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog_Click" Style="{StaticResource imgClose}"/>
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog_Click" Style="{StaticResource CloseButtonImageStyle}"/>
         
         <Border Background="#3AA9AD" Grid.Column="0" Grid.RowSpan="2">
             <Image Source="../Resources/AddTransaction.png" Grid.Column="0" Grid.RowSpan="2"/>
         </Border>
 
         <Border Background="White" Grid.Column="1" Grid.Row="0">
-            <Label Content="Dodawanie Transakcji" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32"/>
+            <Label Content="Dodaj Transakcję" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="32"/>
         </Border>
 
         <Border Background="White" Grid.Column="1" Grid.Row="1">
-
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                <StackPanel Margin="60">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Kategoria" Margin="0,0,0,10"/>
-                        <ComboBox x:Name="ComboBoxCategory" ItemsSource="{Binding Listcategories}" DisplayMemberPath="CategoryName" Width="120" Margin="10,0,0,20" SelectionChanged="ComboBoxCategory_SelectionChanged"/>
+                <StackPanel Margin="30,0,30,30">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Kategoria" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
+                            <ComboBox x:Name="CategoryComboBox" ItemsSource="{Binding Listcategories}" DisplayMemberPath="CategoryName" Width="300" SelectionChanged="ComboBoxCategory_SelectionChanged" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
+                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="PodKategoria" Margin="0,0,0,10"/>
-                        <ComboBox x:Name="ComboSubCategory" IsEnabled="False"  Width="120" Margin="10,0,0,20"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Podkategoria" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
+                            <ComboBox x:Name="SubategoryComboBox" IsEnabled="False" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
+                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="TypTransakcji" Margin="0,0,0,10"/>
-                        <ComboBox x:Name="InpuTypeTransaction" Width="120" Margin="10,0,0,20">
-                            <ComboBoxItem Content="Przychód" IsSelected="True"/>
-                            <ComboBoxItem Content="Wydatek"/>
-                        </ComboBox>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Typ transakcji" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
+                            <ComboBox x:Name="InpuTypeTransaction" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0">
+                                <ComboBoxItem Content="Przychód" IsSelected="True"/>
+                                <ComboBoxItem Content="Wydatek"/>
+                            </ComboBox>
+                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Sklep" Margin="0,0,0,10"/>
-                        <ComboBox x:Name="ComobBoxStore" ItemsSource="{Binding Liststores}" DisplayMemberPath="StoreName" Width="120" Margin="10,0,0,20"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Sklep" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
+                            <ComboBox x:Name="StoreComboBox" ItemsSource="{Binding Liststores}" DisplayMemberPath="StoreName" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
+                        </StackPanel>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Kwota" Margin="0,0,0,10"/>
-                        <TextBox x:Name="InputAmount" Width="160" Margin="10,0,0,10" KeyDown="AddInputAmount_KeyDown" />
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Kwota" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <Border Width="300" Height="35" Background="White" BorderBrush="Gray" BorderThickness="0.5">
+                            <TextBox x:Name="InputAmount" Background="Transparent" FontSize="16" Margin="5,0" Foreground="Black" BorderThickness="0" Height="23.28" KeyDown="AddInputAmount_KeyDown"/>
+                        </Border>
                     </StackPanel>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Data" Margin="0,5,0,10"/>
-                        <DatePicker x:Name="InputData" Margin="10,0,0,10" Width="200"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Data" FontSize="16" VerticalAlignment="Center" Width="80"/>
+                        <Border Width="130" Height="35" Background="White" BorderBrush="Gray" BorderThickness="0.5" Margin="0,0,30,0">
+                            <DatePicker x:Name="InputData" Width="130" FontSize="16"/>
+                        </Border>
+                        <TextBlock Text="Czas" FontSize="16" VerticalAlignment="Center" Width="80"/>
+                        <Border Width="130" Height="35" Background="White" BorderBrush="Gray" BorderThickness="0.5">
+                            <TextBox x:Name="InputTime" Text="00:00" Background="Transparent" Width="130" FontSize="16" Margin="5,0" Foreground="Black" BorderThickness="0" Height="23.28" PreviewTextInput="InputTime_PreviewTextInput" DataObject.Pasting="InputTime_Pasting" LostFocus="InputTime_LostFocus"/>
+                        </Border>
                     </StackPanel>
 
                     <StackPanel Orientation="Vertical">
-                        <TextBlock HorizontalAlignment="Center" Text="Notatki"/>
-                        <TextBox x:Name="InputNote" Height="80" Margin="10" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" TextWrapping="Wrap" SpellCheck.IsEnabled="True"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Notatki" FontSize="16" VerticalAlignment="Center" Margin="0,0,0,10"/>
+                        <Border Width="450" Height="85" Background="White" BorderBrush="Gray" BorderThickness="0.5">
+                            <TextBox x:Name="InputNote" Background="Transparent" FontSize="16" AcceptsReturn="True" Margin="5,5,5,0" Foreground="Black" BorderThickness="0" Height="80" VerticalScrollBarVisibility="Visible" TextWrapping="Wrap" SpellCheck.IsEnabled="True"/>
+                        </Border>
                     </StackPanel>
-
-                    
-
-                    <Button Margin="0,40,0,10" Click="AddTransaction" Content="Dodaj Transakcję" Style="{StaticResource mainButton}"/>
-
-
+                    <Button Margin="0,20,0,10" Width="200" Click="AddTransaction" Content="Dodaj" Style="{StaticResource PrimaryActionButtonStyle}" FontSize="16"/>
                 </StackPanel>
             </StackPanel>
-
         </Border>
-
     </Grid>
 </Window>

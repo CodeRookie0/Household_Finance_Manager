@@ -43,7 +43,7 @@ namespace Main.GUI
                     CategoryName.Add(dataRow[0].ToString());
                 }
             }
-            cmbCategory.ItemsSource = CategoryName;
+            CategoryComboBox.ItemsSource = CategoryName;
         }
 
         private void CloseDialog_Click(object sender, MouseButtonEventArgs e)
@@ -53,13 +53,13 @@ namespace Main.GUI
 
         private void AddStore_Click(object sender, RoutedEventArgs e)
         {
-            int CategoryId=cmbCategory.SelectedIndex+1;
-            if (CategoryId == 0 && txtStoreName.Text.Length<3)
+            int CategoryId=CategoryComboBox.SelectedIndex+1;
+            if (CategoryId == 0 && StoreNameTextBox.Text.Length<3)
             {
                 MessageBox.Show("Wybierz kategorię lub długość nazwy sklepu musi mieć więcej niż 2 znaki","Komunikat",MessageBoxButton.OK,MessageBoxImage.Error);
                 return;
             }
-            else if(!IsStore(txtStoreName.Text,CategoryId))
+            else if(!IsStore(StoreNameTextBox.Text,CategoryId))
             {
                 MessageBox.Show("Istnieje taki sklep", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -68,7 +68,7 @@ namespace Main.GUI
                 DBSqlite dbSqlite = new DBSqlite();
                 int answer = dbSqlite.ExecuteNonQuery("INSERT INTO Stores(CategoryID,StoreName,UserID) VALUES(@UserCategoryId,@UserStoreName,@MyId)",
                      new Microsoft.Data.Sqlite.SqliteParameter("@UserCategoryId", CategoryId),
-                     new SqliteParameter("@UserStoreName", txtStoreName.Text.ToString()),
+                     new SqliteParameter("@UserStoreName", StoreNameTextBox.Text.ToString()),
                      new SqliteParameter("@MyId", privUserId));
                 if (answer > 0)
                 {

@@ -31,7 +31,7 @@
     <Border Background="#FF3AA9AD" CornerRadius="20" BorderBrush="#3AA9AD" BorderThickness="0">
         <Grid>
             <Button x:Name="CloseButton" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="5" Click="CloseButton_Click" Style="{StaticResource NoHoverButtonStyle}">
-                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource imgClose}" Margin="0"/>
+                <Image Source="../Resources/close.png" Stretch="Uniform" Style="{StaticResource CloseButtonImageStyle}" Margin="0"/>
             </Button>
             <Canvas>
                 <Polygon Points="0,25 290,138 0,300" Fill="{StaticResource PolygonGradient1}" Stroke="#3AA9AD" StrokeThickness="2" HorizontalAlignment="Center" Canvas.Top="33" VerticalAlignment="Top">
@@ -109,7 +109,7 @@
                 </Grid>
                 <StackPanel x:Name="SubcategoryContainer" Margin="0,10,0,0"/>
                 <TextBlock x:Name="AddSubcategoryText" Text="Dodaj podkategorię" Foreground="White" FontSize="14" HorizontalAlignment="Right" Margin="0 10 20 10" TextDecorations="Underline" Cursor="Hand" MouseLeftButtonUp="AddSubcategoryText_Click"/>
-                <Button x:Name="AddSubcategoryButton" Content="Zapisz" Width="200" Height="55" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 10" Style="{StaticResource Button}" FontSize="16" Foreground="White" Click="AddSubcategoryButton_Click" MouseEnter="AddSubcategoryButton_MouseEnter" MouseLeave="AddSubcategoryButton_MouseLeave" Background="Transparent"/>
+                <Button x:Name="AddSubcategoryButton" Content="Zapisz" Width="200" Height="55" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0 10" Style="{StaticResource TransparentWhiteButtonStyle}" FontSize="16" Foreground="White" Click="AddSubcategoryButton_Click" MouseEnter="AddSubcategoryButton_MouseEnter" MouseLeave="AddSubcategoryButton_MouseLeave" Background="Transparent"/>
             </StackPanel>
         </Grid>
     </Border>

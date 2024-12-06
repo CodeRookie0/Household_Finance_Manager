@@ -13,17 +13,25 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource imgClose}"/>
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseDialog"  Style="{StaticResource CloseButtonImageStyle}"/>
 
-        <Border Background="White" Grid.Row="0">
+        <Border Background="White" Grid.Row="0"  BorderThickness="0,0,0,3" BorderBrush="#3AA9AD">
             <Label FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" Content="Usuwanie członka rodziny"/>
         </Border>
-
-        <Border Background="White" Grid.Row="1">
-            <ListBox x:Name="FamilyListDelete">
-                
-            </ListBox>
+        <Border Background="White" Grid.Row="2" BorderBrush="DarkSlateGray" BorderThickness="0,1,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Background="White">
+                    <TextBlock Text="Nazwa użytkownika" HorizontalAlignment="Center" FontSize="20" VerticalAlignment="Center" FontWeight="SemiBold" Margin="35,0,30,0" Width="250"/> 
+                    <TextBlock Text="Rola użytkownika" HorizontalAlignment="Center" FontSize="20" VerticalAlignment="Center" FontWeight="SemiBold" Margin="30,0,30,0" Width="210"/>
+                    <TextBlock Text="Akcje" HorizontalAlignment="Center" FontSize="20" VerticalAlignment="Center" FontWeight="SemiBold" Width="105" Margin="80,0,0,0"/>
+                </StackPanel>
+                <ListBox x:Name="FamilyListDelete" Grid.Row="1" Background="#F3F3F3">
+                </ListBox>
+            </Grid>
         </Border>
-
     </Grid>
 </Window>

@@ -45,10 +45,10 @@ namespace Main.GUI
                     stores.Add(dataRow[0].ToString());
                 }
             }
-            cmbCategory.ItemsSource = stores;
+            CategoryComboBox.ItemsSource = stores;
 
-            txtStoreName.Text = argStore.StoreName;
-            cmbCategory.SelectedValue = argStore.CategoryName;
+            StoreNameTextBox.Text = argStore.StoreName;
+            CategoryComboBox.SelectedValue = argStore.CategoryName;
 
 
             
@@ -61,13 +61,13 @@ namespace Main.GUI
 
         private void SaveEditStore_Click(object sender, RoutedEventArgs e)
         {
-            int CategoryId = cmbCategory.SelectedIndex + 1;
-            if (CategoryId == 0 && txtStoreName.Text.Length < 3)
+            int CategoryId = CategoryComboBox.SelectedIndex + 1;
+            if (CategoryId == 0 && StoreNameTextBox.Text.Length < 3)
             {
                 MessageBox.Show("Wybierz kategorię lub długość nazwy sklepu musi mieć więcej niż 2 znaki", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            else if (!IsStore(txtStoreName.Text, CategoryId))
+            else if (!IsStore(StoreNameTextBox.Text, CategoryId))
             {
                 MessageBox.Show("Istnieje taki sklep", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -75,7 +75,7 @@ namespace Main.GUI
             {
                 DBSqlite dBsqlite = new DBSqlite();
                 int answer = dBsqlite.ExecuteNonQuery("UPDATE STORES SET StoreName=@NewName , CategoryID=@NewCategoryId WHERE StoreID=@MyStoreId",
-                     new Microsoft.Data.Sqlite.SqliteParameter("@NewName", txtStoreName.Text.ToString()),
+                     new Microsoft.Data.Sqlite.SqliteParameter("@NewName", StoreNameTextBox.Text.ToString()),
                      new SqliteParameter("@NewCategoryId", CategoryId),
                      new SqliteParameter("@MyStoreId", store.StoreId));
                 if (answer > 0)

@@ -11,7 +11,7 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="1.5*"/>
         </Grid.ColumnDefinitions>
-        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseImage_MouseUp" Style="{StaticResource imgClose}"/>
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="CloseImage_MouseUp" Style="{StaticResource CloseButtonImageStyle}"/>
 
         <Border CornerRadius="10 0 0 10">
             <Border.Background>
@@ -33,7 +33,7 @@
                     <TextBlock x:Name="RegistrationTitleText" Text="Rejestracja" Style="{StaticResource titleText}"/>
                     <TextBlock x:Name="RegistrationDescriptionText" Text="Zarządzaj swoimi finansami! Zarejestruj się, aby ustawić cele i oszczędzać. Dołącz do nas!" Style="{StaticResource normalText}"
                                Opacity="0.8" Margin="20 30"/>
-                    <Button  x:Name="RegisterButton" Content="Zarejestruj się" Style="{StaticResource Button}" Click="RegisterButton_Click"/>
+                    <Button  x:Name="RegisterButton" Content="Zarejestruj się" Style="{StaticResource TransparentWhiteButtonStyle}" Click="RegisterButton_Click"/>
                 </StackPanel>
 
             </Grid>
@@ -47,7 +47,7 @@
                 <TextBlock x:Name="LoginTitleText" Text="Zaloguj się do aplikacji" Style="{StaticResource titleText}" Foreground="#3aa9ad" />
                 <StackPanel Orientation="Horizontal" Margin="0 20" HorizontalAlignment="Center">
 
-                    <Button x:Name="GitHubButton" Style="{StaticResource ButtonCircle}" Click="GitHubButton_Click">
+                    <Button x:Name="GitHubButton" Style="{StaticResource CircleButtonStyle}" Click="GitHubButton_Click">
                         <Image Source="../Resources/github.png" Width="20" Height="20"/>
                     </Button>
                 </StackPanel>
@@ -80,7 +80,7 @@
                     </Grid>
                 </Border>
 
-                <Button x:Name="LoginButton" Content="Zaloguj się" Click="LoginButton_Click" Background="#3aa9ad" Style="{StaticResource mainButton}" MouseEnter="LoginButton_MouseEnter" MouseLeave="LoginButton_MouseLeave"/>
+                <Button x:Name="LoginButton" Content="Zaloguj się" Click="LoginButton_Click" Background="#3aa9ad" Style="{StaticResource PrimaryActionButtonStyle}" MouseEnter="LoginButton_MouseEnter" MouseLeave="LoginButton_MouseLeave"/>
 
             </StackPanel>
         </Border>

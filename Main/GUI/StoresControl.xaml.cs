@@ -74,7 +74,7 @@ namespace Main.GUI
                             int.Parse(row[3].ToString()), boolValue);
                         tmpStore.CategoryName = row[1].ToString();
                         tmpStore.StoreName = row[2].ToString();
-                        var StoreElementList = new ListElementStore(tmpStore, UserId);
+                        var StoreElementList = new ListElementStore(tmpStore, UserId,IsFamily);
                         StoreElementList.ItemDeleted += UpdateOutSideClick;
                         storeList.Children.Add(StoreElementList);
                     }
@@ -111,7 +111,7 @@ namespace Main.GUI
                             int.Parse(row[3].ToString()), boolValue);
                         tmpStore.CategoryName = row[1].ToString();
                         tmpStore.StoreName = row[2].ToString();
-                        var StoreElementList = new ListElementStore(tmpStore, UserId);
+                        var StoreElementList = new ListElementStore(tmpStore, UserId, IsFamily);
                         StoreElementList.ItemDeleted += UpdateOutSideClick;
                         storeList.Children.Add(StoreElementList);
                     }
@@ -168,7 +168,7 @@ namespace Main.GUI
                             int.Parse(row[3].ToString()), boolValue);
                         tmpStore.CategoryName = row[1].ToString();
                         tmpStore.StoreName = row[2].ToString();
-                        var StoreElementList = new ListElementStore(tmpStore, UserId);
+                        var StoreElementList = new ListElementStore(tmpStore, UserId, IsFamily);
                         StoreElementList.ItemDeleted += UpdateOutSideClick;
                         storeList.Children.Add(StoreElementList);
                     }
@@ -205,7 +205,7 @@ namespace Main.GUI
                             int.Parse(row[3].ToString()), boolValue);
                         tmpStore.CategoryName = row[1].ToString();
                         tmpStore.StoreName = row[2].ToString();
-                        var StoreElementList = new ListElementStore(tmpStore, UserId);
+                        var StoreElementList = new ListElementStore(tmpStore, UserId,IsFamily);
                         StoreElementList.ItemDeleted += UpdateOutSideClick;
                         storeList.Children.Add(StoreElementList);
                     }
@@ -216,14 +216,11 @@ namespace Main.GUI
 
         }
 
-        private void AddStoresButton_Click(object sender, RoutedEventArgs e)
+        private void AddStoreButton_Click(object sender, RoutedEventArgs e)
         {
-            
              AddStoreForm addStoreForm = new AddStoreForm(UserId);
              addStoreForm.ShowDialog();
-            RefreshData();
-            
-
+             RefreshData();
         }
 
         private void LogicStoreMagnament()
@@ -246,7 +243,6 @@ namespace Main.GUI
                     }
                 }
                 this.IsFamily = true;
-
             }
             else //Not Family
             {
@@ -254,6 +250,16 @@ namespace Main.GUI
                 this.IsFamily= false;
             }
             
+        }
+
+        private void AddStoreButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            AddStoreBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#993AA9AD"));
+        }
+
+        private void AddStoreButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            AddStoreBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#3AA9AD"));
         }
     }
 }
