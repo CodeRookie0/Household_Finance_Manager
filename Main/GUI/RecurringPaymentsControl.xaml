@@ -1,0 +1,188 @@
+﻿<UserControl x:Class="Main.GUI.RecurringPaymentsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Main.GUI"
+             mc:Ignorable="d"
+             d:DesignHeight="650" d:DesignWidth="1150" d:Background="White">
+    <Grid>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Orientation="Vertical" Margin="10">
+                <Border Background="#4682B4" CornerRadius="10" Padding="5" Margin="0,0,0,10" Width="78" HorizontalAlignment="Left">
+                    <TextBlock Text="Aktywne" Foreground="White" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Margin="0,5,0,5" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                    <Grid >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="284"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="90"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Nazwa płatności" FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="0" Margin="45,0,0,5"/>
+                        <TextBlock Text="Częstotliwość"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="1"/>
+                        <TextBlock Text="Data rozpoczęcia"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="2"/>
+                        <TextBlock Text="Przypisany użytkownik"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="3"/>
+                        <TextBlock Text="Kwota"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="4"/>
+                        <TextBlock Text="Twórca"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="5" Margin="0,0,20,5"/>
+                        <TextBlock Text="Akcje"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="6" Margin="0,0,20,5"/>
+                    </Grid>
+                </Border>
+                <ItemsControl Name="ActivePaymentsList">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                            <Expander Margin="0" Background="Transparent" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                                <Expander.Header>
+                                    <Grid Margin="20,0,0,5" Height="30">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="240"/>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="90"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding RecurringPaymentName}"  Grid.Column="0"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding FrequencyName}" Grid.Column="1"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding PaymentDate, StringFormat=d}" Grid.Column="2"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding UserName}" Grid.Column="3"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding FormattedAmount}"  Grid.Column="4"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding CreatedByUserName}" Grid.Column="5"  FontSize="16" VerticalAlignment="Center"/>
+                                        <StackPanel x:Name="ActionPanel" Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="6">
+                                            <Button Width="30" Height="30" Padding="5" Background="Transparent" BorderBrush="Transparent">
+                                                <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20"/>
+                                            </Button>
+                                            <Button Background="Transparent" Padding="5" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
+                                                <Image Source="/Resources/delete_red.png" Stretch="Uniform" Width="20" Height="20"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Expander.Header>
+                                <StackPanel Orientation="Vertical" Margin="45,0,15,5">
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate}" Width="*"/>
+                                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="*"/>
+                                            <DataGridTextColumn Header="Action" Binding="{Binding ActionTypeName}" Width="*"/>
+                                            <DataGridTextColumn Header="Status" Binding="{Binding ActionDate}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <Grid HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="TotalActiveLabel" Text="{Binding PaymentDate, StringFormat='Łącznie od {0:d}: '}" FontSize="16" Grid.Column="0" />
+                                        <TextBlock x:Name="TotalActiveAmount" Text="{Binding FormattedTotalAmount}" FontSize="16"  Grid.Column="1" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Expander>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+                <Border Background="#B0C4DE"  CornerRadius="10"  Padding="5" Margin="0,20,0,10" Width="78" HorizontalAlignment="Left">
+                    <TextBlock Text="Nieaktywne"  Foreground="DarkSlateGray" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
+                </Border>
+                <Border Margin="0,5,0,5" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="284"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="90"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Nazwa płatności" FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="0" Margin="45,0,0,5"/>
+                        <TextBlock Text="Częstotliwość"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="1"/>
+                        <TextBlock Text="Data rozpoczęcia"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="2"/>
+                        <TextBlock Text="Przypisany użytkownik"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="3"/>
+                        <TextBlock Text="Kwota"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="4"/>
+                        <TextBlock Text="Twórca"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="5" Margin="0,0,20,5"/>
+                        <TextBlock Text="Akcje"  FontWeight="SemiBold" Foreground="Gray" FontSize="16" HorizontalAlignment="Left" Grid.Column="6" Margin="0,0,20,5"/>
+                    </Grid>
+                </Border>
+                <ItemsControl Name="InactivePaymentsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander  Margin="0" Background="Transparent" BorderBrush="LightGray" BorderThickness="0,0,0,1">
+                                <Expander.Header>
+                                    <Grid Margin="20,0,0,5" Height="30">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="240"/>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="130"/>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="90"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding RecurringPaymentName}"  Grid.Column="0"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding FrequencyName}" Grid.Column="1"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding PaymentDate, StringFormat=d}" Grid.Column="2"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding UserName}" Grid.Column="3"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding FormattedAmount}"  Grid.Column="4"  FontSize="16" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding CreatedByUserName}" Grid.Column="5"  FontSize="16" VerticalAlignment="Center"/>
+                                        <StackPanel x:Name="ActionPanel" Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="6">
+                                            <Button Width="30" Height="30" Padding="5" Background="Transparent" BorderBrush="Transparent">
+                                                <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20"/>
+                                            </Button>
+                                            <Button Background="Transparent" Padding="5" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
+                                                <Image Source="/Resources/delete_red.png" Stretch="Uniform" Width="20" Height="20"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Grid>
+                                </Expander.Header>
+                                <StackPanel Orientation="Vertical" Margin="45,0,15,5">
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate}" Width="*"/>
+                                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="*"/>
+                                            <DataGridTextColumn Header="Action" Binding="{Binding ActionTypeName}" Width="*"/>
+                                            <DataGridTextColumn Header="Status" Binding="{Binding ActionDate}" Width="*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <Grid HorizontalAlignment="Right">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="TotalInactiveLabel" Text="{Binding PaymentDate, StringFormat='Łącznie od {0:d}: '}" FontSize="16" Grid.Column="0" />
+                                        <TextBlock x:Name="TotalInactiveAmount" Text="{Binding FormattedTotalAmount}" FontSize="16"  Grid.Column="1" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap">
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+    </ScrollViewer>
+        <Border BorderBrush="#993AA9AD" BorderThickness="0,1,0,0" Height="66" VerticalAlignment="Bottom">
+            <StackPanel VerticalAlignment="Bottom" Margin="0,5,0,0">
+                <Border x:Name="AddRecurringPaymentBorder" Background="#3AA9AD" CornerRadius="15" Margin="0,0,10,10" BorderThickness="0" HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Column="1">
+                    <Border.Effect>
+                        <DropShadowEffect Color="Gray" Direction="270" ShadowDepth="4" Opacity="0.3" />
+                    </Border.Effect>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="AddRecurringPaymentButton" Style="{StaticResource NoHoverButtonStyle}" Height="46" Background="Transparent" BorderBrush="Transparent" Padding="10,10">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="AddRecurringPaymentTextBlock" Text="+ Nowa cykliczna płatność" FontSize="16" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" Padding="20,0"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

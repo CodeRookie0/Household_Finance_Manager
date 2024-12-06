@@ -157,6 +157,7 @@ namespace Main.GUI
                 PendingUser tmp = new PendingUser(int.Parse(row[0].ToString()));
                 tmp.Name = row[1].ToString();
                 tmp.Role = row[2].ToString();
+                tmp.RoleName = Service.GetRoleNameByRoleID(Convert.ToInt32(row[2]));
                 members.Add(tmp);
             }
             FamilyMembersDataGrid.DataContext = members;

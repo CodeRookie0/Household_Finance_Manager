@@ -159,6 +159,8 @@ namespace Main.GUI
             HighlightButton(RecurringPaymentsBorder, RecurringPaymentsTextBlock);
             buttonActiveStates[RecurringPaymentsButton] = true;
             SelectedUserControlTextBlock.Text = RecurringPaymentsTextBlock.Text;
+
+            MainContentArea.Content = new RecurringPaymentsControl(userId, this);
         }
 
         private void LimitsButton_Click(object sender, RoutedEventArgs e)

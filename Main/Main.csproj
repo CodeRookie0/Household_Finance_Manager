@@ -335,6 +335,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\RecurringPaymentsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\RegistrationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -365,6 +369,9 @@
     <Compile Include="GUI\ProfileSettingsControl.xaml.cs">
       <DependentUpon>ProfileSettingsControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GUI\RecurringPaymentsControl.xaml.cs">
+      <DependentUpon>RecurringPaymentsControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GUI\RegistrationControl.xaml.cs">
       <DependentUpon>RegistrationControl.xaml</DependentUpon>
     </Compile>
@@ -374,7 +381,9 @@
     <Compile Include="GUI\StoresControl.xaml.cs">
       <DependentUpon>StoresControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\TransactionsViewModel.cs" />
+    <Compile Include="Models\RecurringPayment.cs" />
+    <Compile Include="Models\RecurringPaymentHistory.cs" />
+    <Compile Include="Models\TransactionSummaryViewModel.cs" />
     <Compile Include="GUI\UserTransactionsControl.xaml.cs">
       <DependentUpon>UserTransactionsControl.xaml</DependentUpon>
     </Compile>

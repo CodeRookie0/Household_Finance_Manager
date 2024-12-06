@@ -1406,5 +1406,131 @@ namespace Main.Logic
             }
             return transactionTypes;
         }
+
+        public static List<RecurringPaymentHistory> GetHistoryByRecurringPaymentID(int recurringPaymentID)
+        {
+            List<RecurringPaymentHistory> historyList = new List<RecurringPaymentHistory>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                try
+                {
+                    string query = @"
+                        SELECT RecurringPaymentHistoryID, RecurringPaymentID, TransactionID, Amount, PaymentDate, ActionTypeID, ActionDate 
+                        FROM RecurringPaymentHistory 
+                        WHERE RecurringPaymentID = @RecurringPaymentID";
+
+                    SqliteParameter recurringPaymentIdParam = new SqliteParameter("@RecurringPaymentID", recurringPaymentID);
+                    DataTable result = database.ExecuteQuery(query, recurringPaymentIdParam);
+
+                    foreach (DataRow row in result.Rows)
+                    {
+                        var history = new RecurringPaymentHistory
+                        {
+                            RecurringPaymentHistoryID = row["RecurringPaymentHistoryID"] != DBNull.Value ? Convert.ToInt32(row["RecurringPaymentHistoryID"]) : 0,
+                            RecurringPaymentID = row["RecurringPaymentID"] != DBNull.Value ? Convert.ToInt32(row["RecurringPaymentID"]) : 0,
+                            TransactionID = row["TransactionID"] != DBNull.Value ? Convert.ToInt32(row["TransactionID"]) : (int?)null,
+                            Amount = row["Amount"] != DBNull.Value ? Convert.ToDecimal(row["Amount"]) : 0m,
+                            PaymentDate = row["PaymentDate"] != DBNull.Value ? Convert.ToDateTime(row["PaymentDate"]) : DateTime.MinValue,
+                            ActionTypeID = row["ActionTypeID"] != DBNull.Value ? Convert.ToInt32(row["ActionTypeID"]) : 0,
+                            ActionDate = row["ActionDate"] != DBNull.Value ? Convert.ToDateTime(row["ActionDate"]) : DateTime.MinValue
+                        };
+
+                        historyList.Add(history);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Błąd podczas pobierania historii płatności: {ex.Message}");
+                }
+            }
+            return historyList; 
+        }
+
+        public static List<RecurringPayment> GetRecurringPaymentsByUserId(int userId)
+        {
+            List<RecurringPayment> recurringPayments = new List<RecurringPayment>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"
+                SELECT RecurringPaymentID, RecurringPaymentName, UserID, StoreID, CategoryID, Amount, PaymentDate, FrequencyID, IsActive, CreatedByUserID
+                FROM RecurringPayments
+                WHERE UserID = @UserId";
+
+                SqliteParameter userIdParam = new SqliteParameter("@UserId", userId);
+                DataTable result = database.ExecuteQuery(query, userIdParam);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    recurringPayments.Add(new RecurringPayment
+                    {
+                        RecurringPaymentID = Convert.ToInt32(row["RecurringPaymentID"]),
+                        RecurringPaymentName = Convert.ToString(row["RecurringPaymentName"]),
+                        UserID = Convert.ToInt32(row["UserID"]),
+                        StoreID = row["StoreID"] != DBNull.Value ? Convert.ToInt32(row["StoreID"]) : (int?)null,
+                        CategoryID = row["CategoryID"] != DBNull.Value ? Convert.ToInt32(row["CategoryID"]) : (int?)null,
+                        Amount = Convert.ToDecimal(row["Amount"]),
+                        PaymentDate = Convert.ToDateTime(row["PaymentDate"]),
+                        FrequencyID = Convert.ToInt32(row["FrequencyID"]),
+                        IsActive = Convert.ToBoolean(row["IsActive"]),
+                        CreatedByUserID = Convert.ToInt32(row["CreatedByUserID"]),
+                    });
+                }
+            }
+
+            return recurringPayments;
+        }
+
+        public static List<RecurringPayment> GetFamilyRecurringPayments(int familyId)
+        {
+            List<RecurringPayment> familyRecurringPayments = new List<RecurringPayment>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+
+                List<RecurringPayment> userRecurringPayments = GetRecurringPaymentsByUserId(userId);
+
+                foreach (RecurringPayment recurringPayment in userRecurringPayments)
+                {
+                    if (!familyRecurringPayments.Any(t => t.RecurringPaymentID == recurringPayment.RecurringPaymentID))
+                    {
+                        familyRecurringPayments.Add(recurringPayment);
+                    }
+                }
+            }
+
+            return familyRecurringPayments;
+        }
+
+        public static string GetActionNameByActionID(int actionTypeId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT TypeName FROM ActionTypes WHERE ActionTypeID = @ActionTypeID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@ActionTypeID", actionTypeId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["TypeName"].ToString();
+            }
+        }
+
+        public static string GetFrequencyNameByFrequencyID(int frequencyID)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT FrequencyName FROM Frequencies WHERE FrequencyID = @FrequencyID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@FrequencyID", frequencyID));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["FrequencyName"].ToString();
+            }
+        }
     }
 }
