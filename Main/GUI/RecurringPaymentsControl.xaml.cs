@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -27,9 +28,9 @@ namespace Main.GUI
         private readonly int userId;
         private int userRole;
         private int familyId;
-        public List<RecurringPayment> ActivePayments { get; set; }
-        public List<RecurringPayment> InactivePayments { get; set; }
-        public List<RecurringPayment> recurringPayments { get; set; }
+        public ObservableCollection<RecurringPayment> ActivePayments { get; set; }
+        public ObservableCollection<RecurringPayment> InactivePayments { get; set; }
+        public ObservableCollection<RecurringPayment> recurringPayments { get; set; }
 
         public RecurringPaymentsControl(int loggedInUserId, MainWindow mainWindow)
         {
@@ -37,16 +38,21 @@ namespace Main.GUI
             this.mainWindow = mainWindow;
             InitializeComponent();
 
-            ActivePayments = new List<RecurringPayment>();
-            InactivePayments = new List<RecurringPayment>();
+            ActivePayments = new ObservableCollection<RecurringPayment>();
+            InactivePayments = new ObservableCollection<RecurringPayment>();
 
             userRole = Service.GetRoleIDByUserID(userId);
             familyId = Service.GetFamilyIdByMemberId(userId);
 
             LoadPayments();
+          
+
         }
         public void LoadPayments()
         {
+            ActivePayments.Clear();
+            InactivePayments.Clear();
+
             if (familyId < 0)
             {
                 var userRecurringPayments = Service.GetRecurringPaymentsByUserId(userId);
@@ -79,6 +85,52 @@ namespace Main.GUI
             }
             ActivePaymentsList.ItemsSource = ActivePayments;
             InactivePaymentsList.ItemsSource = InactivePayments;
+
+        }
+
+        private void AddRecurringPaymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddRecurringPaymentsControl addRecurringPayment=new AddRecurringPaymentsControl(userId);
+            addRecurringPayment.Show();
+            LoadPayments();
+        }
+
+        private void EditButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button=sender as Button;
+            RecurringPayment obj=button.DataContext as RecurringPayment;
+            if(obj!=null)
+            {
+                EditRecuringPayments editRecuring=new EditRecuringPayments(userId, obj);
+                editRecuring.Show();
+                LoadPayments();
+            }
+        }
+
+        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            RecurringPayment obj=button.DataContext as RecurringPayment;
+            if(obj!=null) 
+            {
+                if (MessageBox.Show("Czy chcesz zdeaktywować płatność " + obj.RecurringPaymentName + " ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    DBSqlite dBSqlite = new DBSqlite();
+                    int answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET IsActive = 0 WHERE RecurringPaymentID = @RecurringPaymentID",
+                        new Microsoft.Data.Sqlite.SqliteParameter("@RecurringPaymentID", obj.RecurringPaymentID));
+                    if (answer > 0)
+                    {
+                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " została zdeaktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadPayments();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " nie została zdeaktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    }
+                }
+            }
+           
         }
     }
 }

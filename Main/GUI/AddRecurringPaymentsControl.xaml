@@ -1,0 +1,87 @@
+﻿<Window x:Class="Main.GUI.AddRecurringPaymentsControl"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Main.GUI"
+        mc:Ignorable="d"
+        Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
+        Title="SettingProifl" Height="600" Width="800" BorderThickness="3" BorderBrush="#3AA9AD">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.3*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.3*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="ExitDialog_Click"  Style="{StaticResource CloseButtonImageStyle}"/>
+
+        <Border Background="#3AA9AD" Grid.RowSpan="2" Grid.Column="0">
+            
+        </Border>
+
+        <Border Background="White" Grid.Row="0" Grid.Column="1">
+            <Label Content="Dodawanie Cyklicznej płatności" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
+        </Border>
+
+
+        <Border Background="White" Grid.Row="1" Grid.Column="1">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,30,0,0">
+                <StackPanel Margin="30,0,30,30">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Nazwa Płatności" Width="150" TextAlignment="Center"/>
+                        <TextBox x:Name="InputPayment" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Członek Rodziny" Width="150" TextAlignment="Center"/>
+                        <ComboBox x:Name="UserComboBox" DisplayMemberPath="UserName" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Sklep" Width="150" TextAlignment="Center"/>
+                        <ComboBox DisplayMemberPath="StoreName" x:Name="StoreComboBox" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Kategoria" Width="150" TextAlignment="Center"/>
+                        <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="CategoryName" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Kwota" Width="150" TextAlignment="Center"/>
+                        <TextBox x:Name="InputAmount" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Typ" Width="150" TextAlignment="Center"/>
+                        <ComboBox x:Name="TypePayments" Width="150">
+                            <ComboBoxItem Content="Wydatek" IsSelected="True"/>
+                            <ComboBoxItem Content="Przychód"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Data płatności" Width="150" TextAlignment="Center"/>
+                        <DatePicker x:Name="DataPayment" Width="150"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Częstotliowść płatności" Width="150" TextAlignment="Center"/>
+                        <ComboBox x:Name="FrequencyComboBox" DisplayMemberPath="FrequencyName" Width="150"/>
+
+                    </StackPanel>
+
+                    <Button Content="Dodaj Cykliczną płatność" Style="{StaticResource PrimaryActionButtonStyle}" Click="Button_Click"/>
+
+                </StackPanel>
+                    
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Window>
