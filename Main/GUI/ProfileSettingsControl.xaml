@@ -50,7 +50,7 @@ Title="SettingProifl" Height="560" Width="410">
                             </StackPanel>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="350" Height="45" Margin="0,5,0,0">
-                            <Label x:Name="PasswordDataLabel" Content="Zmiana hasło" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" Margin="0,0,0,0" Width="140"/>
+                            <Label x:Name="PasswordDataLabel" Content="Zmiana hasła" FontSize="20" FontWeight="Bold" HorizontalAlignment="Left" Margin="0,0,0,0" Width="140"/>
                             <Button x:Name="ChangePasswordDataButton" VerticalAlignment="Center" HorizontalAlignment="Left" Style="{StaticResource NoHoverButtonStyle}" Width="49" Margin="0,3,10,15" Click="ChangePasswordDataButton_Click">
                                 <Image x:Name="ChangePasswordDataImage" Source="../Resources/edit.png" Stretch="Uniform" VerticalAlignment="Center" HorizontalAlignment="Left" Width="27" Height="27"/>
                             </Button>

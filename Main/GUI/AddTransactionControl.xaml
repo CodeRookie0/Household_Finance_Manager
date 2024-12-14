@@ -46,19 +46,19 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                        <TextBlock Text="Sklep" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
+                            <ComboBox x:Name="StoreComboBox" ItemsSource="{Binding Liststores}" DisplayMemberPath="StoreName" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                         <TextBlock Text="Typ transakcji" FontSize="16" VerticalAlignment="Center" Width="150"/>
                         <StackPanel Orientation="Horizontal" Width="300" Margin="0">
                             <ComboBox x:Name="InpuTypeTransaction" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0">
                                 <ComboBoxItem Content="Przychód" IsSelected="True"/>
                                 <ComboBoxItem Content="Wydatek"/>
                             </ComboBox>
-                        </StackPanel>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Sklep" FontSize="16" VerticalAlignment="Center" Width="150"/>
-                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
-                            <ComboBox x:Name="StoreComboBox" ItemsSource="{Binding Liststores}" DisplayMemberPath="StoreName" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
                         </StackPanel>
                     </StackPanel>
 

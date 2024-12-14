@@ -56,10 +56,10 @@
                                         <TextBlock Text="{Binding CreatedByUserName}" Grid.Column="5"  FontSize="16" VerticalAlignment="Center"/>
                                         <StackPanel x:Name="ActionPanel" Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="6">
                                             <Button x:Name="EditButton" Width="30" Height="30" Click="EditButton_Click" Padding="5" Background="Transparent" BorderBrush="Transparent">
-                                                <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20"/>
+                                                <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Button>
-                                            <Button x:Name="DeleteButton" Click="DeleteButton_Click" Background="Transparent" Padding="5" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
-                                                <Image Source="/Resources/delete_red.png" Stretch="Uniform" Width="20" Height="20"/>
+                                            <Button x:Name="DeactivatePeymentButton" Click="DeactivatePeymentButton_Click" Background="Transparent" Padding="3" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
+                                                <Image Source="/Resources/power_off_red.png" Stretch="Uniform" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Button>
                                         </StackPanel>
                                     </Grid>
@@ -135,10 +135,10 @@
                                         <TextBlock Text="{Binding CreatedByUserName}" Grid.Column="5"  FontSize="16" VerticalAlignment="Center"/>
                                         <StackPanel x:Name="ActionPanel" Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="6">
                                             <Button Width="30" Height="30" Padding="5" Background="Transparent" BorderBrush="Transparent">
-                                                <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20"/>
+                                                <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Button>
-                                            <Button Background="Transparent" Padding="5" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
-                                                <Image Source="/Resources/delete_red.png" Stretch="Uniform" Width="20" Height="20"/>
+                                            <Button x:Name="ActivatePaymentButton" Background="Transparent" Padding="3" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
+                                                <Image Source="/Resources/power_off_blue.png" Stretch="Uniform" Width="24" Height="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Button>
                                         </StackPanel>
                                     </Grid>

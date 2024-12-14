@@ -206,7 +206,7 @@ namespace Main.GUI
             {
                 DBSqlite dBSqlite = new DBSqlite();
                 int answer = dBSqlite.ExecuteNonQuery("INSERT INTO RecurringPayments (RecurringPaymentName,UserID,StoreID,CategoryID,Amount,PaymentDate,FrequencyID,IsActive,CreatedByUserID)" +
-                    " VALUES (@TitlePayments,@UserId,@Store,@CategoryId,@Amount,@Date,@Frequency,1,@ToUserId)",
+                    " VALUES (@TitlePayments,@ToUserId,@Store,@CategoryId,@Amount,@Date,@Frequency,1,@UserId)",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
                     new SqliteParameter("@UserId", userId),
                     new SqliteParameter("@Store", store.StoreId),

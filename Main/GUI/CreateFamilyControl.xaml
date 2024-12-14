@@ -26,10 +26,10 @@
                      VerticalAlignment="Center" 
                      HorizontalAlignment="Center"/>
             <Button x:Name="SubmitButton" Content="Zatwierdź" 
-                    Style="{StaticResource submitButton}"
+                    Style="{StaticResource PrimaryActionButtonStyle}"
                     VerticalAlignment="Bottom" 
                     HorizontalAlignment="Center" 
-                    Margin="0,20,0,20" Click="SubmitButton_Click" Width="150" Height="40" Padding="5"/>
+                    Margin="0,20,0,15" Click="SubmitButton_Click" Width="150" Height="50"/>
         </Grid>
     </Border>
 </Window>

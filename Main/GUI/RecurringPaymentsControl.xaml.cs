@@ -107,7 +107,7 @@ namespace Main.GUI
             }
         }
 
-        private void DeleteButton_Click(object sender, RoutedEventArgs e)
+        private void DeactivatePeymentButton_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
             RecurringPayment obj=button.DataContext as RecurringPayment;
