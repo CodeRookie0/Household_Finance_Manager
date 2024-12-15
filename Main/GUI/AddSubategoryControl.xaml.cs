@@ -106,7 +106,7 @@ namespace Main.GUI
 
             Label placeholderLabel = new Label
             {
-                Content = "Nazwa podkategorii",
+                Content = "Nazwa podkategorii *",
                 Background = Brushes.Transparent,
                 Foreground = Brushes.Gray,
                 Opacity = 1,

@@ -25,33 +25,55 @@ namespace Main.GUI
     public partial class EditStoreForm : Window
     {
         private readonly Store store;
-        private ObservableCollection<String> stores;
+        private ObservableCollection<Category> CategoryList;
         private readonly int UserId;
         public EditStoreForm(Store argStore,int userId)
         {
             InitializeComponent();
             this.store = argStore;
             this.UserId = userId;
-            stores = new ObservableCollection<String>();
+            CategoryList = new ObservableCollection<Category>();
 
-            DBSqlite dBSqlite = new DBSqlite();
-            var answer = dBSqlite.ExecuteQuery("SELECT Categories.CategoryName FROM Categories WHERE Categories.UserID IS NULL OR Categories.UserID=@UserId;",
-                new Microsoft.Data.Sqlite.SqliteParameter("@UserId", store.UserId));
+            //DBSqlite dBSqlite = new DBSqlite();
+            //var answer = dBSqlite.ExecuteQuery("SELECT Categories.CategoryName FROM Categories WHERE Categories.UserID IS NULL OR Categories.UserID=@UserId;",
+            //    new Microsoft.Data.Sqlite.SqliteParameter("@UserId", store.UserId));
 
-            if (answer != null)
+            //if (answer != null)
+            //{
+            //    foreach (DataRow dataRow in answer.Rows)
+            //    {
+            //        stores.Add(dataRow[0].ToString());
+            //    }
+            //}
+            List<Category> defaultCategories = Service.GetDefaultCategories();
+
+            int familyId = Service.GetFamilyIdByMemberId(UserId);
+            List<Category> familyCategories = familyId > 0
+                ? Service.GetFamilyCategories(familyId)
+                : Service.GetUserCategories(UserId);
+
+            var allCategories = defaultCategories.Concat(familyCategories).Distinct();
+
+            foreach (var category in allCategories.Where(c => Service.IsCategoryFavoriteForUser(UserId, c.CategoryID)))
             {
-                foreach (DataRow dataRow in answer.Rows)
+
+                if (!category.CategoryName.StartsWith("❤️ "))
                 {
-                    stores.Add(dataRow[0].ToString());
+                    category.CategoryName = $"❤️ {category.CategoryName}";
                 }
+                CategoryList.Add(category);
             }
-            CategoryComboBox.ItemsSource = stores;
+            foreach (var category in allCategories.Where(c => !Service.IsCategoryFavoriteForUser(UserId, c.CategoryID)))
+            {
+                CategoryList.Add(category);
+            }
+
+            CategoryComboBox.ItemsSource = CategoryList;
+            CategoryComboBox.DisplayMemberPath = "CategoryName";
+            CategoryComboBox.SelectedValuePath = "CategoryID";
 
             StoreNameTextBox.Text = argStore.StoreName;
-            CategoryComboBox.SelectedValue = argStore.CategoryName;
-
-
-            
+            CategoryComboBox.SelectedValue = Service.GetCategoryIDByCategoryName(store.CategoryName);
         }
 
         private void CloseDialog_Edit(object sender, MouseButtonEventArgs e)
@@ -62,12 +84,15 @@ namespace Main.GUI
         private void SaveEditStore_Click(object sender, RoutedEventArgs e)
         {
             int CategoryId = CategoryComboBox.SelectedIndex + 1;
-            if (CategoryId == 0 || StoreNameTextBox.Text.Length < 3)
+            if (CategoryId == 0 && StoreNameTextBox.Text.Length < 3)
             {
-                MessageBox.Show("Wybierz kategorię lub długość nazwy sklepu musi mieć więcej niż 2 znaki", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Nazwa sklepu musi mieć więcej niż 2 znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            else if (!IsStore(StoreNameTextBox.Text, CategoryId))
+
+            int categoryId = (int)CategoryComboBox.SelectedValue;
+
+            if (!IsStore(StoreNameTextBox.Text, categoryId))
             {
                 MessageBox.Show("Istnieje taki sklep", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -76,7 +101,7 @@ namespace Main.GUI
                 DBSqlite dBsqlite = new DBSqlite();
                 int answer = dBsqlite.ExecuteNonQuery("UPDATE STORES SET StoreName=@NewName , CategoryID=@NewCategoryId WHERE StoreID=@MyStoreId",
                      new Microsoft.Data.Sqlite.SqliteParameter("@NewName", StoreNameTextBox.Text.ToString()),
-                     new SqliteParameter("@NewCategoryId", CategoryId),
+                     new SqliteParameter("@NewCategoryId", categoryId),
                      new SqliteParameter("@MyStoreId", store.StoreId));
                 if (answer > 0)
                 {

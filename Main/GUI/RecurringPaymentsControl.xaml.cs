@@ -44,22 +44,26 @@ namespace Main.GUI
             userRole = Service.GetRoleIDByUserID(userId);
             familyId = Service.GetFamilyIdByMemberId(userId);
 
-            LoadPayments();
-          
+            if (userRole == 3)
+            {
+                AddRecurringPaymentButton.Visibility=Visibility.Collapsed;
+            }
 
+            LoadPayments();
         }
         public void LoadPayments()
         {
             ActivePayments.Clear();
             InactivePayments.Clear();
 
-            if (familyId < 0)
+            if (familyId < 0 || userRole==3)
             {
                 var userRecurringPayments = Service.GetRecurringPaymentsByUserId(userId);
                 foreach (RecurringPayment payment in userRecurringPayments)
                 {
                     if (payment.IsActive)
                     {
+                        payment.CanEditAndDeactivate = false;
                         ActivePayments.Add(payment);
                     }
                     else if (!payment.IsActive)
@@ -75,6 +79,11 @@ namespace Main.GUI
                 {
                     if (payment.IsActive)
                     {
+                        if(userRole == 2 && payment.CreatedByUserID!= userId && Service.GetRoleIDByUserID(payment.UserID)!=3)
+                        {
+                            payment.CanEditAndDeactivate = false;
+                        }
+
                         ActivePayments.Add(payment);
                     }
                     else if (!payment.IsActive) 
@@ -129,8 +138,28 @@ namespace Main.GUI
 
                     }
                 }
+            }        }
+
+        private void ActivatePaymentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button button = sender as Button;
+            RecurringPayment obj = button.DataContext as RecurringPayment;
+            if (obj != null)
+            {
+                if (MessageBox.Show("Czy chcesz ponownie aktywować płatność " + obj.RecurringPaymentName + " ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    if (Service.ActivateRecurringPayment(obj.RecurringPaymentID))
+                    {
+                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " została aktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        LoadPayments();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " nie została aktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    }
+                }
             }
-           
         }
     }
 }

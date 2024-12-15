@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,7 @@ namespace Main.GUI
     {
         private readonly int userId;
         private RecurringPayment RecurringPayment;
+        private int? categoryId;
 
         private ObservableCollection<User> userList;
         private ObservableCollection<Store> storeList;
@@ -41,17 +43,33 @@ namespace Main.GUI
             userList = new ObservableCollection<User>();
             frequenciesList = new ObservableCollection<Frequencies>();
 
+            categoryId = argRecuringPayment.CategoryID; 
+
             LoadUser();
             LoadStore();
             LoadCategory();
             LoadFrequencyPayment();
-
             InputPayment.Text = argRecuringPayment.RecurringPaymentName;
-            InputAmount.Text = argRecuringPayment.Amount.ToString();
+
+            if (argRecuringPayment.TransactionTypeID.HasValue)
+            {
+                TypePayments.SelectedIndex = argRecuringPayment.TransactionTypeID.Value-1;
+            }
+            else
+            {
+                TypePayments.SelectedIndex = 0;
+            }
+
+            string amount = argRecuringPayment.Amount.ToString("F2");
+            if (!char.IsDigit(amount[0]))
+            {
+                amount = amount.Substring(1);
+            }
+            InputAmount.Text = amount;
+
             DataPayment.Text = argRecuringPayment.PaymentDate.ToString();
 
             SetValueComboBox();
-
         }
 
         //Custom Function [START]
@@ -101,30 +119,93 @@ namespace Main.GUI
                     }
                     break;
             }
-
             UserComboBox.SelectedIndex = 0;
-
         }
 
         private void LoadStore()
         {
-            storeList = Service.GetUserStores(userId);
-            storeList.Insert(0, new Store(-1, -1, false) { StoreName = "Wybierz" });
+            StoreComboBox.ItemsSource = null;
+            ObservableCollection<Store> allStores = new ObservableCollection<Store>();
 
+            int familyId = Service.GetFamilyIdByMemberId(userId);
+            if (familyId > 0)
+            {
+                var familyStores = Service.GetFamilyStoresByCategory(familyId, categoryId.GetValueOrDefault(-1));
+                allStores = familyStores ?? new ObservableCollection<Store>();
+            }
+            else
+            {
+                var userStores = Service.GetUserStoresByCategory(userId, categoryId.GetValueOrDefault(-1));
+                allStores = userStores ?? new ObservableCollection<Store>();
+            }
 
+            storeList = new ObservableCollection<Store>();
+
+            foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userId, c.StoreId)))
+            {
+                if (!store.StoreName.StartsWith("❤️ "))
+                {
+                    store.StoreName = $"❤️ {store.StoreName}";
+                }
+                storeList.Add(store);
+            }
+            foreach (var store in allStores.Where(c => !Service.IsStoreFavoriteForUser(userId, c.StoreId)))
+            {
+                storeList.Add(store);
+            }
+
+            StoreComboBox.IsEnabled = storeList.Any();
+            if (storeList.Any())
+            {
+                storeList.Insert(0, new Store(-1, -1,false) { StoreName = "Wybierz" });
+            }
+
+            // Przypisanie właściwości ComboBox
             StoreComboBox.ItemsSource = storeList;
-            StoreComboBox.SelectedIndex = 0;
+            StoreComboBox.DisplayMemberPath = "StoreName";
+            StoreComboBox.SelectedValuePath = "StoreId";
 
+            var selectedStore = storeList.FirstOrDefault(store => store.StoreId == RecurringPayment.StoreID);
+            if (selectedStore != null)
+            {
+                StoreComboBox.SelectedItem = selectedStore;
+            }
+            else
+            {
+                StoreComboBox.SelectedIndex = 0;
+            }
         }
 
 
         private void LoadCategory()
         {
-            categoryList = new ObservableCollection<Category>(Service.GetDefaultCategories());
+            categoryList = new ObservableCollection<Category>();
+
+            List<Category> defaultCategories = Service.GetDefaultCategories();
+
+            int familyId = Service.GetFamilyIdByMemberId(userId);
+            List<Category> familyCategories = familyId > 0
+                ? Service.GetFamilyCategories(familyId)
+                : Service.GetUserCategories(userId);
+
+            var allCategories = defaultCategories.Concat(familyCategories).Distinct();
+
+            foreach (var category in allCategories.Where(c => Service.IsCategoryFavoriteForUser(userId, c.CategoryID)))
+            {
+                if (!category.CategoryName.StartsWith("❤️ "))
+                {
+                    category.CategoryName = $"❤️ {category.CategoryName}";
+                }
+                categoryList.Add(category);
+            }
+            foreach (var category in allCategories.Where(c => !Service.IsCategoryFavoriteForUser(userId, c.CategoryID)))
+            {
+                categoryList.Add(category);
+            }
+
             categoryList.Insert(0, new Category { CategoryName = "Wybierz" });
             CategoryComboBox.ItemsSource = categoryList;
             CategoryComboBox.SelectedIndex = 0;
-
         }
 
         private void LoadFrequencyPayment()
@@ -139,7 +220,6 @@ namespace Main.GUI
                 frequencies.FrequencyName = row[1].ToString();
                 frequenciesList.Add(frequencies);
             }
-
             FrequencyComboBox.ItemsSource = frequenciesList;
             FrequencyComboBox.SelectedIndex = 0;
         }
@@ -204,7 +284,8 @@ namespace Main.GUI
             Store store = StoreComboBox.SelectedItem as Store;
             Category category = CategoryComboBox.SelectedItem as Category;
             Frequencies frequencies = FrequencyComboBox.SelectedItem as Frequencies;
-            string typePayments = TypePayments.SelectedItem.ToString();
+            int typePayment = TypePayments.SelectedIndex + 1;
+            string amount = InputAmount.Text;
             DateTime dateTime;
 
             if (string.IsNullOrEmpty(InputPayment.Text))
@@ -247,20 +328,24 @@ namespace Main.GUI
                 return;
             }
 
-            
+            if (typePayment == 2)
+            {
+                amount = "-" + amount;
+            }
 
             DBSqlite dBSqlite = new DBSqlite();
             int answer;
 
-            if (store.StoreName != "Wybierz") // JEST sklep
+            if (store != null && !string.IsNullOrEmpty(store.StoreName) &&  store.StoreName != "Wybierz") // JEST sklep
             {
                 // Zapytanie do aktualizacji rekordu w tabeli RecurringPayments z uwzględnieniem sklepu
-                answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET RecurringPaymentName = @TitlePayments, UserID = @UserId, StoreID = @Store, CategoryID = @CategoryId, Amount = @Amount, PaymentDate = @Date, FrequencyID = @Frequency, IsActive = 1, CreatedByUserID = @ToUserId WHERE RecurringPaymentID = @RecurringPaymentId",
+                answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET RecurringPaymentName = @TitlePayments, UserID = @UserId, StoreID = @Store, CategoryID = @CategoryId, Amount = @Amount, TransactionTypeID = @TransactionTypeID, PaymentDate = @Date, FrequencyID = @Frequency, IsActive = 1, CreatedByUserID = @ToUserId WHERE RecurringPaymentID = @RecurringPaymentId",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
                     new SqliteParameter("@UserId", userId),
                     new SqliteParameter("@Store", store.StoreId),
                     new SqliteParameter("@CategoryId", category.CategoryID),
-                    new SqliteParameter("@Amount", InputAmount.Text),
+                    new SqliteParameter("@Amount", amount),
+                    new SqliteParameter("@TransactionTypeID", typePayment),
                     new SqliteParameter("@Date", dateTime.ToString()),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
                     new SqliteParameter("@ToUserId", user.UserID),
@@ -280,11 +365,12 @@ namespace Main.GUI
             else
             {
                 // Zapytanie do aktualizacji rekordu w tabeli RecurringPayments BEZ sklepu
-                answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET RecurringPaymentName = @TitlePayments, UserID = @UserId, CategoryID = @CategoryId, Amount = @Amount, PaymentDate = @Date, FrequencyID = @Frequency, IsActive = 1, CreatedByUserID = @ToUserId WHERE RecurringPaymentID = @RecurringPaymentId",
+                answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET RecurringPaymentName = @TitlePayments, UserID = @UserId, StoreID = NULL, CategoryID = @CategoryId, Amount = @Amount, TransactionTypeID = @TransactionTypeID, PaymentDate = @Date, FrequencyID = @Frequency, IsActive = 1, CreatedByUserID = @ToUserId WHERE RecurringPaymentID = @RecurringPaymentId",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
                     new SqliteParameter("@UserId", userId),
                     new SqliteParameter("@CategoryId", category.CategoryID),
-                    new SqliteParameter("@Amount", InputAmount.Text),
+                    new SqliteParameter("@Amount", amount),
+                    new SqliteParameter("@TransactionTypeID", typePayment),
                     new SqliteParameter("@Date", dateTime.ToString()),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
                     new SqliteParameter("@ToUserId", user.UserID),
@@ -301,8 +387,126 @@ namespace Main.GUI
                     return;
                 }
             }
+        }
 
+        private void InputAmount_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string currentText = ((TextBox)sender).Text;
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
 
+            if (e.Text == "." || e.Text == ",")
+            {
+                if (currentText.Contains(".") || currentText.Contains(","))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            e.Handled = !isDigitOrSeparator;
+        }
+
+        private void InputAmount_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+
+            if (text.Contains(","))
+            {
+                text = text.Replace(",", ".");
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                if (text.Contains("."))
+                {
+                    string[] parts = text.Split('.');
+
+                    if (string.IsNullOrEmpty(parts[0]))
+                    {
+                        parts[0] = "0";
+                    }
+
+                    if (parts.Length > 1 && parts[1].Length > 2)
+                    {
+                        parts[1] = parts[1].Substring(0, 2);
+                    }
+
+                    text = parts[0] + "." + parts[1];
+                }
+                else
+                {
+                    text = text + ".00";
+                }
+
+                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                {
+                    textBox.Text = text;
+                }
+                else
+                {
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    textBox.Text = "";
+                }
+            }
+        }
+
+        private void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var item = CategoryComboBox.SelectedItem as Category;
+            if (item != null)
+            {
+                StoreComboBox.ItemsSource = null;
+                StoreComboBox.SelectedItem = null;
+                ObservableCollection<Store> allStores = new ObservableCollection<Store>();
+
+                int familyId = Service.GetFamilyIdByMemberId(userId);
+                if (familyId > 0)
+                {
+                    var familyStores = Service.GetFamilyStoresByCategory(familyId, item.CategoryID);
+                    allStores = familyStores ?? new ObservableCollection<Store>();
+                }
+                else
+                {
+                    var userStores = Service.GetUserStoresByCategory(userId, item.CategoryID);
+                    allStores = userStores ?? new ObservableCollection<Store>();
+                }
+
+                storeList = new ObservableCollection<Store>();
+
+                foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userId, c.StoreId)))
+                {
+                    if (!store.StoreName.StartsWith("❤️ "))
+                    {
+                        store.StoreName = $"❤️ {store.StoreName}";
+                    }
+                    storeList.Add(store);
+                }
+                foreach (var store in allStores.Where(c => !Service.IsStoreFavoriteForUser(userId, c.StoreId)))
+                {
+                    storeList.Add(store);
+                }
+
+                StoreComboBox.IsEnabled = storeList.Any();
+                if (storeList.Any())
+                {
+                    storeList.Insert(0, new Store(-1, -1, false) { StoreName = "Wybierz" });
+                }
+
+                StoreComboBox.ItemsSource = storeList;
+                StoreComboBox.DisplayMemberPath = "StoreName";
+                StoreComboBox.SelectedValuePath = "StoreId";
+
+                var selectedStore = storeList.FirstOrDefault(store => store.StoreId == RecurringPayment.StoreID);
+                if (selectedStore != null)
+                {
+                    StoreComboBox.SelectedItem = selectedStore;
+                }
+                else
+                {
+                    StoreComboBox.SelectedIndex = 0;
+                }
+            }
         }
     }
 }

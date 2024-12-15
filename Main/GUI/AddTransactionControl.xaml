@@ -32,7 +32,7 @@
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <StackPanel Margin="30,0,30,30">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Kategoria" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <TextBlock Text="Kategoria *" FontSize="16" VerticalAlignment="Center" Width="150"/>
                         <StackPanel Orientation="Horizontal" Width="300" Margin="0">
                             <ComboBox x:Name="CategoryComboBox" ItemsSource="{Binding Listcategories}" DisplayMemberPath="CategoryName" Width="300" SelectionChanged="ComboBoxCategory_SelectionChanged" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
                         </StackPanel>
@@ -46,35 +46,38 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Sklep" FontSize="16" VerticalAlignment="Center" Width="150"/>
-                        <StackPanel Orientation="Horizontal" Width="300" Margin="0">
-                            <ComboBox x:Name="StoreComboBox" ItemsSource="{Binding Liststores}" DisplayMemberPath="StoreName" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0"/>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="Sklep" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" Width="300" Margin="0">
+                            <ComboBox x:Name="StoreComboBox" ItemsSource="{Binding Liststores}" DisplayMemberPath="StoreName" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0" IsEnabled="False"/>
+                            <TextBlock Text="Wybierz kategorię, aby odkryć sklepy, jeśli są dostępne" FontSize="12" VerticalAlignment="Center" Width="300"  Foreground="DarkGray" Margin="2,3,0,0"/>
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Typ transakcji" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <TextBlock Text="Typ transakcji *" FontSize="16" VerticalAlignment="Center" Width="150"/>
                         <StackPanel Orientation="Horizontal" Width="300" Margin="0">
                             <ComboBox x:Name="InpuTypeTransaction" Width="300" Background="Transparent" FontSize="16" Foreground="Black" BorderThickness="0" Height="35.28" VerticalContentAlignment="Center" Padding="10,0,10,0">
-                                <ComboBoxItem Content="Przychód" IsSelected="True"/>
-                                <ComboBoxItem Content="Wydatek"/>
+                                <ComboBoxItem Content="Przychód"/>
+                                <ComboBoxItem Content="Wydatek" IsSelected="True"/>
                             </ComboBox>
                         </StackPanel>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Kwota" FontSize="16" VerticalAlignment="Center" Width="150"/>
+                        <TextBlock Text="Kwota *" FontSize="16" VerticalAlignment="Center" Width="150"/>
                         <Border Width="300" Height="35" Background="White" BorderBrush="Gray" BorderThickness="0.5">
-                            <TextBox x:Name="InputAmount" Background="Transparent" FontSize="16" Margin="5,0" Foreground="Black" BorderThickness="0" Height="23.28" KeyDown="AddInputAmount_KeyDown"/>
+                            <TextBox x:Name="InputAmount" Background="Transparent" FontSize="16" Margin="5,0" Foreground="Black" BorderThickness="0" Height="23.28" PreviewTextInput="InputAmount_PreviewTextInput" LostFocus="InputAmount_LostFocus"/>
                         </Border>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Data" FontSize="16" VerticalAlignment="Center" Width="80"/>
+                        <TextBlock Text="Data *" FontSize="16" VerticalAlignment="Center" Width="80"/>
                         <Border Width="130" Height="35" Background="White" BorderBrush="Gray" BorderThickness="0.5" Margin="0,0,30,0">
                             <DatePicker x:Name="InputData" Width="130" FontSize="16"/>
                         </Border>
-                        <TextBlock Text="Czas" FontSize="16" VerticalAlignment="Center" Width="80"/>
+                        <TextBlock Text="Czas *" FontSize="16" VerticalAlignment="Center" Width="80"/>
                         <Border Width="130" Height="35" Background="White" BorderBrush="Gray" BorderThickness="0.5">
                             <TextBox x:Name="InputTime" Text="00:00" Background="Transparent" Width="130" FontSize="16" Margin="5,0" Foreground="Black" BorderThickness="0" Height="23.28" PreviewTextInput="InputTime_PreviewTextInput" DataObject.Pasting="InputTime_Pasting" LostFocus="InputTime_LostFocus"/>
                         </Border>

@@ -33,47 +33,49 @@
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,30,0,0">
                 <StackPanel Margin="30,0,30,30">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Nazwa Płatności" Width="150" TextAlignment="Left"/>
-                        <TextBox x:Name="InputPayment" Width="150"/>
+                        <TextBlock Text="Nazwa Płatności *" Width="150" TextAlignment="Left"/>
+                        <TextBox x:Name="InputPayment" Width="300"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Członek Rodziny" Width="150" TextAlignment="Left"/>
-                        <ComboBox x:Name="UserComboBox" DisplayMemberPath="UserName" Width="150"/>
+                        <TextBlock Text="Członek Rodziny *" Width="150" TextAlignment="Left"/>
+                        <ComboBox x:Name="UserComboBox" DisplayMemberPath="UserName" Width="300"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Kategoria" Width="150" TextAlignment="Left"/>
-                        <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="CategoryName" Width="150"/>
+                        <TextBlock Text="Kategoria *" Width="150" TextAlignment="Left"/>
+                        <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="CategoryName" Width="300" SelectionChanged="CategoryComboBox_SelectionChanged"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                         <TextBlock Text="Sklep" Width="150" TextAlignment="Left"/>
-                        <ComboBox DisplayMemberPath="StoreName" x:Name="StoreComboBox" Width="150"/>
+                        <StackPanel Orientation="Vertical" Width="300">
+                            <ComboBox DisplayMemberPath="StoreName" x:Name="StoreComboBox" Width="300"/>
+                            <TextBlock Text="Wybierz kategorię, aby odkryć sklepy, jeśli są dostępne" FontSize="12" VerticalAlignment="Center" Width="300"  Foreground="DarkGray" Margin="2,3,0,0"/>
+                        </StackPanel>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Typ" Width="150" TextAlignment="Left"/>
-                        <ComboBox x:Name="TypePayments" Width="150">
-                            <ComboBoxItem Content="Wydatek" IsSelected="True"/>
+                        <TextBlock Text="Typ *" Width="150" TextAlignment="Left"/>
+                        <ComboBox x:Name="TypePayments" Width="300">
                             <ComboBoxItem Content="Przychód"/>
+                            <ComboBoxItem Content="Wydatek" IsSelected="True"/>
                         </ComboBox>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Kwota" Width="150" TextAlignment="Left"/>
-                        <TextBox x:Name="InputAmount" Width="150"/>
+                        <TextBlock Text="Kwota *" Width="150" TextAlignment="Left"/>
+                        <TextBox x:Name="InputAmount" Width="300"  PreviewTextInput="InputAmount_PreviewTextInput" LostFocus="InputAmount_LostFocus"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Data płatności" Width="150" TextAlignment="Left"/>
-                        <DatePicker x:Name="DataPayment" Width="150"/>
+                        <TextBlock Text="Data płatności *" Width="150" TextAlignment="Left"/>
+                        <DatePicker x:Name="DataPayment" Width="300"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Częstotliowść płatności" Width="150" TextAlignment="Left"/>
-                        <ComboBox x:Name="FrequencyComboBox" DisplayMemberPath="FrequencyName" Width="150"/>
-
+                        <TextBlock Text="Częstotliowść płatności *" Width="150" TextAlignment="Left"/>
+                        <ComboBox x:Name="FrequencyComboBox" DisplayMemberPath="FrequencyName" Width="300"/>
                     </StackPanel>
 
                     <Button Content="Dodaj Cykliczną płatność" Style="{StaticResource PrimaryActionButtonStyle}" Click="Button_Click"/>

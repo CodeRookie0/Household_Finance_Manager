@@ -25,25 +25,49 @@ namespace Main.GUI
     /// </summary>
     public partial class AddStoreForm : Window
     {
-        private ObservableCollection<string> CategoryName;
+        private ObservableCollection<Category> CategoryList;
         private readonly int privUserId;
         public AddStoreForm(int userId)
         {
             InitializeComponent();
             privUserId = userId;
-            CategoryName = new ObservableCollection<string>();
-            DBSqlite dBSqlite = new DBSqlite();
-            var answer = dBSqlite.ExecuteQuery("SELECT Categories.CategoryName FROM Categories WHERE Categories.UserID IS NULL OR Categories.UserID=@UserId;",
-                new Microsoft.Data.Sqlite.SqliteParameter("@UserId", privUserId));
+            CategoryList = new ObservableCollection<Category>();
+            //DBSqlite dBSqlite = new DBSqlite();
+            //var answer = dBSqlite.ExecuteQuery("SELECT Categories.CategoryName FROM Categories WHERE Categories.UserID IS NULL OR Categories.UserID=@UserId;",
+            //    new Microsoft.Data.Sqlite.SqliteParameter("@UserId", privUserId));
 
-            if(answer != null ) 
+            //if(answer != null ) 
+            //{
+            //    foreach(DataRow dataRow in answer.Rows)
+            //    {
+            //        CategoryName.Add(dataRow[0].ToString());
+            //    }
+            //}
+            List<Category> defaultCategories = Service.GetDefaultCategories();
+
+            int familyId = Service.GetFamilyIdByMemberId(privUserId);
+            List<Category> familyCategories = familyId > 0
+                ? Service.GetFamilyCategories(familyId)
+                : Service.GetUserCategories(privUserId);
+
+            var allCategories = defaultCategories.Concat(familyCategories).Distinct();
+
+            foreach (var category in allCategories.Where(c => Service.IsCategoryFavoriteForUser(privUserId, c.CategoryID)))
             {
-                foreach(DataRow dataRow in answer.Rows)
+                if (!category.CategoryName.StartsWith("❤️ "))
                 {
-                    CategoryName.Add(dataRow[0].ToString());
+                    category.CategoryName = $"❤️ {category.CategoryName}";
                 }
+                CategoryList.Add(category);
             }
-            CategoryComboBox.ItemsSource = CategoryName;
+            foreach (var category in allCategories.Where(c => !Service.IsCategoryFavoriteForUser(privUserId, c.CategoryID)))
+            {
+                CategoryList.Add(category);
+            }
+
+            CategoryComboBox.ItemsSource = CategoryList;
+            CategoryComboBox.DisplayMemberPath = "CategoryName";
+            CategoryComboBox.SelectedValuePath = "CategoryID";
         }
 
         private void CloseDialog_Click(object sender, MouseButtonEventArgs e)
@@ -54,12 +78,14 @@ namespace Main.GUI
         private void AddStore_Click(object sender, RoutedEventArgs e)
         {
             int CategoryId=CategoryComboBox.SelectedIndex+1;
-            if (CategoryId == 0 || StoreNameTextBox.Text.Length<3)
+            if (CategoryId == 0 && StoreNameTextBox.Text.Length<3)
             {
-                MessageBox.Show("Wybierz kategorię lub długość nazwy sklepu musi mieć więcej niż 2 znaki","Komunikat",MessageBoxButton.OK,MessageBoxImage.Error);
+                MessageBox.Show("Nazwa sklepu musi mieć więcej niż 2 znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            else if(!IsStore(StoreNameTextBox.Text,CategoryId))
+            int categoryId = (int)CategoryComboBox.SelectedValue;
+
+            if(!IsStore(StoreNameTextBox.Text, categoryId))
             {
                 MessageBox.Show("Istnieje taki sklep", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -67,7 +93,7 @@ namespace Main.GUI
             {
                 DBSqlite dbSqlite = new DBSqlite();
                 int answer = dbSqlite.ExecuteNonQuery("INSERT INTO Stores(CategoryID,StoreName,UserID) VALUES(@UserCategoryId,@UserStoreName,@MyId)",
-                     new Microsoft.Data.Sqlite.SqliteParameter("@UserCategoryId", CategoryId),
+                     new Microsoft.Data.Sqlite.SqliteParameter("@UserCategoryId", categoryId),
                      new SqliteParameter("@UserStoreName", StoreNameTextBox.Text.ToString()),
                      new SqliteParameter("@MyId", privUserId));
                 if (answer > 0)
@@ -80,7 +106,6 @@ namespace Main.GUI
                     MessageBox.Show("Sklep nie został wstawiony do bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-
         }
 
 

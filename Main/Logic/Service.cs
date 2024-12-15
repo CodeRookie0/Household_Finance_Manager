@@ -239,6 +239,19 @@ namespace Main.Logic
             }
         }
 
+        public static bool IsStoreFavoriteForUser(int userId, int storeId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT COUNT(*) FROM FavoriteStores WHERE UserID = @UserID AND StoreID = @StoreID";
+                var result = database.ExecuteQuery(selectQuery,
+                        new SqliteParameter("@StoreID", storeId),
+                        new SqliteParameter("@UserID", userId));
+                int count = Convert.ToInt32(result.Rows[0][0]);
+                return count > 0;
+            }
+        }
+
         public static bool IsCategoryPresentInDefaultOrFamily(int userId, string categoryName)
         {
             using (DBSqlite database = new DBSqlite())
@@ -602,8 +615,24 @@ namespace Main.Logic
                 return rowsAffected > 0;
             }
         }
-
-
+        public static bool ActivateRecurringPayment(int recurringPaymentID)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string updateQuery = "UPDATE RecurringPayments SET PaymentDate = @PaymentDate, IsActive = 1 WHERE RecurringPaymentID = @RecurringPaymentID";
+                try
+                {
+                    database.ExecuteNonQuery(updateQuery,
+                        new SqliteParameter("@PaymentDate", DateTime.Today),
+                        new SqliteParameter("@RecurringPaymentID", recurringPaymentID));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
 
         // Delete Methods
         public static bool DeleteFamily(int familyId)
@@ -632,11 +661,11 @@ namespace Main.Logic
             {
                 try
                 {
-                    string updateTransactionsQuery = "UPDATE Transactions SET CategoryID = NULL, SubcategoryID = NULL WHERE CategoryID = @CategoryId OR SubcategoryID IN (SELECT SubcategoryID FROM Subcategories WHERE CategoryID = @CategoryId)";
-                    database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@CategoryId", categoryId));
-
                     string deleteSubcategoriesQuery = "DELETE FROM Subcategories WHERE CategoryID = @CategoryId";
                     database.ExecuteNonQuery(deleteSubcategoriesQuery, new SqliteParameter("@CategoryId", categoryId));
+
+                    string deleteFavoriteCategoriesQuery = "DELETE FROM FavoriteCategories WHERE CategoryID = @CategoryId";
+                    database.ExecuteNonQuery(deleteFavoriteCategoriesQuery, new SqliteParameter("@CategoryId", categoryId));
 
                     string deleteCategoriesQuery = "DELETE FROM Categories WHERE CategoryID = @CategoryId";
                     database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@CategoryId", categoryId));
@@ -761,8 +790,8 @@ namespace Main.Logic
             {
                 try
                 {
-                    string updateTransactionsQuery = "UPDATE Transactions SET StoreID = NULL WHERE StoreID = @StoreID";
-                    database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@StoreID", storeId));
+                    string deleteFavoriteCategoriesQuery = "DELETE FROM FavoriteStores WHERE StoreID = @StoreID";
+                    database.ExecuteNonQuery(deleteFavoriteCategoriesQuery, new SqliteParameter("@StoreID", storeId));
 
                     string deleteCategoriesQuery = "DELETE FROM Stores WHERE StoreID = @StoreID";
                     database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@StoreID", storeId));
@@ -1114,6 +1143,20 @@ namespace Main.Logic
             }
         }
 
+        public static int GetCategoryIDByCategoryName(string categoryName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT CategoryID FROM Categories WHERE CategoryName = @CategoryName";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@CategoryName", categoryName));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return -1;
+                }
+                return Convert.ToInt32(result.Rows[0]["CategoryID"]);
+            }
+        }
+
         public static string GetSubcategoryNameBySubcategoryID(int subcategoryId)
         {
             using (DBSqlite database = new DBSqlite())
@@ -1180,7 +1223,7 @@ namespace Main.Logic
                 string query = "SELECT TransactionID, UserID, Amount, TransactionTypeID, CategoryID, SubcategoryID, StoreID, Note, Date FROM Transactions WHERE 1 = 1";
                 List<SqliteParameter> parameters = new List<SqliteParameter>();
 
-                if (userId.HasValue)
+                if (userId.HasValue && userId.Value != -1)
                 {
                     query += " AND UserID = @UserId";
                     parameters.Add(new SqliteParameter("@UserId", userId.Value));
@@ -1197,17 +1240,17 @@ namespace Main.Logic
                     query += " AND Date <= @DateTo";
                     parameters.Add(new SqliteParameter("@DateTo", endDate));
                 }
-                if (categoryId.HasValue)
+                if (categoryId.HasValue && categoryId.Value!=-1)
                 {
                     query += " AND CategoryID = @CategoryID";
                     parameters.Add(new SqliteParameter("@CategoryID", categoryId.Value));
                 }
-                if (storeId.HasValue)
+                if (storeId.HasValue && storeId.Value != -1)
                 {
                     query += " AND StoreID = @StoreID";
                     parameters.Add(new SqliteParameter("@StoreID", storeId.Value));
                 }
-                if (transactionTypeId.HasValue)
+                if (transactionTypeId.HasValue && transactionTypeId.Value != -1)
                 {
                     query += " AND TransactionTypeID = @TransactionTypeID";
                     parameters.Add(new SqliteParameter("@TransactionTypeID", transactionTypeId.Value));
@@ -1269,7 +1312,7 @@ namespace Main.Logic
         {
             List<Transaction> familyTransactions = new List<Transaction>();
 
-            if (filterUserId.HasValue)
+            if (filterUserId.HasValue && filterUserId.Value!=-1)
             {
                 int userId = filterUserId.Value;
                 List<Transaction> userTransactions = GetFilteredUserTransactions(userId: userId, dateFrom: startDate, dateTo: endDate, categoryId: categoryId, storeId: storeId, transactionTypeId: transactionTypeId, amountFrom: amountFrom, amountTo: amountTo);
@@ -1339,15 +1382,80 @@ namespace Main.Logic
             return stores;
         }
 
-        public static List<Store> GetFamilyStores(int familyId)
+        public static ObservableCollection<Store> GetUserStoresByCategory(int userId, int categoryId)
         {
-            List<Store> familyStores = new List<Store>();
+            ObservableCollection<Store> stores = new ObservableCollection<Store>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"
+                    SELECT 
+                        Stores.StoreID, 
+                        Stores.StoreName, 
+                        Stores.UserID, 
+                        Stores.IsFavorite, 
+                        Categories.CategoryName
+                    FROM 
+                        Stores
+                    LEFT JOIN 
+                        Categories ON Stores.CategoryID = Categories.CategoryID
+                    WHERE 
+                        (Stores.UserID = @UserID OR Stores.UserID IS NULL) 
+                        AND Stores.CategoryID = @CategoryID";
+
+                DataTable result = database.ExecuteQuery(
+                    query,
+                    new SqliteParameter("@UserID", userId),
+                    new SqliteParameter("@CategoryID", categoryId)
+                );
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Store store = new Store(
+                        storeId: Convert.ToInt32(row["StoreID"]),
+                        userId: row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"]),
+                        isFavorite: Convert.ToBoolean(row["IsFavorite"])
+                    )
+                    {
+                        StoreName = row["StoreName"].ToString(),
+                        CategoryName = row["CategoryName"] == DBNull.Value ? null : row["CategoryName"].ToString()
+                    };
+
+                    stores.Add(store);
+                }
+            }
+            return stores;
+        }
+
+        public static ObservableCollection<Store> GetFamilyStores(int familyId)
+        {
+            ObservableCollection<Store> familyStores = new ObservableCollection<Store>();
             List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
 
             foreach (FamilyMember member in familyMembers)
             {
                 int userId = member.UserID;
                 ObservableCollection<Store> userStores = GetUserStores(userId);
+
+                foreach (Store store in userStores)
+                {
+                    if (!familyStores.Any(s => s.StoreId == store.StoreId))
+                    {
+                        familyStores.Add(store);
+                    }
+                }
+            }
+            return familyStores;
+        }
+
+        public static ObservableCollection<Store> GetFamilyStoresByCategory(int familyId, int categoryId)
+        {
+            ObservableCollection<Store> familyStores = new ObservableCollection<Store>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+                ObservableCollection<Store> userStores = GetUserStoresByCategory(userId, categoryId);
 
                 foreach (Store store in userStores)
                 {
@@ -1454,7 +1562,7 @@ namespace Main.Logic
             using (DBSqlite database = new DBSqlite())
             {
                 string query = @"
-                SELECT RecurringPaymentID, RecurringPaymentName, UserID, StoreID, CategoryID, Amount, PaymentDate, FrequencyID, IsActive, CreatedByUserID
+                SELECT RecurringPaymentID, RecurringPaymentName, UserID, StoreID, CategoryID, Amount, TransactionTypeID, PaymentDate, FrequencyID, IsActive, CreatedByUserID
                 FROM RecurringPayments
                 WHERE UserID = @UserId";
 
@@ -1470,6 +1578,7 @@ namespace Main.Logic
                         UserID = Convert.ToInt32(row["UserID"]),
                         StoreID = row["StoreID"] != DBNull.Value ? Convert.ToInt32(row["StoreID"]) : (int?)null,
                         CategoryID = row["CategoryID"] != DBNull.Value ? Convert.ToInt32(row["CategoryID"]) : (int?)null,
+                        TransactionTypeID = row["TransactionTypeID"] != DBNull.Value ? Convert.ToInt32(row["TransactionTypeID"]) : (int?)null,
                         Amount = Convert.ToDecimal(row["Amount"]),
                         PaymentDate = Convert.ToDateTime(row["PaymentDate"]),
                         FrequencyID = Convert.ToInt32(row["FrequencyID"]),

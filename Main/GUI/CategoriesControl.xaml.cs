@@ -232,7 +232,11 @@ namespace Main.GUI
                                 }
                                 else
                                 {
-                                    MessageBox.Show("Wystąpił błąd podczas usuwania kategorii.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    MessageBox.Show("Nie udało się usunąć kategorii.\n" +
+                                        "Kategoria może być powiązana z transakcjami lub cyklicznymi płatnościami, które uniemożliwiają jej usunięcie.",
+                                        "Niepowodzenie",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Error);
                                 }
                             }
                         };

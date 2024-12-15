@@ -34,22 +34,33 @@ namespace Main.GUI
         public EditTransactionControl(ObservableCollection<Category> argcategoryList, ObservableCollection<Store> argStore, int userId, Transaction argtransaction)
         {
             InitializeComponent();
-
-            argStore.Insert(0, new Store(-1, -1, false) { StoreName = "Wybierz" });
-
             Listcategories = argcategoryList;
             Liststores = argStore;
             Listsubcategory = new ObservableCollection<Subcategory>();
             transaction = argtransaction;
+            userid = userId;
 
+            foreach (var category in argcategoryList.Where(c => Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
+            {
+                if (!category.CategoryName.StartsWith("❤️ "))
+                {
+                    category.CategoryName = $"❤️ {category.CategoryName}";
+                }
+                Listcategories.Add(category);
+            }
+            foreach (var category in argcategoryList.Where(c => !Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
+            {
+                Listcategories.Add(category);
+            }
+            CategoryComboBox.ItemsSource = null;
             CategoryComboBox.ItemsSource = Listcategories;
 
             // var thisCategory = argcategoryList.Find(c => c.CategoryID == transaction.CategoryID);
-            var thisCategory = argcategoryList.FirstOrDefault(x => x.CategoryID == transaction.CategoryID);
+            var thisCategory = Listcategories.FirstOrDefault(x => x.CategoryID == transaction.CategoryID);
 
             if (thisCategory != null)
             {
-                CategoryComboBox.SelectedIndex = argcategoryList.IndexOf(thisCategory);
+                CategoryComboBox.SelectedItem = thisCategory;
 
                 DBSqlite dBSqlite = new DBSqlite();
                 DataTable answer = dBSqlite.ExecuteQuery("SELECT SubCategoryID,CategoryID,SubcategoryName,UserID FROM SubCategories WHERE CategoryID=@MyCategoryId",
@@ -80,22 +91,20 @@ namespace Main.GUI
                         SubategoryComboBox.SelectedIndex = Listsubcategory.IndexOf(thisSubCategory);
                         
                     }
-                    else
-                    {
-                        SubategoryComboBox.IsEnabled = true;
-                        SubategoryComboBox.SelectedIndex = 0;
-                    }
                 }
             }
-           
 
 
             StoreComboBox.ItemsSource = Liststores;
 
-            var thisStore = argStore.FirstOrDefault(c => c.StoreId == transaction.StoreID);
+            var thisStore = Liststores.FirstOrDefault(c => c.StoreId == transaction.StoreID);
             if (thisStore != null)
             {
-                StoreComboBox.SelectedIndex = argStore.IndexOf(thisStore);
+                StoreComboBox.SelectedItem = thisStore;
+            }
+            else
+            {
+                StoreComboBox.SelectedIndex = 0;
             }
 
             InpuTypeTransaction.SelectedIndex = (transaction.TransactionTypeID - 1);
@@ -103,16 +112,11 @@ namespace Main.GUI
             if (transaction.SubcategoryID != -1)
             {
                 CategoryComboBox.IsEnabled = true;
-
-
             }
-
-            userid = userId;
 
             Listsubcategory = new ObservableCollection<Subcategory>();
 
-
-            InputAmount.Text = Math.Abs(transaction.Amount).ToString();
+            InputAmount.Text = Math.Abs(transaction.Amount).ToString("F2");
             InputData.Text = transaction.Date.ToString();
             InputNote.Text = transaction.Note.ToString();
         }
@@ -149,8 +153,24 @@ namespace Main.GUI
                     }
                     SubategoryComboBox.ItemsSource = Listsubcategory;
                     SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
-                   
 
+                    ObservableCollection<Store> allStores=new ObservableCollection<Store>();
+
+                    foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                    {
+                        if (!store.StoreName.StartsWith("❤️ "))
+                        {
+                            store.StoreName = $"❤️ {store.StoreName}";
+                        }
+                        Liststores.Add(store);
+                    }
+                    foreach (var store in allStores.Where(c => !Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                    {
+                        Liststores.Add(store);
+                    }
+
+                    StoreComboBox.IsEnabled = Liststores.Any();
+                    StoreComboBox.ItemsSource = Liststores;
                 }
             }
         }
@@ -224,6 +244,10 @@ namespace Main.GUI
             if (store != null && store.StoreName!="Wybierz")
             {
                 query.Append(", StoreID = '" + store.StoreId + "'");
+            }
+            else
+            {
+                query.Append(", StoreID = NULL");
             }
 
             // Określenie, którą transakcję zaktualizować
