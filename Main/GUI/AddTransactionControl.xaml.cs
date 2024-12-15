@@ -31,18 +31,28 @@ namespace Main.GUI
        
         private readonly int userid;
         
-        public AddTransactionControl(ObservableCollection<Category> argCategoryList,ObservableCollection<Store> argStore,int userId)
+        public AddTransactionControl(ObservableCollection<Category> argCategoryList,int userId)
         {
             InitializeComponent();
-           
-            Listcategories = argCategoryList;
-            Liststores = argStore;
-            CategoryComboBox.ItemsSource = Listcategories;
-            StoreComboBox.ItemsSource = Liststores;
             userid = userId;
+           
+            Listcategories = new ObservableCollection<Category>();
+            foreach (var category in argCategoryList.Where(c => Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
+            {
+                if (!category.CategoryName.StartsWith("❤️ "))
+                {
+                    category.CategoryName = $"❤️ {category.CategoryName}";
+                }
+                Listcategories.Add(category);
+            }
+            foreach (var category in argCategoryList.Where(c => !Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
+            {
+                Listcategories.Add(category);
+            }
+            CategoryComboBox.ItemsSource = null;
+            CategoryComboBox.ItemsSource = Listcategories;
 
             Listsubcategory = new ObservableCollection<Subcategory>();
-            
         } 
 
         private void CloseDialog_Click(object sender, MouseButtonEventArgs e)
@@ -78,6 +88,37 @@ namespace Main.GUI
                     SubategoryComboBox.ItemsSource = Listsubcategory;
                     SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
 
+                    StoreComboBox.ItemsSource = null;
+                    ObservableCollection<Store> allStores = new ObservableCollection<Store>();
+                    int familyId = Service.GetFamilyIdByMemberId(userid);
+                    if (familyId > 0)
+                    {
+                        var familyStores = Service.GetFamilyStoresByCategory(familyId, item.CategoryID);
+                        allStores = familyStores ?? new ObservableCollection<Store>();
+                    }
+                    else
+                    {
+                        var userStores = Service.GetUserStoresByCategory(userid, item.CategoryID);
+                        allStores = userStores ?? new ObservableCollection<Store>();
+                    }
+
+                    Liststores = new ObservableCollection<Store>();
+
+                    foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                    {
+                        if (!store.StoreName.StartsWith("❤️ "))
+                        {
+                            store.StoreName = $"❤️ {store.StoreName}";
+                        }
+                        Liststores.Add(store);
+                    }
+                    foreach (var store in allStores.Where(c => !Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                    {
+                        Liststores.Add(store);
+                    }
+
+                    StoreComboBox.IsEnabled = Liststores.Any();
+                    StoreComboBox.ItemsSource = Liststores;
                 }
             }
         }
@@ -179,18 +220,6 @@ namespace Main.GUI
             }
         }
 
-        private void AddInputAmount_KeyDown(object sender, KeyEventArgs e)
-        {
-            if((e.Key<Key.D0 || e.Key >Key.D9)&&
-                (e.Key<Key.NumPad0 || e.Key>Key.NumPad9)
-                && e.Key!=Key.OemPeriod
-                && e.Key!=Key.Decimal)
-            {
-                e.Handled = true;
-            }
-
-        }
-
         private void InputTime_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9:]");
@@ -218,6 +247,67 @@ namespace Main.GUI
             {
                 MessageBox.Show("Nieprawidłowy format czasu! Użyj formatu HH:mm.", "Błąd walidacji", MessageBoxButton.OK, MessageBoxImage.Error);
                 InputTime.Text = "00:00";
+            }
+        }
+        private void InputAmount_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string currentText = ((TextBox)sender).Text;
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+            if (e.Text == "." || e.Text == ",")
+            {
+                if (currentText.Contains(".") || currentText.Contains(","))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            e.Handled = !isDigitOrSeparator;
+        }
+
+        private void InputAmount_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+
+            if (text.Contains(","))
+            {
+                text = text.Replace(",", ".");
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                if (text.Contains("."))
+                {
+                    string[] parts = text.Split('.');
+
+                    if (string.IsNullOrEmpty(parts[0]))
+                    {
+                        parts[0] = "0";
+                    }
+
+                    if (parts.Length > 1 && parts[1].Length > 2)
+                    {
+                        parts[1] = parts[1].Substring(0, 2);
+                    }
+
+                    text = parts[0] + "." + parts[1];
+                }
+                else
+                {
+                    text = text + ".00";
+                }
+
+                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                {
+                    textBox.Text = text;
+                }
+                else
+                {
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    textBox.Text = "";
+                }
             }
         }
     }

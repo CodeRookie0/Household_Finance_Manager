@@ -36,7 +36,6 @@ namespace Main.GUI
                 CategoriesBorder.Visibility = Visibility.Collapsed;
                 StoresBorder.Visibility = Visibility.Collapsed;
                 LimitsBorder.Visibility = Visibility.Collapsed;
-                RecurringPaymentsBorder.Visibility = Visibility.Collapsed;
                 FamilyTransactionsBorder.Visibility = Visibility.Collapsed;
             }
 

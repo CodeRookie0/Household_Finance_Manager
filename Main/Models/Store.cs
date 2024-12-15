@@ -19,7 +19,7 @@ namespace Main.Models
         public bool IsFavorite { get { return isFavorit; } }
         public string CreatedBy => Service.GetUserNameByUserID(UserId);
 
-        public Store(int storeId,int userId,bool isFavorite)
+        public Store(int storeId,int userId, bool isFavorite)
         {
             this.storeId = storeId;
             this.userId = userId;

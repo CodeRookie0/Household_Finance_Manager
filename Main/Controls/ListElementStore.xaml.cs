@@ -102,7 +102,11 @@ namespace Main.Controls
                 }
                 else
                 {
-                    MessageBox.Show("Sklep nie został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Nie udało się usunąć sklepu.\n" +
+                        "Sklep może być powiązany z transakcjami lub cyklicznymi płatnościami, które uniemożliwiają jego usunięcie.",
+                        "Niepowodzenie",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Error);
                 }
             }
         }

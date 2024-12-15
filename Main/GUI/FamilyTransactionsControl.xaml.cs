@@ -104,16 +104,38 @@ namespace Main.GUI
                 {
                     allCategories.Add(category);
                 }
-                CategoryComboBox.ItemsSource = allCategories;
+                CategoryComboBox.Items.Add(new Category { CategoryID = -1, CategoryName = "Wybierz" });
+                foreach (var category in allCategories)
+                {
+                    CategoryComboBox.Items.Add(category);
+                }
+                CategoryComboBox.SelectedIndex = 0;
 
                 var users = Service.GetFamilyMembersByFamilyId(familyId);
-                UserComboBox.ItemsSource = users;
+                UserComboBox.Items.Add(new User { UserID = -1, UserName = "Wybierz" });
+                foreach (var user in users)
+                {
+                    UserComboBox.Items.Add(user);
+                }
+                UserComboBox.SelectedIndex = 0;
 
                 var stores = Service.GetFamilyStores(familyId);
-                StoreComboBox.ItemsSource = stores;
+                var defaultStore = new Store(-1, -1, false) { StoreName = "Wybierz" };
+                StoreComboBox.Items.Add(defaultStore);
+                foreach (var store in stores)
+                {
+                    StoreComboBox.Items.Add(store);
+                }
+                StoreComboBox.SelectedIndex = 0;
 
                 List<TransactionType> transactionTypes = Service.GetTransactionTypes();
-                TransactionTypeComboBox.ItemsSource = transactionTypes;
+                var defaultTransactionType = new TransactionType { TransactionTypeID = -1, TypeName = "Wybierz" };
+                transactionTypes.Insert(0, defaultTransactionType);
+                foreach (var transactionType in transactionTypes)
+                {
+                    TransactionTypeComboBox.Items.Add(transactionType);
+                }
+                TransactionTypeComboBox.SelectedIndex = 0;
             }
         }
         private Grid CreateTransactionGrid(List<Transaction> transactions)
@@ -347,15 +369,17 @@ namespace Main.GUI
             LoadTransactions(transactions);
         }
 
-        private void CleaFiltersButton_Click(object sender, RoutedEventArgs e)
+        private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
         {
             StartDatePicker.SelectedDate = null;
             EndDatePicker.SelectedDate = null;
-            CategoryComboBox.SelectedIndex = -1;
-            StoreComboBox.SelectedIndex = -1;
-            TransactionTypeComboBox.SelectedIndex = -1;
+            UserComboBox.SelectedIndex = 0;
+            CategoryComboBox.SelectedIndex = 0;
+            StoreComboBox.SelectedIndex = 0;
+            TransactionTypeComboBox.SelectedIndex = 0;
             AmountFromTextBox.Clear();
             AmountToTextBox.Clear();
+            FilterButton_Click(sender, e);
         }
 
         private void AmountFromTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
@@ -508,7 +532,7 @@ namespace Main.GUI
             }
 
 
-            AddTransactionControl addTransaction = new AddTransactionControl(categories, store, userId);
+            AddTransactionControl addTransaction = new AddTransactionControl(categories, userId);
             addTransaction.ShowDialog();
             LoadTransactions();
 
@@ -576,13 +600,22 @@ namespace Main.GUI
 
             var button = sender as Button;
             Transaction transaction = button?.DataContext as Transaction;
-            if(transaction != null) 
+            if(transaction != null)
             {
-                EditTransactionControl editTransaction = new EditTransactionControl(categories, store, userId, transaction);
+                int familyId = Service.GetFamilyIdByMemberId(userId);
+                ObservableCollection<Store> storeListByCategory;
+                if (familyId > 0)
+                {
+                    storeListByCategory = Service.GetFamilyStoresByCategory(familyId, transaction.CategoryID);
+                }
+                else
+                {
+                    storeListByCategory = Service.GetUserStoresByCategory(userId, transaction.CategoryID);
+                }
+                EditTransactionControl editTransaction = new EditTransactionControl(categories, storeListByCategory, userId, transaction);
                 editTransaction.ShowDialog();
                 LoadTransactions();
             }
-           
         }
     }
 }
