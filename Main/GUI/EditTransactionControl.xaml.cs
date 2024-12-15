@@ -34,7 +34,7 @@ namespace Main.GUI
         public EditTransactionControl(ObservableCollection<Category> argcategoryList, ObservableCollection<Store> argStore, int userId, Transaction argtransaction)
         {
             InitializeComponent();
-            Listcategories = argcategoryList;
+            Listcategories = new ObservableCollection<Category>();
             Liststores = argStore;
             Listsubcategory = new ObservableCollection<Subcategory>();
             transaction = argtransaction;

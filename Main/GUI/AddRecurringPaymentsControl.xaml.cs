@@ -220,7 +220,7 @@ namespace Main.GUI
                 amount = "-" + amount;
             }
 
-            if (store.StoreName != "Wybierz") //Jest sklep
+            if (store?.StoreName != null && store.StoreName != "Wybierz") //Jest sklep
             {
                 DBSqlite dBSqlite = new DBSqlite();
                 int answer = dBSqlite.ExecuteNonQuery("INSERT INTO RecurringPayments (RecurringPaymentName,UserID,StoreID,CategoryID,Amount,TransactionTypeID,PaymentDate,FrequencyID,IsActive,CreatedByUserID)" +
