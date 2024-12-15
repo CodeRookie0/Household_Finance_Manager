@@ -107,6 +107,11 @@ namespace Main.GUI
             }*/
             PermissionEditorControl permissionEditor = new PermissionEditorControl(members);
             permissionEditor.ShowDialog();
+
+            FamilyMembersDataGrid.DataContext = null;
+            FamilyMembersDataGrid.ItemsSource= null;
+            FamilyMembersDataGrid.DataContext = members;
+            FamilyMembersDataGrid.ItemsSource = members;
         }
 
 
@@ -162,6 +167,12 @@ namespace Main.GUI
             }
             FamilyMembersDataGrid.DataContext = members;
             FamilyMembersDataGrid.ItemsSource = members;
+
+            JoinRequestsDataGrid.ItemsSource = null;
+            JoinRequestsDataGrid.SelectedItem = joinRequestMembers;
+
+            JoinRequestsTextBlock.DataContext = null;
+            JoinRequestsTextBlock.DataContext = joinRequestMembers;
 
         }
 

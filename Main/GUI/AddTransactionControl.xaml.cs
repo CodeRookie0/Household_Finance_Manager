@@ -34,14 +34,21 @@ namespace Main.GUI
         public AddTransactionControl(ObservableCollection<Category> argCategoryList,ObservableCollection<Store> argStore,int userId)
         {
             InitializeComponent();
+
+
+            argStore.Insert(0, new Store(-1, -1, false) { StoreName = "Wybierz" });
+
            
             Listcategories = argCategoryList;
             Liststores = argStore;
             CategoryComboBox.ItemsSource = Listcategories;
             StoreComboBox.ItemsSource = Liststores;
+            StoreComboBox.SelectedIndex = 0;
+    
             userid = userId;
 
             Listsubcategory = new ObservableCollection<Subcategory>();
+           
             
         } 
 
@@ -65,6 +72,7 @@ namespace Main.GUI
                     SubategoryComboBox.IsEnabled = true;
                     SubategoryComboBox.ItemsSource = null;
                     Listsubcategory.Clear();
+                    Listsubcategory.Insert(0, new Subcategory { SubcategoryName = "Wybierz" });
 
                     foreach(DataRow row in answer.Rows) 
                     {
@@ -77,6 +85,7 @@ namespace Main.GUI
                     }
                     SubategoryComboBox.ItemsSource = Listsubcategory;
                     SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
+                    SubategoryComboBox.SelectedIndex = 0;
 
                 }
             }
@@ -120,11 +129,11 @@ namespace Main.GUI
             }
             query.Append(",CategoryID");
 
-            if (subcategory != null)
+            if (subcategory != null && subcategory.SubcategoryName!="Wybierz")
             {
                 query.Append(",SubCategoryID");
             }
-            if (store != null)
+            if (store != null && store.StoreName!="Wybierz")
             {
                 query.Append(",StoreID");
             }
@@ -154,18 +163,18 @@ namespace Main.GUI
             // Dodajemy wartości dla opcjonalnych pól
              query.Append(", '" + category.CategoryID + "'");
             
-            if (subcategory != null)
+            if (subcategory != null && subcategory.SubcategoryName!="Wybierz")
             {
                 query.Append(", '" + subcategory.SubcategoryID + "'");
             }
-            if (store != null)
+            if (store != null && store.StoreName!="Wybierz")
             {
                 query.Append(", '" + store.StoreId + "'");
             }
 
             query.Append(");");
 
-
+            MessageBox.Show(query.ToString());
             DBSqlite dBSqlite=new DBSqlite();
             int answer = dBSqlite.ExecuteNonQuery(query.ToString());
             if(answer>0)

@@ -34,6 +34,9 @@ namespace Main.GUI
         public EditTransactionControl(ObservableCollection<Category> argcategoryList, ObservableCollection<Store> argStore, int userId, Transaction argtransaction)
         {
             InitializeComponent();
+
+            argStore.Insert(0, new Store(-1, -1, false) { StoreName = "Wybierz" });
+
             Listcategories = argcategoryList;
             Liststores = argStore;
             Listsubcategory = new ObservableCollection<Subcategory>();
@@ -56,6 +59,7 @@ namespace Main.GUI
 
                     SubategoryComboBox.ItemsSource = null;
                     Listsubcategory.Clear();
+                    Listsubcategory.Insert(0, new Subcategory { SubcategoryName = "Wybierz" });
 
                     foreach (DataRow row in answer.Rows)
                     {
@@ -74,9 +78,16 @@ namespace Main.GUI
                     {
                         SubategoryComboBox.IsEnabled = true;
                         SubategoryComboBox.SelectedIndex = Listsubcategory.IndexOf(thisSubCategory);
+                        
+                    }
+                    else
+                    {
+                        SubategoryComboBox.IsEnabled = true;
+                        SubategoryComboBox.SelectedIndex = 0;
                     }
                 }
             }
+           
 
 
             StoreComboBox.ItemsSource = Liststores;
@@ -125,6 +136,7 @@ namespace Main.GUI
                     SubategoryComboBox.IsEnabled = true;
                     SubategoryComboBox.ItemsSource = null;
                     Listsubcategory.Clear();
+                    Listsubcategory.Insert(0, new Subcategory { SubcategoryName = "Wybierz" });
 
                     foreach (DataRow row in answer.Rows)
                     {
@@ -137,6 +149,7 @@ namespace Main.GUI
                     }
                     SubategoryComboBox.ItemsSource = Listsubcategory;
                     SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
+                   
 
                 }
             }
@@ -204,11 +217,11 @@ namespace Main.GUI
             }
             query.Append(", CategoryID = '" + category.CategoryID + "'");
 
-            if (subcategory != null)
+            if (subcategory != null && subcategory.SubcategoryName != "Wybierz") 
             {
                 query.Append(", SubCategoryID = '" + subcategory.SubcategoryID + "'");
             }
-            if (store != null)
+            if (store != null && store.StoreName!="Wybierz")
             {
                 query.Append(", StoreID = '" + store.StoreId + "'");
             }

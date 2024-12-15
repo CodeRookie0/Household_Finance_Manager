@@ -28,11 +28,11 @@
             <DataGrid x:Name="dataGridUserMyFamily" AutoGenerateColumns="False" ItemsSource="{Binding pendingUsers}" FontSize="20">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="User Name" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTemplateColumn Header="Role" Width="*">
+                    <DataGridTemplateColumn Header="Role"  Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox  ItemsSource="{Binding DataContext.ComboBoxItems ,RelativeSource={RelativeSource AncestorType=Window}}"
-                                          SelectedItem="{Binding Role}"
+                                <ComboBox x:Name="roleComboBox" ItemsSource="{Binding DataContext.ComboBoxItems ,RelativeSource={RelativeSource AncestorType=Window}}"
+                                          Loaded="roleComboBox_Loaded"
                                           SelectionChanged="ChangeRole"/>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>

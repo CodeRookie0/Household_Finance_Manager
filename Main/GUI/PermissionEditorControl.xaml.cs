@@ -30,6 +30,7 @@ namespace Main.GUI
 
 
         private bool firstWindow = true;
+        private string previousRole;
       
         public PermissionEditorControl(ObservableCollection<PendingUser> argList)
         {
@@ -48,8 +49,9 @@ namespace Main.GUI
                 "Partner",
                 "Child"
             };
-            
+
             DataContext = this;
+  
             
         }
 
@@ -80,18 +82,24 @@ namespace Main.GUI
                 {
 
                     var currentUser = (PendingUser)comboBox.DataContext;
-                    int role = GetNumberRole(currentUser.Role);
-                    if (MessageBox.Show("Czy chcesz zmienić uprawnienia dla użytkownika ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+
+                    previousRole = currentUser.RoleName;
+
+                    int role = GetNumberRole(comboBox.SelectedValue.ToString());
+                    if (MessageBox.Show("Czy chcesz zmienić uprawnienia dla użytkownika "+currentUser.Name+" ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         
                         DBSqlite dBSqlite = new DBSqlite();
                         dBSqlite.ExecuteNonQuery("UPDATE Users SET RoleID=@NewRole WHERE UserID=@UserId",
                             new Microsoft.Data.Sqlite.SqliteParameter("@NewRole", role),
                             new SqliteParameter("@UserId", currentUser.Userid.ToString()));
+                        currentUser.RoleName= comboBox.SelectedValue.ToString();
                     }
                     else
                     {
-                       
+                        firstWindow = true;
+                        comboBox.SelectedItem = previousRole;
+                        return;
                     }
                     
 
@@ -105,7 +113,18 @@ namespace Main.GUI
             }
         }
 
-        
+        private void roleComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            if(sender is ComboBox comboBox)
+            {
+                var currentUser = (PendingUser)comboBox.DataContext;
+                if(currentUser!=null)
+                {
+                    comboBox.SelectedItem = currentUser.RoleName;
+                }
+              
+            }
+        }
     }
 }
 

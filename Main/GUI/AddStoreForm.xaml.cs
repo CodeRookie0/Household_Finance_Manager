@@ -54,7 +54,7 @@ namespace Main.GUI
         private void AddStore_Click(object sender, RoutedEventArgs e)
         {
             int CategoryId=CategoryComboBox.SelectedIndex+1;
-            if (CategoryId == 0 && StoreNameTextBox.Text.Length<3)
+            if (CategoryId == 0 || StoreNameTextBox.Text.Length<3)
             {
                 MessageBox.Show("Wybierz kategorię lub długość nazwy sklepu musi mieć więcej niż 2 znaki","Komunikat",MessageBoxButton.OK,MessageBoxImage.Error);
                 return;
