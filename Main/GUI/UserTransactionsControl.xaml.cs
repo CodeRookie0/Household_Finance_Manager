@@ -152,27 +152,37 @@ namespace Main.GUI
             if(transaction != null)
             {
                 MessageBoxResult answerQuestion = MessageBox.Show("Czy na pewno chcesz usunąć transakcję o kwocie "
-                    + transaction.Amount + " zrealizowaną w dniu " + transaction.Date, "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    + transaction.Amount.ToString("C") + " zrealizowaną w dniu " + transaction.Date.ToString("dd-MM-yyyy HH:mm"), "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (answerQuestion == MessageBoxResult.Yes)
                 {
-                    DBSqlite dBSqlite = new DBSqlite();
-
-                    int updateHistory = dBSqlite.ExecuteNonQuery(
-                        "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID AND TransactionID=NULL AND ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
-                        new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 3),
-                        new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
-
-                    int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
-                        new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
-                    if (answer > 0)
+                    try
                     {
-                        MessageBox.Show("Transakcja została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                        LoadTransactions();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Transakcja nie została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        DBSqlite dBSqlite = new DBSqlite();
 
+                        int updateHistory = dBSqlite.ExecuteNonQuery(
+                            "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID, TransactionID=NULL, ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
+                            new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 3),
+                            new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
+
+                        int answer = dBSqlite.ExecuteNonQuery(
+                            "DELETE FROM Transactions WHERE TransactionID=@MyTransactionsId",
+                            new Microsoft.Data.Sqlite.SqliteParameter("@MyTransactionsId", transaction.TransactionID));
+
+                        if (answer > 0)
+                        {
+                            MessageBox.Show("Transakcja została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                            LoadTransactions();
+                        }
+                        else
+                        {
+                            MessageBox.Show("Transakcja nie została skasowana z bazy danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+
+                        }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Błąd podczas operacji: {ex.Message}");
+                        Console.WriteLine($"StackTrace: {ex.StackTrace}");
                     }
                 }
             }

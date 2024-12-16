@@ -513,6 +513,151 @@ namespace Main.Logic
             }
         }
 
+        public static bool AddTransaction(int userId, decimal amount, int transactionTypeId, int categoryId, int? subcategoryId, int? storeId, string note, DateTime date, out int? transactionId)
+        {
+            transactionId = null;
+            using (DBSqlite database = new DBSqlite())
+            {
+                string insertQuery = @"
+                    INSERT INTO Transactions (UserID, Amount, TransactionTypeID, CategoryID, SubcategoryID, StoreID, Note, Date) 
+                    VALUES (@UserID, @Amount, @TransactionTypeID, @CategoryID, @SubcategoryID, @StoreID, @Note, @Date)";
+
+                try
+                {
+                    database.ExecuteNonQuery(
+                        insertQuery,
+                        new SqliteParameter("@UserID", userId),
+                        new SqliteParameter("@Amount", amount),
+                        new SqliteParameter("@TransactionTypeID", transactionTypeId),
+                        new SqliteParameter("@CategoryID", categoryId),
+                        new SqliteParameter("@SubcategoryID", subcategoryId.HasValue ? (object)subcategoryId.Value : DBNull.Value),
+                        new SqliteParameter("@StoreID", storeId.HasValue ? (object)storeId.Value : DBNull.Value),
+                        new SqliteParameter("@Note", note == null ? DBNull.Value : (object)note),
+                        new SqliteParameter("@Date", date)
+                    );
+
+                    var idQuery = "SELECT LAST_INSERT_ROWID()";
+                    var result = database.ExecuteQuery(idQuery);
+                    if (result != null && result.Rows.Count > 0 && int.TryParse(result.Rows[0][0]?.ToString(), out var id))
+                    {
+                        transactionId = id;
+                        return true;
+                    }
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool AddRecurringPaymentHistory( int recurringPaymentId, int? transactionId, decimal amount, DateTime paymentDate, int actionTypeId, DateTime actionDate)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string insertQuery = @"
+                    INSERT INTO RecurringPaymentHistory 
+                    (RecurringPaymentID, TransactionID, Amount, PaymentDate, ActionTypeID, ActionDate) 
+                    VALUES (@RecurringPaymentID, @TransactionID, @Amount, @PaymentDate, @ActionTypeID, @ActionDate)";
+
+                try
+                {
+                    database.ExecuteNonQuery(
+                        insertQuery,
+                        new SqliteParameter("@RecurringPaymentID", recurringPaymentId),
+                        new SqliteParameter("@TransactionID", transactionId.HasValue ? (object)transactionId.Value : DBNull.Value),
+                        new SqliteParameter("@Amount", amount),
+                        new SqliteParameter("@PaymentDate", paymentDate),
+                        new SqliteParameter("@ActionTypeID", actionTypeId),
+                        new SqliteParameter("@ActionDate", actionDate)
+                    );
+
+                    return true; 
+                }
+                catch (Exception ex)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool AddTransactionsFromRecurringPayments(List<RecurringPayment> recurringPayments)
+        {
+            if (recurringPayments!=null && recurringPayments.Any())
+            {
+                Console.WriteLine("Lista cyklicznych płatności:");
+                foreach (var payment in recurringPayments)
+                {
+                    Console.WriteLine($"- {payment.RecurringPaymentName} (ID: {payment.RecurringPaymentID})");
+                }
+                foreach (var payment in recurringPayments)
+                {
+                    Console.WriteLine($"\nPrzetwarzanie cyklicznej płatności: {payment.RecurringPaymentName}");
+                    // Sprawdź, czy w historii brakuje transakcji dla tego cyklicznego płatności
+                    var lastPaymentDate = GetLastPaymentDateForRecurringPayment(payment.RecurringPaymentID); 
+                    Console.WriteLine($"Ostatnia data płatności: {lastPaymentDate?.ToString("yyyy-MM-dd") ?? "Brak danych"}");
+                    var startDate = lastPaymentDate ?? payment.PaymentDate;
+                    var nextPaymentDate = GetNextPaymentDate(payment.FrequencyID, startDate);
+                    Console.WriteLine($"Startowa data: {startDate:yyyy-MM-dd}");
+                    Console.WriteLine($"Obliczona następna data płatności: {nextPaymentDate?.ToString("yyyy-MM-dd") ?? "Brak daty"}");
+
+                    if (nextPaymentDate == null)
+                    {
+                        Console.WriteLine("Brak odpowiedniej daty płatności do dalszego przetwarzania.");
+                        return false;
+                    }
+
+                    while (nextPaymentDate <= DateTime.Now)
+                    {
+                        Console.WriteLine($"\nPrzygotowanie do dodania transakcji:");
+                        Console.WriteLine($"Użytkownik ID: {payment.UserID}");
+                        Console.WriteLine($"Kwota: {payment.Amount}");
+                        Console.WriteLine($"Typ transakcji ID: {payment.TransactionTypeID ?? -1}");
+                        Console.WriteLine($"Kategoria ID: {payment.CategoryID ?? -1}");
+                        Console.WriteLine($"Data płatności: {nextPaymentDate:yyyy-MM-dd}");
+
+                        // Dodaj transakcję do tabeli Transactions
+                        var successAddTransaction = Service.AddTransaction(payment.UserID, payment.Amount, payment.TransactionTypeID ?? -1, payment.CategoryID ?? -1, null, payment.StoreID, $"Cykliczna płatność: {payment.RecurringPaymentName}", nextPaymentDate ?? DateTime.Now, out int? transactionId);
+                        if (successAddTransaction && transactionId!=null)
+                        {
+                            Console.WriteLine($"Transakcja dodana pomyślnie. Transaction ID: {transactionId}");
+                            // Dodaj wpis do RecurringPaymentHistory
+                            Console.WriteLine($"Dodanie wpisu do historii płatności...");
+                            var successAddRecurringHistory = Service.AddRecurringPaymentHistory(
+                                payment.RecurringPaymentID,
+                                transactionId,
+                                payment.Amount,
+                                nextPaymentDate ?? DateTime.Now,
+                                1,
+                                nextPaymentDate ?? DateTime.Now
+                            );
+                            if (successAddRecurringHistory)
+                            {
+                                Console.WriteLine($"Wpis dodany do historii pomyślnie.");
+                                nextPaymentDate = GetNextPaymentDate(payment.FrequencyID, nextPaymentDate ?? DateTime.Now);
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Nie udało się dodać wpisu do historii płatności.");
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Nie udało się dodać transakcji.");
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            Console.WriteLine("Brak danych do przetworzenia.");
+            return false;
+        }
+
+
         // Update Methods
 
         public static bool UpdateFamilyName(int familyId, string newFamilyName)
@@ -625,6 +770,62 @@ namespace Main.Logic
                     database.ExecuteNonQuery(updateQuery,
                         new SqliteParameter("@PaymentDate", DateTime.Today),
                         new SqliteParameter("@RecurringPaymentID", recurringPaymentID));
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool UpdateNotesForRecurringTransactions(int recurringPaymentId, string newPaymentName)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                try {
+                    if (string.IsNullOrWhiteSpace(newPaymentName))
+                    {
+                        return false;
+                    }
+                    string noteContent = $"Cykliczna płatność: {newPaymentName}";
+
+                    string selectQuery = @" SELECT TransactionID FROM RecurringPaymentHistory WHERE RecurringPaymentID = @RecurringPaymentID AND TransactionID IS NOT NULL";
+                    List<int> transactionIds = new List<int>();
+
+                    DataTable result = database.ExecuteQuery(
+                        selectQuery,
+                        new SqliteParameter("@RecurringPaymentID", recurringPaymentId)
+                        );
+
+                    if (result != null && result.Rows.Count != 0) { 
+                        foreach (DataRow row in result.Rows)
+                        {
+                            if (row["TransactionID"] != DBNull.Value)
+                            {
+                                transactionIds.Add(Convert.ToInt32(row["TransactionID"]));
+                            }
+                        }
+                    }
+
+                    string updateQuery = @"UPDATE Transactions SET Note = @Note WHERE TransactionID = @TransactionID"; 
+                    if (transactionIds != null && transactionIds.Count != 0)
+                    {
+                        foreach (int transactionId in transactionIds)
+                        {
+                            try
+                            {
+                                database.ExecuteNonQuery(updateQuery,
+                                    new SqliteParameter("@Note", noteContent),
+                                    new SqliteParameter("@TransactionID", transactionId));
+                            }
+                            catch (Exception)
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
                     return true;
                 }
                 catch (Exception)
@@ -847,6 +1048,20 @@ namespace Main.Logic
                     return null;
                 }
                 return result.Rows[0]["UserName"].ToString();
+            }
+        }
+
+        public static int GetUserIdByRecurringPaymentId(int recurringPaymentId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT UserID FROM RecurringPayments WHERE RecurringPaymentID = @RecurringPaymentID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@RecurringPaymentID", recurringPaymentId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return -1;
+                }
+                return result.Rows[0]["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(result.Rows[0]["UserID"]);
             }
         }
 
@@ -1515,6 +1730,21 @@ namespace Main.Logic
             return transactionTypes;
         }
 
+        public static string GetRecurringPaymentNameByRecurringPaymentID(int recurringPaymentId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                string selectQuery = "SELECT RecurringPaymentName FROM RecurringPayments WHERE RecurringPaymentID = @RecurringPaymentID";
+                var result = database.ExecuteQuery(selectQuery, new SqliteParameter("@RecurringPaymentID", recurringPaymentId));
+                if (result == null || result.Rows.Count == 0)
+                {
+                    return null;
+                }
+                return result.Rows[0]["RecurringPaymentName"].ToString();
+            }
+        }
+
+
         public static List<RecurringPaymentHistory> GetHistoryByRecurringPaymentID(int recurringPaymentID)
         {
             List<RecurringPaymentHistory> historyList = new List<RecurringPaymentHistory>();
@@ -1591,6 +1821,42 @@ namespace Main.Logic
             return recurringPayments;
         }
 
+        public static List<RecurringPayment> GetActiveRecurringPaymentsByUserId(int userId)
+        {
+            List<RecurringPayment> recurringPayments = new List<RecurringPayment>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"
+                SELECT RecurringPaymentID, RecurringPaymentName, UserID, StoreID, CategoryID, Amount, TransactionTypeID, PaymentDate, FrequencyID, IsActive, CreatedByUserID
+                FROM RecurringPayments
+                WHERE UserID = @UserId AND IsActive = 1";
+
+                SqliteParameter userIdParam = new SqliteParameter("@UserId", userId);
+                DataTable result = database.ExecuteQuery(query, userIdParam);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    recurringPayments.Add(new RecurringPayment
+                    {
+                        RecurringPaymentID = Convert.ToInt32(row["RecurringPaymentID"]),
+                        RecurringPaymentName = Convert.ToString(row["RecurringPaymentName"]),
+                        UserID = Convert.ToInt32(row["UserID"]),
+                        StoreID = row["StoreID"] != DBNull.Value ? Convert.ToInt32(row["StoreID"]) : (int?)null,
+                        CategoryID = row["CategoryID"] != DBNull.Value ? Convert.ToInt32(row["CategoryID"]) : (int?)null,
+                        TransactionTypeID = row["TransactionTypeID"] != DBNull.Value ? Convert.ToInt32(row["TransactionTypeID"]) : (int?)null,
+                        Amount = Convert.ToDecimal(row["Amount"]),
+                        PaymentDate = Convert.ToDateTime(row["PaymentDate"]),
+                        FrequencyID = Convert.ToInt32(row["FrequencyID"]),
+                        IsActive = Convert.ToBoolean(row["IsActive"]),
+                        CreatedByUserID = Convert.ToInt32(row["CreatedByUserID"]),
+                    });
+                }
+            }
+
+            return recurringPayments;
+        }
+
         public static List<RecurringPayment> GetFamilyRecurringPayments(int familyId)
         {
             List<RecurringPayment> familyRecurringPayments = new List<RecurringPayment>();
@@ -1612,6 +1878,76 @@ namespace Main.Logic
             }
 
             return familyRecurringPayments;
+        }
+
+        public static List<RecurringPayment> GetActiveRecurringPaymentsByFamilyId(int familyId)
+        {
+            List<RecurringPayment> familyRecurringPayments = new List<RecurringPayment>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+
+                List<RecurringPayment> userRecurringPayments = GetActiveRecurringPaymentsByUserId(userId);
+
+                foreach (RecurringPayment recurringPayment in userRecurringPayments)
+                {
+                    if (!familyRecurringPayments.Any(t => t.RecurringPaymentID == recurringPayment.RecurringPaymentID))
+                    {
+                        familyRecurringPayments.Add(recurringPayment);
+                    }
+                }
+            }
+
+            return familyRecurringPayments;
+        }
+
+        private static DateTime? GetNextPaymentDate(int frequencyId, DateTime lastPaymentDate)
+        {
+            DateTime baseDate = lastPaymentDate;
+
+            if (frequencyId == 1)
+            {
+                return baseDate.AddDays(1);       // Codziennie
+            }
+            else if (frequencyId == 2)
+            {
+                return baseDate.AddDays(7);       // Co tydzień
+            }
+            else if (frequencyId == 3)
+            {
+                return new DateTime(baseDate.Year, baseDate.Month, baseDate.Day).AddMonths(1);     // Co miesiąc
+            }
+            else if (frequencyId == 4)
+            {
+                return new DateTime(baseDate.Year, baseDate.Month, baseDate.Day).AddMonths(3);     // Co kwartał
+            }
+            else if (frequencyId == 5)
+            {
+                return new DateTime(baseDate.Year + 1, baseDate.Month, baseDate.Day); ;      // Co rok
+            }
+
+            return null;
+        }
+
+        public static DateTime? GetLastPaymentDateForRecurringPayment(int recurringPaymentId)
+        {
+            using (DBSqlite database = new DBSqlite())
+            {
+                var query = "SELECT MAX(PaymentDate) AS LastPaymentDate FROM RecurringPaymentHistory WHERE RecurringPaymentID = @RecurringPaymentID";
+                var result = database.ExecuteQuery(query, new SqliteParameter("@RecurringPaymentID", recurringPaymentId));
+                if (result == null || result.Rows.Count == 0 || result.Rows[0]["LastPaymentDate"] == DBNull.Value)
+                {
+                    return null;
+                }
+                if (DateTime.TryParse(result.Rows[0]["LastPaymentDate"].ToString(), out DateTime lastPaymentDate))
+                {
+                    return lastPaymentDate;
+                }
+
+                return null;
+            }
         }
 
         public static string GetActionNameByActionID(int actionTypeId)

@@ -282,18 +282,38 @@ namespace Main.GUI
             query.Append(" WHERE TransactionID = '" + transactionId + "';");
 
             // Uruchomienie zapytania SQL
-            DBSqlite dBSqlite = new DBSqlite(); 
+            DBSqlite dBSqlite = new DBSqlite();
 
-            int updateHistory = dBSqlite.ExecuteNonQuery(
-                "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID AND Amount = @Amount AND ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
-                new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 2),
-                new Microsoft.Data.Sqlite.SqliteParameter("@Amount", amount),
-                new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
+
+            string selectQuery = "SELECT Amount, Note, Date, TransactionTypeID, CategoryID, SubCategoryID, StoreID FROM Transactions WHERE TransactionID = @TransactionID";
+
+            var currentData = dBSqlite.ExecuteQuery(selectQuery, new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transactionId));
 
             int answer = dBSqlite.ExecuteNonQuery(query.ToString());
 
             if (answer > 0)
             {
+                if (currentData.Rows.Count > 0)
+                {
+                    var oldAmount = currentData.Rows[0]["Amount"].ToString();
+                    var oldNote = currentData.Rows[0]["Note"].ToString();
+                    var oldDate = currentData.Rows[0]["Date"].ToString();
+                    var oldType = currentData.Rows[0]["TransactionTypeID"].ToString();
+                    var oldCategoryID = currentData.Rows[0]["CategoryID"].ToString();
+                    var oldSubCategoryID = currentData.Rows[0]["SubCategoryID"].ToString();
+                    var oldStoreID = currentData.Rows[0]["StoreID"].ToString();
+
+                    if (oldAmount != amount || oldNote != note || oldDate != combinedDateTime.ToString("yyyy-MM-dd HH:mm") || oldType != transactionType || oldCategoryID != category?.CategoryID.ToString() || oldSubCategoryID != subcategory?.SubcategoryID.ToString() || oldStoreID != store?.StoreId.ToString())
+                    {
+                        string finalAmount = (InpuTypeTransaction.SelectedIndex == 0)? amount : "-"+amount;
+                        
+                        int updateHistory = dBSqlite.ExecuteNonQuery(
+                            "UPDATE RecurringPaymentHistory SET ActionTypeID = @ActionTypeID, Amount = @Amount, ActionDate = CURRENT_TIMESTAMP WHERE TransactionID = @TransactionID",
+                            new Microsoft.Data.Sqlite.SqliteParameter("@ActionTypeID", 2),
+                            new Microsoft.Data.Sqlite.SqliteParameter("@Amount", finalAmount),
+                            new Microsoft.Data.Sqlite.SqliteParameter("@TransactionID", transaction.TransactionID));
+                    }
+                }
                 MessageBox.Show("Transakcja została zaktualizowana w bazie danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
                 this.Close();
             }
@@ -301,7 +321,6 @@ namespace Main.GUI
             {
                 MessageBox.Show("Transakcja nie została zaktualizowana w bazie danych", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
         }
 
         private void EditInputAmount_KeyDown(object sender, KeyEventArgs e)

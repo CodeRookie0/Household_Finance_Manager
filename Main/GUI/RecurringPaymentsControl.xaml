@@ -85,12 +85,13 @@
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Orientation="Vertical" Margin="45,0,15,5">
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150">
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150" FontSize="14">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate}" Width="*"/>
-                                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="*"/>
-                                            <DataGridTextColumn Header="Action" Binding="{Binding ActionTypeName}" Width="*"/>
-                                            <DataGridTextColumn Header="Status" Binding="{Binding ActionDate}" Width="*"/>
+                                            <DataGridTextColumn Header="Data transakcji" Binding="{Binding PaymentDate, StringFormat={}{0:dd/MM/yyyy}}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Użytkownik" Binding="{Binding UserName}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Kwota transakcji" Binding="{Binding FormattedAmount}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Rodzaj akcji" Binding="{Binding ActionTypeName}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Data akcji" Binding="{Binding ActionDate, StringFormat={}{0:dd/MM/yyyy}}" FontSize="14" Width="*"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <Grid HorizontalAlignment="Right">
@@ -161,12 +162,13 @@
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Orientation="Vertical" Margin="45,0,15,5">
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150">
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150" FontSize="14">
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate}" Width="*"/>
-                                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount}" Width="*"/>
-                                            <DataGridTextColumn Header="Action" Binding="{Binding ActionTypeName}" Width="*"/>
-                                            <DataGridTextColumn Header="Status" Binding="{Binding ActionDate}" Width="*"/>
+                                            <DataGridTextColumn Header="Data transakcji" Binding="{Binding PaymentDate, StringFormat={}{0:dd/MM/yyyy}}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Użytkownik" Binding="{Binding UserName}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Kwota transakcji" Binding="{Binding FormattedAmount}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Rodzaj akcji" Binding="{Binding ActionTypeName}" FontSize="14" Width="*"/>
+                                            <DataGridTextColumn Header="Data akcji" Binding="{Binding ActionDate, StringFormat={}{0:dd/MM/yyyy}}" FontSize="14" Width="*"/>
                                         </DataGrid.Columns>
                                     </DataGrid>
                                     <Grid HorizontalAlignment="Right">

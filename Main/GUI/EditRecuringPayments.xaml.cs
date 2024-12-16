@@ -332,6 +332,7 @@ namespace Main.GUI
             {
                 amount = "-" + amount;
             }
+            string previousPaymentName = Service.GetRecurringPaymentNameByRecurringPaymentID(RecurringPayment.RecurringPaymentID);
 
             DBSqlite dBSqlite = new DBSqlite();
             int answer;
@@ -353,6 +354,18 @@ namespace Main.GUI
 
                 if (answer > 0)
                 {
+                    if(previousPaymentName!= InputPayment.Text)
+                    {
+                        bool success = Service.UpdateNotesForRecurringTransactions(RecurringPayment.RecurringPaymentID, InputPayment.Text);
+                        if (success)
+                        {
+                            Console.WriteLine("Notatki transakcji zostały pomyślnie zaktualizowane.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Wystąpił błąd podczas aktualizacji notatek dla transakcji.");
+                        }
+                    }
                     MessageBox.Show("Płatność cykliczna została zaktualizowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
                     this.Close();
                 }
@@ -378,6 +391,18 @@ namespace Main.GUI
 
                 if (answer > 0)
                 {
+                    if (previousPaymentName != InputPayment.Text)
+                    {
+                        bool success = Service.UpdateNotesForRecurringTransactions(RecurringPayment.RecurringPaymentID, InputPayment.Text);
+                        if (success)
+                        {
+                            Console.WriteLine("Notatki transakcji zostały pomyślnie zaktualizowane.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Wystąpił błąd podczas aktualizacji notatek dla transakcji.");
+                        }
+                    }
                     MessageBox.Show("Płatność cykliczna została zaktualizowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
                     this.Close();
                 }

@@ -27,6 +27,29 @@ namespace Main.GUI
         public MainWindow(int loggedInUserId)
         {
             userId = loggedInUserId;
+            int familyId = Service.GetFamilyIdByMemberId(userId);
+
+            if (familyId > 0)
+            {
+                var familyActiveRecurringPayments = Service.GetActiveRecurringPaymentsByFamilyId(familyId);
+                bool success = Service.AddTransactionsFromRecurringPayments(familyActiveRecurringPayments);
+
+                if (!success)
+                {
+                    Console.WriteLine("Nie udało się dodać transakcji dla cyklicznych płatności.");
+                }
+            }
+            else
+            {
+                var userActiveRecurringPayments = Service.GetActiveRecurringPaymentsByUserId(userId);
+                bool success = Service.AddTransactionsFromRecurringPayments(userActiveRecurringPayments);
+
+                if (!success)
+                {
+                    Console.WriteLine("Nie udało się dodać transakcji dla cyklicznych płatności.");
+                }
+            }
+
             InitializeComponent();
             
             int userRole=Service.GetRoleIDByUserID(userId);
