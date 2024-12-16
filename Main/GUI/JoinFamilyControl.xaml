@@ -43,10 +43,10 @@
               VerticalAlignment="Center" 
               HorizontalAlignment="Center"/>
                 <Button x:Name="JoinFamilyButton" Content="Dołącz do rodziny" 
-             Style="{StaticResource submitButton}"
+             Style="{StaticResource PrimaryActionButtonStyle}"
              VerticalAlignment="Bottom" 
              HorizontalAlignment="Center" 
-             Margin="0,20,0,20" Width="150" Height="40" Padding="5" Click="JoinFamilyButton_Click"/>
+             Margin="0,20,0,20" Width="150" Height="50" Padding="5" Click="JoinFamilyButton_Click"/>
             </StackPanel>
         </Grid>
     </Border>
