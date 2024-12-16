@@ -35,7 +35,6 @@ namespace Main.GUI
         {
             InitializeComponent();
             Listcategories = new ObservableCollection<Category>();
-            Liststores = argStore;
             Listsubcategory = new ObservableCollection<Subcategory>();
             transaction = argtransaction;
             userid = userId;
@@ -94,7 +93,21 @@ namespace Main.GUI
                 }
             }
 
+            Liststores = new ObservableCollection<Store>();
+            foreach (var store in argStore.Where(c => Service.IsStoreFavoriteForUser(userId, c.StoreId)))
+            {
+                if (!store.StoreName.StartsWith("❤️ "))
+                {
+                    store.StoreName = $"❤️ {store.StoreName}";
+                }
+                Liststores.Add(store);
+            }
+            foreach (var store in argStore.Where(c => !Service.IsStoreFavoriteForUser(userId, c.StoreId)))
+            {
+                Liststores.Add(store);
+            }
 
+            StoreComboBox.ItemsSource = null;
             StoreComboBox.ItemsSource = Liststores;
 
             var thisStore = Liststores.FirstOrDefault(c => c.StoreId == transaction.StoreID);
@@ -153,25 +166,40 @@ namespace Main.GUI
                     }
                     SubategoryComboBox.ItemsSource = Listsubcategory;
                     SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
-
-                    ObservableCollection<Store> allStores=new ObservableCollection<Store>();
-
-                    foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
-                    {
-                        if (!store.StoreName.StartsWith("❤️ "))
-                        {
-                            store.StoreName = $"❤️ {store.StoreName}";
-                        }
-                        Liststores.Add(store);
-                    }
-                    foreach (var store in allStores.Where(c => !Service.IsStoreFavoriteForUser(userid, c.StoreId)))
-                    {
-                        Liststores.Add(store);
-                    }
-
-                    StoreComboBox.IsEnabled = Liststores.Any();
-                    StoreComboBox.ItemsSource = Liststores;
                 }
+
+                StoreComboBox.ItemsSource = null;
+                StoreComboBox.SelectedItem = null;
+                ObservableCollection<Store> allStores = new ObservableCollection<Store>();
+
+                int familyId = Service.GetFamilyIdByMemberId(userid);
+                if (familyId > 0)
+                {
+                    var familyStores = Service.GetFamilyStoresByCategory(familyId, item.CategoryID);
+                    allStores = familyStores ?? new ObservableCollection<Store>();
+                }
+                else
+                {
+                    var userStores = Service.GetUserStoresByCategory(userid, item.CategoryID);
+                    allStores = userStores ?? new ObservableCollection<Store>();
+                }
+                Liststores = new ObservableCollection<Store>();
+
+                foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                {
+                    if (!store.StoreName.StartsWith("❤️ "))
+                    {
+                        store.StoreName = $"❤️ {store.StoreName}";
+                    }
+                    Liststores.Add(store);
+                }
+                foreach (var store in allStores.Where(c => !Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                {
+                    Liststores.Add(store);
+                }
+
+                StoreComboBox.IsEnabled = Liststores.Any();
+                StoreComboBox.ItemsSource = Liststores;
             }
         }
 
@@ -317,6 +345,24 @@ namespace Main.GUI
             {
                 MessageBox.Show("Nieprawidłowy format czasu! Użyj formatu HH:mm.", "Błąd walidacji", MessageBoxButton.OK, MessageBoxImage.Error);
                 InputTime.Text = "00:00";
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            foreach (var category in Listcategories.Where(c => Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
+            {
+                if (category.CategoryName.StartsWith("❤️ "))
+                {
+                    category.CategoryName = category.CategoryName.Substring(2);
+                }
+            }
+            foreach (var store in Liststores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+            {
+                if (!store.StoreName.StartsWith("❤️ "))
+                {
+                    store.StoreName = store.StoreName.Substring(2);
+                }
             }
         }
     }

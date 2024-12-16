@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Main.GUI"
         mc:Ignorable="d"
           Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
-        Title="EditTransactionControl" Height="700" Width="800"  BorderBrush="#3AA9AD" BorderThickness="3">
+        Title="EditTransactionControl" Height="700" Width="800"  BorderBrush="#3AA9AD" BorderThickness="3" Closing="Window_Closing">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.3*"/>

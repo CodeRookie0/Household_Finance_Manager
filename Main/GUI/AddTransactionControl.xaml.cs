@@ -1,4 +1,5 @@
-﻿using Main.Logic;
+﻿using Main.Controls;
+using Main.Logic;
 using Main.Models;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,7 @@ namespace Main.GUI
         public AddTransactionControl(ObservableCollection<Category> argCategoryList,int userId)
         {
             InitializeComponent();
+            userid = userId;
            
             Listcategories = new ObservableCollection<Category>();
             foreach (var category in argCategoryList.Where(c => Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
@@ -50,8 +52,6 @@ namespace Main.GUI
             }
             CategoryComboBox.ItemsSource = null;
             CategoryComboBox.ItemsSource = Listcategories;
-            StoreComboBox.ItemsSource = Liststores;
-            userid = userId;
 
             Listsubcategory = new ObservableCollection<Subcategory>();
             
@@ -210,7 +210,6 @@ namespace Main.GUI
 
             query.Append(");");
 
-            MessageBox.Show(query.ToString());
             DBSqlite dBSqlite=new DBSqlite();
             int answer = dBSqlite.ExecuteNonQuery(query.ToString());
             if(answer>0)
@@ -311,6 +310,30 @@ namespace Main.GUI
                 {
                     MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
                     textBox.Text = "";
+                }
+            }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (Listcategories != null && Listcategories.Any())
+            {
+                foreach (var category in Listcategories.Where(c => Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
+                {
+                    if (category.CategoryName!=null && category.CategoryName.StartsWith("❤️ "))
+                    {
+                        category.CategoryName = category.CategoryName.Substring(2);
+                    }
+                }
+            }
+            if (Liststores != null && Liststores.Any())
+            {
+                foreach (var store in Liststores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
+                {
+                    if (store.StoreName!=null && store.StoreName.StartsWith("❤️ "))
+                    {
+                        store.StoreName = store.StoreName.Substring(2);
+                    }
                 }
             }
         }

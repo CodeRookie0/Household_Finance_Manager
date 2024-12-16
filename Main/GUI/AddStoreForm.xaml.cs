@@ -77,12 +77,17 @@ namespace Main.GUI
 
         private void AddStore_Click(object sender, RoutedEventArgs e)
         {
-            int CategoryId=CategoryComboBox.SelectedIndex+1;
-            if (CategoryId == 0 && StoreNameTextBox.Text.Length<3)
+            if (CategoryComboBox.SelectedValue == null)
+            {
+                MessageBox.Show("Proszę wybrać kategorię.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (StoreNameTextBox.Text.Length < 3)
             {
                 MessageBox.Show("Nazwa sklepu musi mieć więcej niż 2 znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
+
             int categoryId = (int)CategoryComboBox.SelectedValue;
 
             if(!IsStore(StoreNameTextBox.Text, categoryId))
