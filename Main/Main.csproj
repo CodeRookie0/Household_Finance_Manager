@@ -258,6 +258,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="GUI\LimitsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GUI\LoginControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -328,6 +332,9 @@
     </Compile>
     <Compile Include="GUI\JoinFamilyControl.xaml.cs">
       <DependentUpon>JoinFamilyControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\LimitsControl.xaml.cs">
+      <DependentUpon>LimitsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\LoginControl.xaml.cs">
       <DependentUpon>LoginControl.xaml</DependentUpon>

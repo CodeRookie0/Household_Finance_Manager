@@ -190,6 +190,8 @@ namespace Main.GUI
             HighlightButton(LimitsBorder, LimitsTextBlock);
             buttonActiveStates[LimitsButton] = true;
             SelectedUserControlTextBlock.Text = LimitsTextBlock.Text;
+
+            MainContentArea.Content = new LimitsControl(userId, this);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

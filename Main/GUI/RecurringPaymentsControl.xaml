@@ -7,7 +7,7 @@
              mc:Ignorable="d"
              d:DesignHeight="650" d:DesignWidth="1150" d:Background="White">
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="584" VerticalAlignment="Top">
             <StackPanel Orientation="Vertical" Margin="10">
                 <Border Background="#4682B4" CornerRadius="10" Padding="5" Margin="0,0,0,10" Width="78" HorizontalAlignment="Left">
                     <TextBlock Text="Aktywne" Foreground="White" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center"/>
@@ -85,7 +85,7 @@
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Orientation="Vertical" Margin="45,0,15,5">
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150" FontSize="14">
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150" FontSize="14"  IsReadOnly="True" SelectionMode="Single">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Data transakcji" Binding="{Binding PaymentDate, StringFormat={}{0:dd/MM/yyyy}}" FontSize="14" Width="*"/>
                                             <DataGridTextColumn Header="Użytkownik" Binding="{Binding UserName}" FontSize="14" Width="*"/>
@@ -162,7 +162,7 @@
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Orientation="Vertical" Margin="45,0,15,5">
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150" FontSize="14">
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding History}"  AutoGenerateColumns="False" HeadersVisibility="Column" CanUserAddRows="False" Margin="0,5" Height="150" FontSize="14"  IsReadOnly="True" SelectionMode="Single">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn Header="Data transakcji" Binding="{Binding PaymentDate, StringFormat={}{0:dd/MM/yyyy}}" FontSize="14" Width="*"/>
                                             <DataGridTextColumn Header="Użytkownik" Binding="{Binding UserName}" FontSize="14" Width="*"/>
