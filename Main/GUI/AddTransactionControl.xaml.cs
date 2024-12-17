@@ -36,6 +36,8 @@ namespace Main.GUI
         {
             InitializeComponent();
             userid = userId;
+
+           
            
             Listcategories = new ObservableCollection<Category>();
             foreach (var category in argCategoryList.Where(c => Service.IsCategoryFavoriteForUser(userid, c.CategoryID)))
@@ -107,6 +109,7 @@ namespace Main.GUI
                     }
 
                     Liststores = new ObservableCollection<Store>();
+                    Liststores.Insert(0, new Store(-1, -1, false) { StoreName = "Wybierz" });
 
                     foreach (var store in allStores.Where(c => Service.IsStoreFavoriteForUser(userid, c.StoreId)))
                     {
@@ -123,6 +126,7 @@ namespace Main.GUI
 
                     StoreComboBox.IsEnabled = Liststores.Any();
                     StoreComboBox.ItemsSource = Liststores;
+                    StoreComboBox.SelectedIndex = 0;
                 }
             }
         }

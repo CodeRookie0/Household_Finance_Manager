@@ -115,6 +115,7 @@ namespace Main.GUI
 
         private void roleComboBox_Loaded(object sender, RoutedEventArgs e)
         {
+            firstWindow=true;
             if(sender is ComboBox comboBox)
             {
                 var currentUser = (PendingUser)comboBox.DataContext;

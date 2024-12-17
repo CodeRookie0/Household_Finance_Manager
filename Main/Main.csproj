@@ -178,6 +178,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\Limits.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ListElementStore.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -187,6 +191,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GUI\AddFamilyMemberRequest.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\AddLimits.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -227,6 +235,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GUI\DeleteFamilyMemberControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GUI\EditLimits.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -273,6 +285,9 @@
     <Compile Include="Controls\FamilyUser.xaml.cs">
       <DependentUpon>FamilyUser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Limits.xaml.cs">
+      <DependentUpon>Limits.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\ListElementStore.xaml.cs">
       <DependentUpon>ListElementStore.xaml</DependentUpon>
     </Compile>
@@ -281,6 +296,9 @@
     </Compile>
     <Compile Include="GUI\AddFamilyMemberRequest.xaml.cs">
       <DependentUpon>AddFamilyMemberRequest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\AddLimits.xaml.cs">
+      <DependentUpon>AddLimits.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\AddRecurringPaymentsControl.xaml.cs">
       <DependentUpon>AddRecurringPaymentsControl.xaml</DependentUpon>
@@ -311,6 +329,9 @@
     </Compile>
     <Compile Include="GUI\DeleteFamilyMemberControl.xaml.cs">
       <DependentUpon>DeleteFamilyMemberControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\EditLimits.xaml.cs">
+      <DependentUpon>EditLimits.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\EditRecuringPayments.xaml.cs">
       <DependentUpon>EditRecuringPayments.xaml</DependentUpon>
@@ -403,6 +424,7 @@
       <DependentUpon>StoresControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Frequencies.cs" />
+    <Compile Include="Models\Limits.cs" />
     <Compile Include="Models\RecurringPayment.cs" />
     <Compile Include="Models\RecurringPaymentHistory.cs" />
     <Compile Include="Models\TransactionSummaryViewModel.cs" />

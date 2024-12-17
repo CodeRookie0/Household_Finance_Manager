@@ -90,6 +90,10 @@ namespace Main.GUI
                         SubategoryComboBox.SelectedIndex = Listsubcategory.IndexOf(thisSubCategory);
                         
                     }
+                    else
+                    {
+                        SubategoryComboBox.SelectedIndex=0;
+                    }
                 }
             }
 
@@ -166,6 +170,7 @@ namespace Main.GUI
                     }
                     SubategoryComboBox.ItemsSource = Listsubcategory;
                     SubategoryComboBox.DisplayMemberPath = "SubcategoryName";
+                    SubategoryComboBox.SelectedIndex = 0;
                 }
 
                 StoreComboBox.ItemsSource = null;

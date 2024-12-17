@@ -92,6 +92,9 @@ namespace Main.GUI
                     }
                 }
             }
+
+            
+
             ActivePaymentsList.ItemsSource = ActivePayments;
             InactivePaymentsList.ItemsSource = InactivePayments;
 
@@ -100,8 +103,9 @@ namespace Main.GUI
         private void AddRecurringPaymentButton_Click(object sender, RoutedEventArgs e)
         {
             AddRecurringPaymentsControl addRecurringPayment=new AddRecurringPaymentsControl(userId);
+            addRecurringPayment.Closed += (s, args) => LoadPayments();
             addRecurringPayment.Show();
-            LoadPayments();
+            
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
@@ -111,8 +115,11 @@ namespace Main.GUI
             if(obj!=null)
             {
                 EditRecuringPayments editRecuring=new EditRecuringPayments(userId, obj);
+
+                editRecuring.Closed += (s, args) => LoadPayments();
+
                 editRecuring.Show();
-                LoadPayments();
+             
             }
         }
 
