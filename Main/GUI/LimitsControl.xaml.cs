@@ -28,17 +28,16 @@ namespace Main.GUI
     {
         private MainWindow mainWindow;
         private readonly int userId;
-
-        
+        public int roleId;
 
         public LimitsControl(int loggedInUserId, MainWindow mainWindow)
         {
             userId = loggedInUserId;
+            roleId = Service.GetRoleIDByUserID(userId);
             this.mainWindow = mainWindow;
             InitializeComponent();
 
-
-            loadLimits();
+            LoadLimits();
 
             /*Limits test=new Limits();
 
@@ -49,54 +48,80 @@ namespace Main.GUI
 
         }
 
-        private void loadLimits()
+        private void LoadLimits()
         {
-            int FamilyId = Service.GetFamilyIdByMemberId(userId);
-            DBSqlite dBSqlite = new DBSqlite();
-            DataTable answer = dBSqlite.ExecuteQuery("SELECT LimitID,FamilyID,UserID,CategoryID,LimitAmount,FrequencyID,IsFamilyWide FROM Limits WHERE UserID=@MyUserId OR FamilyID=@MyFamilyId",
-                new Microsoft.Data.Sqlite.SqliteParameter("@MyUserId", userId),
-                new SqliteParameter("@MyFamilyId", FamilyId));
+            LimitsGrid.RowDefinitions.Clear();
+            LimitsGrid.Children.Clear();
 
+            int familyId;
+            ObservableCollection<Limit> userLimits;
+            ObservableCollection<Limit> allLimits;
             int rowNumber = 0;
             int Numbercolumn = 0;
-            foreach (DataRow row in answer.Rows)
+
+            if (roleId!= 3)
             {
-                if (Numbercolumn > 2)
+                familyId = Service.GetFamilyIdByMemberId(userId);
+                allLimits=Service.GetFamilyLimits(familyId);
+
+                foreach (Limit limit in allLimits)
                 {
-                    Numbercolumn = 0;
-                    rowNumber++;
+                    if (Numbercolumn > 2)
+                    {
+                        Numbercolumn = 0;
+                        rowNumber++;
+
+                        LimitsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(190) });
+                    }
+
+                    Limits tmpControl = new Limits(limit, userId);
+                    tmpControl.RefreshData += RunEventRefresh;
+                    tmpControl.MaxHeight = 190;
+                    Grid.SetRow(tmpControl, rowNumber);
+                    Grid.SetColumn(tmpControl, Numbercolumn);
+
+                    LimitsGrid.Children.Add(tmpControl);
+
+                    Numbercolumn++;
                 }
-
-                LimitsModel model = new LimitsModel();
-                model.LimitId = int.Parse(row[0].ToString());
-                model.FamilyId = int.Parse(row[1].ToString());
-                model.UserId = int.Parse(row[2].ToString());
-                model.CategoryId = int.Parse(row[3].ToString());
-                model.LimitAmount = double.Parse(row[4].ToString());
-                model.FrequencyId = int.Parse(row[5].ToString());
-                model.IsFamilyWide = int.Parse(row[6].ToString());
-
-                Limits tmpControl = new Limits(model);
-                tmpControl.RefreshData += RunEventRefresh;
-                Grid.SetRow(tmpControl, rowNumber);
-                Grid.SetColumn(tmpControl, Numbercolumn);
-
-                LimitsGrid.Children.Add(tmpControl);
-
-
-                Numbercolumn++;
             }
+            else
+            {
+                userLimits = Service.GetUserLimits(userId);
+
+                foreach (Limit limit in userLimits)
+                {
+                    if (Numbercolumn > 2)
+                    {
+                        Numbercolumn = 0;
+                        rowNumber++;
+
+                        LimitsGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(190) });
+                    };
+
+                    Limits tmpControl = new Limits(limit, userId);
+                    tmpControl.RefreshData += RunEventRefresh;
+                    tmpControl.MaxHeight = 190;
+                    Grid.SetRow(tmpControl, rowNumber);
+                    Grid.SetColumn(tmpControl, Numbercolumn);
+
+                    LimitsGrid.Children.Add(tmpControl);
+
+                    Numbercolumn++;
+                }
+            }
+            LimitsGrid.UpdateLayout();
         }
 
         private void RunEventRefresh(object sender, EventArgs e)
         {
-            loadLimits();
+            LoadLimits();
         }
 
         private void AddLimitButton_Click(object sender, RoutedEventArgs e)
         {
             AddLimits limitsDialog = new AddLimits(userId);
-            limitsDialog.Closed += (s, args) => loadLimits();
+            limitsDialog.Closed += (s, args) => LoadLimits();
             limitsDialog.Show();
         }
     }

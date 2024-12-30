@@ -58,7 +58,6 @@ namespace Main.GUI
                 FamilyMembersBorder.Visibility = Visibility.Collapsed;
                 CategoriesBorder.Visibility = Visibility.Collapsed;
                 StoresBorder.Visibility = Visibility.Collapsed;
-                LimitsBorder.Visibility = Visibility.Collapsed;
                 FamilyTransactionsBorder.Visibility = Visibility.Collapsed;
             }
 

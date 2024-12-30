@@ -31,14 +31,14 @@ namespace Main.GUI
         private readonly int userid;
         private bool firstRun = true;
 
-        private LimitsModel _model;
+        private Limit limit;
 
-        public EditLimits(LimitsModel argModel)
+        public EditLimits(Limit argModel)
         {
             InitializeComponent();
 
             userid = argModel.UserId;
-            _model = argModel;
+            limit = argModel;
 
             _categories = Service.GetDefaultCategories();
             var tmpFirst = Service.GetUserCategories(userid);
@@ -120,7 +120,7 @@ namespace Main.GUI
                 DBSqlite dBSqlite = new DBSqlite();
 
                 // Załóżmy, że LimitID jest dostępny w 'tmp' lub 'thisCategory' lub innym obiekcie (możesz go dodać do obiektów User, Category, Frequencies jeśli to konieczne)
-                int limitID =_model.LimitId; // Funkcja do pobrania identyfikatora limitu, np. z wybranego elementu w UI
+                int limitID =limit.LimitId; // Funkcja do pobrania identyfikatora limitu, np. z wybranego elementu w UI
 
                 // Zapytanie UPDATE zamiast INSERT
                 int answer = dBSqlite.ExecuteNonQuery(

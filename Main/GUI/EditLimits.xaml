@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Main.GUI"
          Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
         Title="SettingProifl" Height="450" Width="800" BorderThickness="3" BorderBrush="#3AA9AD">
-    <Grid>
+    <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="0.3*"/>
             <ColumnDefinition Width="*"/>

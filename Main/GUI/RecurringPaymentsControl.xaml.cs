@@ -30,7 +30,6 @@ namespace Main.GUI
         private int familyId;
         public ObservableCollection<RecurringPayment> ActivePayments { get; set; }
         public ObservableCollection<RecurringPayment> InactivePayments { get; set; }
-        public ObservableCollection<RecurringPayment> recurringPayments { get; set; }
 
         public RecurringPaymentsControl(int loggedInUserId, MainWindow mainWindow)
         {
@@ -93,11 +92,8 @@ namespace Main.GUI
                 }
             }
 
-            
-
             ActivePaymentsList.ItemsSource = ActivePayments;
             InactivePaymentsList.ItemsSource = InactivePayments;
-
         }
 
         private void AddRecurringPaymentButton_Click(object sender, RoutedEventArgs e)

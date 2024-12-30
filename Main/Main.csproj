@@ -424,7 +424,7 @@
       <DependentUpon>StoresControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\Frequencies.cs" />
-    <Compile Include="Models\Limits.cs" />
+    <Compile Include="Models\Limit.cs" />
     <Compile Include="Models\RecurringPayment.cs" />
     <Compile Include="Models\RecurringPaymentHistory.cs" />
     <Compile Include="Models\TransactionSummaryViewModel.cs" />

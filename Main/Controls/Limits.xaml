@@ -25,10 +25,10 @@ Grid.Column="0">
                     </Grid.ColumnDefinitions>
                     <TextBlock x:Name="LimitName" Text="Limit na zakupy" FontWeight="Bold" FontSize="20" Foreground="#3AA9AD" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="6">
-                        <Button Click="Button_Click" Width="30" Height="30" Padding="5" Background="Transparent" BorderBrush="Transparent">
+                        <Button x:Name="EditLimitButton" Click="EditLimitButton_Click" Width="30" Height="30" Padding="5" Background="Transparent" BorderBrush="Transparent">
                             <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Button>
-                        <Button Click="Button_Click_1" Background="Transparent" Padding="3" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
+                        <Button x:Name="DeleteLimitButton" Click="DeleteLimitButton_Click" Background="Transparent" Padding="3" Width="30" Height="30" Margin="5,0" BorderBrush="Transparent">
                             <Image Source="/Resources/delete_red.png" Stretch="Uniform" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Button>
                     </StackPanel>
@@ -41,8 +41,8 @@ Grid.Column="0">
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="60.00 zł" FontSize="14" HorizontalAlignment="Left" Grid.Column="0" />
-                    <TextBlock x:Name="LabelTextAmountLimit" Text="100.00 zł" FontSize="14" HorizontalAlignment="Right" Grid.Column="1" />
+                    <TextBlock x:Name="SpentAmountTextBlock" Text="60.00 zł" FontSize="14" HorizontalAlignment="Left" Grid.Column="0" />
+                    <TextBlock x:Name="LimitAmountTextBlock" Text="100.00 zł" FontSize="14" HorizontalAlignment="Right" Grid.Column="1" />
                 </Grid>
                 <ProgressBar x:Name="LimitAmount" Minimum="0" Maximum="100" Value="60" Height="20" Margin="0,3,0,3"/>
             </StackPanel>

@@ -23,9 +23,14 @@ namespace Main.Controls
     /// </summary>
     public partial class Limits : UserControl
     {
-        private LimitsModel thisLimits;
-        public Limits(LimitsModel argModel)
-        { 
+        private Limit thisLimits;
+        private readonly int userId;
+        private readonly int roleId;
+        public Limits(Limit argModel, int userId)
+        {
+            this.userId = userId;
+            roleId = Service.GetRoleIDByUserID(userId);
+
             InitializeComponent();
             thisLimits = argModel;
 
@@ -33,22 +38,34 @@ namespace Main.Controls
             CategoryName.Text ="Kategoria: "+ Service.GetCategoryNameByCategoryID(argModel.CategoryId);
             FrequencyUser.Text="Częstotliwość: "+Service.GetFrequencyNameByFrequencyID(argModel.FrequencyId);
             AddUser.Text = "Przypisany: " + Service.GetUserNameByUserID(argModel.UserId);
-            LabelTextAmountLimit.Text=argModel.LimitAmount.ToString()+" zł";
+            SpentAmountTextBlock.Text = "60.00 zł";
+            LimitAmountTextBlock.Text = argModel.LimitAmount.ToString("C");
 
-
-
+            if(roleId == 3)
+            {
+                EditLimitButton.Visibility = Visibility.Collapsed;
+                DeleteLimitButton.Visibility = Visibility.Collapsed;
+            }
+            else if (roleId == 2)
+            {
+                if(Service.GetRoleIDByUserID(argModel.UserId) != 3 && argModel.UserId!= userId || argModel.UserId == userId & Service.GetRoleIDByUserID(argModel.CreatedByUserID)==1)
+                {
+                    EditLimitButton.Visibility = Visibility.Collapsed;
+                    DeleteLimitButton.Visibility = Visibility.Collapsed;
+                }
+            }
         }
 
         public event EventHandler RefreshData;
 
-        private void Button_Click(object sender, RoutedEventArgs e) //Edit Limits
+        private void EditLimitButton_Click(object sender, RoutedEventArgs e)
         {
             EditLimits editLimits = new EditLimits(thisLimits);
             editLimits.Closed += (s, args) => RefreshData?.Invoke(this, EventArgs.Empty);
             editLimits.Show();
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e) //Delete Limits
+        private void DeleteLimitButton_Click(object sender, RoutedEventArgs e)
         {
 
         }

@@ -107,13 +107,14 @@ namespace Main.GUI
                 Frequencies thisFrequency=Frequency.SelectedItem as Frequencies;
 
                 DBSqlite dBSqlite = new DBSqlite();
-                int answer = dBSqlite.ExecuteNonQuery("INSERT INTO Limits (FamilyID,UserID,CategoryID,LimitAmount,FrequencyID) VALUES(@MyFamilyId,@MyUserId,@MyCategoryId,@MyLimitAmount,@MyFrequencyId)",
+                int answer = dBSqlite.ExecuteNonQuery("INSERT INTO Limits (FamilyID,UserID,CategoryID,LimitAmount,FrequencyID,CreatedByUserID) VALUES(@MyFamilyId,@MyUserId,@MyCategoryId,@MyLimitAmount,@MyFrequencyId,@CreatedByUserID)",
                     new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userid)),
                     new SqliteParameter("@MyUserId",tmp.UserID),
                     new SqliteParameter("@MyCategoryId",thisCategory.CategoryID),
                     new SqliteParameter("@MyFrequencyId",thisFrequency.FrequencyID),
-                    new SqliteParameter("@MyLimitAmount",Amount.Text.ToString()));
-                if(answer>0)
+                    new SqliteParameter("@MyLimitAmount",Amount.Text.ToString()),
+                    new SqliteParameter("@CreatedByUserID", userid));
+                if (answer>0)
                 {
                     MessageBox.Show("Limit został dodany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
                     this.Close();
@@ -123,7 +124,6 @@ namespace Main.GUI
                     MessageBox.Show("Limit nie został dodany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
                     return;
                 }
-                    
             }
             else
             {

@@ -18,6 +18,9 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Main.Models;
 using System.Runtime.InteropServices.ComTypes;
+using Main.Controls;
+using OxyPlot;
+using System.Windows.Controls.Primitives;
 
 namespace Main.Logic
 {
@@ -1953,6 +1956,55 @@ namespace Main.Logic
                 }
                 return result.Rows[0]["FrequencyName"].ToString();
             }
+        }
+
+        public static ObservableCollection<Limit> GetUserLimits(int userId)
+        {
+            ObservableCollection<Limit> limits = new ObservableCollection<Limit>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"SELECT LimitID, FamilyID, UserID, CategoryID, LimitAmount, FrequencyID, IsFamilyWide, CreatedByUserID FROM Limits WHERE UserID = @UserID";
+
+                DataTable result = database.ExecuteQuery(query, new SqliteParameter("@UserID", userId));
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Limit limit = new Limit(
+                        limitId: Convert.ToInt32(row["LimitID"]),
+                        familyId: row["FamilyID"] == DBNull.Value ? -1 : Convert.ToInt32(row["FamilyID"]),
+                        userId: row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"]),
+                        categoryId: Convert.ToInt32(row["CategoryID"]),
+                        limitAmount: Convert.ToDouble(row["LimitAmount"]),
+                        frequencyId: Convert.ToInt32(row["FrequencyID"]),
+                        isFamilyWide: Convert.ToInt32(row["IsFamilyWide"]),
+                        createdByUserID: Convert.ToInt32(row["CreatedByUserID"])
+                    );
+
+                    limits.Add(limit);
+                }
+            }
+            return limits;
+        }
+
+        public static ObservableCollection<Limit> GetFamilyLimits(int familyId)
+        {
+            ObservableCollection<Limit> familyLimits = new ObservableCollection<Limit>();
+            List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+            foreach (FamilyMember member in familyMembers)
+            {
+                int userId = member.UserID;
+                ObservableCollection<Limit> userLimits = GetUserLimits(userId);
+
+                foreach (Limit limit in userLimits)
+                {
+                    if (!familyLimits.Any(s => s.LimitId == limit.LimitId))
+                    {
+                        familyLimits.Add(limit);
+                    }
+                }
+            }
+            return familyLimits;
         }
     }
 }
