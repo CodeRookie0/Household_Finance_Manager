@@ -36,7 +36,8 @@ namespace Main.GUI
             userId = loggedInUserId;
             this.mainWindow = mainWindow;
             InitializeComponent();
-            if (!Service.IsPrimaryUser(userId))
+            int roleId = Service.GetRoleIDByUserID(userId);
+            if (!Service.IsPrimaryUser(userId)&&roleId!=1)
             {
                 FamilySettingsButton.Visibility = Visibility.Collapsed;
                 JoinRequestsDataGrid.Visibility = Visibility.Collapsed;
@@ -47,7 +48,11 @@ namespace Main.GUI
                 FamilySettingsButton.Visibility=Visibility.Collapsed;
                 LeaveFamilyButton.Visibility = Visibility.Visible;
             }
-            
+            else if (!Service.IsPrimaryUser(userId) && roleId == 1)
+            {
+                FamilySettingsButton.Visibility = Visibility.Collapsed;
+            }
+
             joinRequestMembers = new ObservableCollection<PendingUser>(GeneratePendingUser());
             var familyId = Service.GetFamilyIdByMemberId(userId);
             var joinRequests = Service.GetPendingJoinRequestsByFamilyId(familyId);
@@ -92,20 +97,31 @@ namespace Main.GUI
 
         private void ChangePermision(object sender, RoutedEventArgs e)
         {
-           /* ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
-            DBSqlite dBSqlite = new DBSqlite();
-            DataTable answer = dBSqlite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@MyId) AND Users.UserID!=@MyId"
-                , new Microsoft.Data.Sqlite.SqliteParameter("@MyId", userId));
+            /* ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
+             DBSqlite dBSqlite = new DBSqlite();
+             DataTable answer = dBSqlite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.FamilyID=(SELECT FamilyID FROM Users WHERE Users.UserID=@MyId) AND Users.UserID!=@MyId"
+                 , new Microsoft.Data.Sqlite.SqliteParameter("@MyId", userId));
 
-            foreach (DataRow row in answer.Rows)
+             foreach (DataRow row in answer.Rows)
+             {
+                 PendingUser tmp = new PendingUser(Int32.Parse(row["UserID"].ToString()));
+                 tmp.Name = row["UserName"].ToString();
+                 tmp.Role = row["RoleName"].ToString();
+                 users.Add(tmp);
+
+             }*/
+            ObservableCollection<PendingUser> filteredMembers;
+
+            if (!Service.IsPrimaryUser(userId))
             {
-                PendingUser tmp = new PendingUser(Int32.Parse(row["UserID"].ToString()));
-                tmp.Name = row["UserName"].ToString();
-                tmp.Role = row["RoleName"].ToString();
-                users.Add(tmp);
+                filteredMembers = new ObservableCollection<PendingUser>(members.Where(member => !Service.IsPrimaryUser(member.Userid)));
+            }
+            else
+            {
+                filteredMembers = members;
+            }
 
-            }*/
-            PermissionEditorControl permissionEditor = new PermissionEditorControl(members);
+            PermissionEditorControl permissionEditor = new PermissionEditorControl(filteredMembers);
             permissionEditor.ShowDialog();
 
             FamilyMembersDataGrid.DataContext = null;
@@ -238,23 +254,33 @@ namespace Main.GUI
 
         private void RemoveFamilyMember_Click(object sender, RoutedEventArgs e)
         {
-           /*ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
-           DBSqlite dbsqite=new DBSqlite();
-           DataTable answer=dbsqite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Family ON Users.FamilyID=Family.FamilyID INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.UserID<>Family.PrimaryUserID AND Users.FamilyID=(" +
-                "SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
-                new Microsoft.Data.Sqlite.SqliteParameter("@UserId",userId));
-            if(answer != null)
-            {
-                foreach(DataRow row in answer.Rows) 
-                {
-                    PendingUser tmp = new PendingUser(Int32.Parse(row[0].ToString()));
-                    tmp.Name = row[1].ToString();
-                    tmp.Role = row[2].ToString();
-                    users.Add(tmp);
+            /*ObservableCollection<PendingUser> users = new ObservableCollection<PendingUser>();
+            DBSqlite dbsqite=new DBSqlite();
+            DataTable answer=dbsqite.ExecuteQuery("SELECT UserID,UserName,RoleName FROM Users INNER JOIN Family ON Users.FamilyID=Family.FamilyID INNER JOIN Roles ON Users.RoleID=Roles.RoleID WHERE Users.UserID<>Family.PrimaryUserID AND Users.FamilyID=(" +
+                 "SELECT FamilyID FROM Users WHERE Users.UserID=@UserId)",
+                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId",userId));
+             if(answer != null)
+             {
+                 foreach(DataRow row in answer.Rows) 
+                 {
+                     PendingUser tmp = new PendingUser(Int32.Parse(row[0].ToString()));
+                     tmp.Name = row[1].ToString();
+                     tmp.Role = row[2].ToString();
+                     users.Add(tmp);
 
-                }
-            }*/
-            DeleteFamilyMemberControl deleteFamilyMemberControl = new DeleteFamilyMemberControl(members);
+                 }
+             }*/
+            ObservableCollection<PendingUser> filteredMembers;
+
+            if (!Service.IsPrimaryUser(userId))
+            {
+                filteredMembers = new ObservableCollection<PendingUser>(members.Where(member => !Service.IsPrimaryUser(member.Userid)));
+            }
+            else
+            {
+                filteredMembers = members;
+            }
+            DeleteFamilyMemberControl deleteFamilyMemberControl = new DeleteFamilyMemberControl(filteredMembers);
             deleteFamilyMemberControl.Show();
         }
     }

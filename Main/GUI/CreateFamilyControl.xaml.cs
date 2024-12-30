@@ -47,13 +47,13 @@ namespace Main.GUI
 
             if (familyName.Length < 3)
             {
-                MessageBox.Show("Nazwa rodziny musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Nazwa rodziny musi mieć co najmniej " + minNameLength + " znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             if (Service.UserHasFamily(userId))
             {
-                MessageBox.Show("Już stworzyłeś rodzinę.\n" +
+                MessageBox.Show("Już utworzyłeś rodzinę.\n" +
                     "Nie możesz należeć do dwóch rodzin jednocześnie. " +
                     "Jeśli chcesz dołączyć do innej rodziny, najpierw musisz opuścić obecną.",
                 "Informacja",
@@ -67,11 +67,9 @@ namespace Main.GUI
 
             if (Service.AddFamily(userId, familyName, familyCode))
             {
-                MessageBox.Show($"Rodzina została pomyślnie stworzona!\n" +
-                $"Twój unikalny kod rodziny znajdziesz w ustawieniach rodziny.\n\n" +
-                "Podziel się tym kodem, aby inni mogli dołączyć do Twojej rodziny. " +
-                "Osoby, które chcą dołączyć, powinny wprowadzić ten kod w aplikacji, " +
-                "aby wysłać prośbę o dołączenie do wspólnego budżetu.",
+                MessageBox.Show($"Rodzina została pomyślnie utworzona!\n" +
+                $"Unikalny kod rodziny znajdziesz w ustawieniach rodziny.\n\n" +
+                "Podziel się nim, aby inni mogli dołączyć do Twojej rodziny. Osoby, które chcą dołączyć, mogą wprowadzić ten kod w aplikacji, aby wysłać prośbę o dołączenie do rodziny.",
                 "Sukces",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);

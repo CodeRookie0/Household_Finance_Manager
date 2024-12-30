@@ -202,9 +202,16 @@ namespace Main.GUI
 
             if (result == MessageBoxResult.Yes)
             {
+                foreach (Window window in Application.Current.Windows)
+                {
+                    if (window != this)
+                    {
+                        window.Close();
+                    }
+                }
                 LoginControl loginControl = new LoginControl();
                 loginControl.Show();
-                this.Hide();
+                this.Close();
             }
             else
             {

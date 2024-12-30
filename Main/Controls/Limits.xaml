@@ -18,12 +18,12 @@ BorderThickness="1.5"
 Grid.Row="0" 
 Grid.Column="0">
             <StackPanel>
-                <Grid>
+                <Grid Margin="0,0,0,7">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Limit na zakupy" FontWeight="Bold" FontSize="20" Foreground="#3AA9AD" Margin="0,0,0,10"/>
+                    <TextBlock x:Name="LimitName" Text="Limit na zakupy" FontWeight="Bold" FontSize="20" Foreground="#3AA9AD" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Grid.Column="6">
                         <Button Click="Button_Click" Width="30" Height="30" Padding="5" Background="Transparent" BorderBrush="Transparent">
                             <Image Source="/Resources/edit_green.png" Stretch="Uniform" Width="20" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -44,7 +44,7 @@ Grid.Column="0">
                     <TextBlock Text="60.00 zł" FontSize="14" HorizontalAlignment="Left" Grid.Column="0" />
                     <TextBlock x:Name="LabelTextAmountLimit" Text="100.00 zł" FontSize="14" HorizontalAlignment="Right" Grid.Column="1" />
                 </Grid>
-                <ProgressBar x:Name="LimitAmount" Minimum="0" Maximum="100" Value="60" Height="20"  Margin="0,3,0,3"/>
+                <ProgressBar x:Name="LimitAmount" Minimum="0" Maximum="100" Value="60" Height="20" Margin="0,3,0,3"/>
             </StackPanel>
         </Border>
 

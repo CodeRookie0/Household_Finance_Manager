@@ -587,21 +587,13 @@ namespace Main.Logic
         {
             if (recurringPayments!=null && recurringPayments.Any())
             {
-                Console.WriteLine("Lista cyklicznych płatności:");
                 foreach (var payment in recurringPayments)
                 {
-                    Console.WriteLine($"- {payment.RecurringPaymentName} (ID: {payment.RecurringPaymentID})");
-                }
-                foreach (var payment in recurringPayments)
-                {
-                    Console.WriteLine($"\nPrzetwarzanie cyklicznej płatności: {payment.RecurringPaymentName}");
-                    // Sprawdź, czy w historii brakuje transakcji dla tego cyklicznego płatności
-                    var lastPaymentDate = GetLastPaymentDateForRecurringPayment(payment.RecurringPaymentID); 
-                    Console.WriteLine($"Ostatnia data płatności: {lastPaymentDate?.ToString("yyyy-MM-dd") ?? "Brak danych"}");
-                    var startDate = lastPaymentDate ?? payment.PaymentDate;
+                    var lastPaymentDate = GetLastPaymentDateForRecurringPayment(payment.RecurringPaymentID);
+                    var startDate = (lastPaymentDate == null || payment.PaymentDate > lastPaymentDate)
+                        ? payment.PaymentDate
+                        : lastPaymentDate.Value;
                     var nextPaymentDate = GetNextPaymentDate(payment.FrequencyID, startDate);
-                    Console.WriteLine($"Startowa data: {startDate:yyyy-MM-dd}");
-                    Console.WriteLine($"Obliczona następna data płatności: {nextPaymentDate?.ToString("yyyy-MM-dd") ?? "Brak daty"}");
 
                     if (nextPaymentDate == null)
                     {
@@ -611,20 +603,9 @@ namespace Main.Logic
 
                     while (nextPaymentDate <= DateTime.Now)
                     {
-                        Console.WriteLine($"\nPrzygotowanie do dodania transakcji:");
-                        Console.WriteLine($"Użytkownik ID: {payment.UserID}");
-                        Console.WriteLine($"Kwota: {payment.Amount}");
-                        Console.WriteLine($"Typ transakcji ID: {payment.TransactionTypeID ?? -1}");
-                        Console.WriteLine($"Kategoria ID: {payment.CategoryID ?? -1}");
-                        Console.WriteLine($"Data płatności: {nextPaymentDate:yyyy-MM-dd}");
-
-                        // Dodaj transakcję do tabeli Transactions
                         var successAddTransaction = Service.AddTransaction(payment.UserID, payment.Amount, payment.TransactionTypeID ?? -1, payment.CategoryID ?? -1, null, payment.StoreID, $"Cykliczna płatność: {payment.RecurringPaymentName}", nextPaymentDate ?? DateTime.Now, out int? transactionId);
                         if (successAddTransaction && transactionId!=null)
                         {
-                            Console.WriteLine($"Transakcja dodana pomyślnie. Transaction ID: {transactionId}");
-                            // Dodaj wpis do RecurringPaymentHistory
-                            Console.WriteLine($"Dodanie wpisu do historii płatności...");
                             var successAddRecurringHistory = Service.AddRecurringPaymentHistory(
                                 payment.RecurringPaymentID,
                                 transactionId,
@@ -635,25 +616,21 @@ namespace Main.Logic
                             );
                             if (successAddRecurringHistory)
                             {
-                                Console.WriteLine($"Wpis dodany do historii pomyślnie.");
                                 nextPaymentDate = GetNextPaymentDate(payment.FrequencyID, nextPaymentDate ?? DateTime.Now);
                             }
                             else
                             {
-                                Console.WriteLine($"Nie udało się dodać wpisu do historii płatności.");
                                 return false;
                             }
                         }
                         else
                         {
-                            Console.WriteLine("Nie udało się dodać transakcji.");
                             return false;
                         }
                     }
                 }
                 return true;
             }
-            Console.WriteLine("Brak danych do przetworzenia.");
             return false;
         }
 

@@ -66,7 +66,7 @@ namespace Main.GUI
 
             if(Service.AddJoinRequest(familyId, userId))
             {
-                MessageBox.Show("Prośba o dołączenie do rodziny została wysłana. Czekaj na akceptację.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Prośba o dołączenie do rodziny została wysłana. Oczekuj na akceptację.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                 FamilyCodeTextBox.Clear();
                 Close();
                 mainWindow.FamilyMembersButton_Click(sender, e);

@@ -131,7 +131,7 @@ namespace Main.GUI
 
             if (newFamilyName.Length < 3)
             {
-                MessageBox.Show("Nazwa rodziny musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Nazwa rodziny musi mieć co najmniej " + minNameLength + " znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -142,7 +142,7 @@ namespace Main.GUI
                 ChangeNameButton.IsEnabled = true;
                 FamilyNameInput.IsEnabled = false;
                 EditButtonsPanel.Visibility = Visibility.Collapsed;
-                MessageBox.Show("Nazwę rodziny zmieniono pomyślnie.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Nazwa rodziny została pomyślnie zmieniona.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {

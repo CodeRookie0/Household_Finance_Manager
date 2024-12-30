@@ -24,7 +24,7 @@
         </Border>
 
         <Border Background="White" Grid.Row="0" Grid.Column="1">
-            <Label Content="Dodawanie Nowego Limitu" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
+            <Label Content="Edycja Limitu" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="30"/>
         </Border>
 
 
@@ -32,7 +32,7 @@
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,30,0,0">
                 <StackPanel Margin="30,0,30,30">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Typ: " Width="80" TextAlignment="Left"/>
+                        <TextBlock Text="Typ *" Width="90" TextAlignment="Left"/>
                         <ComboBox x:Name="Type" Width="300" SelectionChanged="Type_SelectionChanged">
                             <ComboBoxItem Content="Członek Rodziny" IsSelected="True"/>
                             <ComboBoxItem Content="Rodzina"/>
@@ -40,22 +40,22 @@
                     </StackPanel>
 
                     <StackPanel x:Name="PanelListUser" Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Użytkownik: " Width="80" TextAlignment="Left"/>
+                        <TextBlock Text="Użytkownik *" Width="90" TextAlignment="Left"/>
                         <ComboBox x:Name="UserList" DisplayMemberPath="UserName" Width="300"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Kateogria" Width="80" TextAlignment="Left"/>
+                        <TextBlock Text="Kateogria *" Width="90" TextAlignment="Left"/>
                         <ComboBox x:Name="CategoryList" DisplayMemberPath="CategoryName" Width="300"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Kwota: " Width="80" TextAlignment="Left"/>
+                        <TextBlock Text="Kwota *" Width="90" TextAlignment="Left"/>
                         <TextBox x:Name="Amount" Width="300"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Częstotliwość: " Width="80" TextAlignment="Left"/>
+                        <TextBlock Text="Częstotliwość *" Width="90" TextAlignment="Left"/>
                         <ComboBox x:Name="Frequency" Width="300" DisplayMemberPath="FrequencyName"/>
                     </StackPanel>
 

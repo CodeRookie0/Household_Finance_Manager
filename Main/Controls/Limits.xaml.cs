@@ -29,7 +29,8 @@ namespace Main.Controls
             InitializeComponent();
             thisLimits = argModel;
 
-            CategoryName.Text ="Kategoria: "+Service.GetCategoryNameByCategoryID(argModel.CategoryId);
+            LimitName.Text="Limit dla " + Service.GetCategoryNameByCategoryID(argModel.CategoryId);
+            CategoryName.Text ="Kategoria: "+ Service.GetCategoryNameByCategoryID(argModel.CategoryId);
             FrequencyUser.Text="Częstotliwość: "+Service.GetFrequencyNameByFrequencyID(argModel.FrequencyId);
             AddUser.Text = "Przypisany: " + Service.GetUserNameByUserID(argModel.UserId);
             LabelTextAmountLimit.Text=argModel.LimitAmount.ToString()+" zł";

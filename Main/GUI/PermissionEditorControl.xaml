@@ -27,8 +27,8 @@
         <Border Background="#ffffff" Grid.Row="1" Grid.ColumnSpan="2">
             <DataGrid x:Name="dataGridUserMyFamily" AutoGenerateColumns="False" ItemsSource="{Binding pendingUsers}" FontSize="20">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="User Name" Binding="{Binding Name}" Width="*"/>
-                    <DataGridTemplateColumn Header="Role"  Width="*">
+                    <DataGridTextColumn Header="Nazwa użytkownika" Binding="{Binding Name}" Width="*"/>
+                    <DataGridTemplateColumn Header="Rola użytkownika"  Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ComboBox x:Name="roleComboBox" ItemsSource="{Binding DataContext.ComboBoxItems ,RelativeSource={RelativeSource AncestorType=Window}}"

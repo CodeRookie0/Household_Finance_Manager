@@ -219,7 +219,7 @@ namespace Main.GUI
 
                         deleteButton.Click += (sender, e) =>
                         {
-                            var result = MessageBox.Show("Czy na pewno chcesz usunąć tę kategorię : " + category.CategoryName + "?\n" + "Wszystkie podkategorie zostaną usunięte razem z kategorią, a transakcje powiązane z nią nie będą miały przypisanej żadnej kategorii", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                            var result = MessageBox.Show("Czy na pewno chcesz usunąć tę kategorię : " + category.CategoryName + "?\n" + "Wszystkie podkategorie zostaną usunięte razem z kategorią.", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
                             if (result == MessageBoxResult.Yes)
                             {
@@ -233,7 +233,7 @@ namespace Main.GUI
                                 else
                                 {
                                     MessageBox.Show("Nie udało się usunąć kategorii.\n" +
-                                        "Kategoria może być powiązana z transakcjami lub cyklicznymi płatnościami, które uniemożliwiają jej usunięcie.",
+                                        "Kategoria może być powiązana z transakcją, cykliczną płatnością, sklepem lub limitem, który uniemożliwia jej usunięcie.",
                                         "Niepowodzenie",
                                         MessageBoxButton.OK,
                                         MessageBoxImage.Error);
@@ -349,7 +349,7 @@ namespace Main.GUI
 
                             deleteButton.Click += (sender, e) =>
                             {
-                                var result = MessageBox.Show("Czy na pewno chcesz usunąć tę podkategorię : " + subcategory.SubcategoryName + "?\n" + "Transakcje powiązane z nią będą miały kategorię 'Brak kategorii'.", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                                var result = MessageBox.Show("Czy na pewno chcesz usunąć tę podkategorię : " + subcategory.SubcategoryName + "?\n" + "Transakcje powiązane z nią będą miały przypisanej podkategori.", "Potwierdzenie usunięcia", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
                                 if (result == MessageBoxResult.Yes)
                                 {
