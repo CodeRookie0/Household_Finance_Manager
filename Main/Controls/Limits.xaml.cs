@@ -60,7 +60,7 @@ namespace Main.Controls
 
         private void EditLimitButton_Click(object sender, RoutedEventArgs e)
         {
-            EditLimits editLimits = new EditLimits(thisLimits);
+            EditLimits editLimits = new EditLimits(thisLimits, userId);
             editLimits.Closed += (s, args) => RefreshData?.Invoke(this, EventArgs.Empty);
             editLimits.Show();
         }

@@ -34,7 +34,7 @@
                         <StackPanel Margin="30,0,30,30">
                            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                         <TextBlock Text="Typ: " Width="80" TextAlignment="Left"/>
-                        <ComboBox x:Name="Type" Width="300" SelectionChanged="ComboBox_SelectionChanged">
+                        <ComboBox x:Name="TypeComboBox" Width="300" SelectionChanged="ComboBox_SelectionChanged">
                             <ComboBoxItem Content="Członek Rodziny" IsSelected="True"/>
                             <ComboBoxItem Content="Rodzina"/>
                         </ComboBox>

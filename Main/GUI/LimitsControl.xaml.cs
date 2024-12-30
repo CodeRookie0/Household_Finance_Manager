@@ -37,15 +37,11 @@ namespace Main.GUI
             this.mainWindow = mainWindow;
             InitializeComponent();
 
+            if(roleId==3)
+            {
+                AddLimitButton.Visibility = Visibility.Collapsed;
+            }
             LoadLimits();
-
-            /*Limits test=new Limits();
-
-            Grid.SetRow(test, 1);
-            Grid.SetColumn(test, 1);
-
-            LimitsGrid.Children.Add(test);*/
-
         }
 
         private void LoadLimits()

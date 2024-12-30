@@ -2006,5 +2006,98 @@ namespace Main.Logic
             }
             return familyLimits;
         }
+
+        public static List<User> GetChildrenByFamilyId(int familyId)
+        {
+            List<User> children = new List<User>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT UserID, UserName, Email,PasswordHash,Salt,RoleID,FamilyID,CreatedAt,ProfileSettings FROM Users WHERE  FamilyID = @FamilyID AND RoleID = 3";
+                
+
+                SqliteParameter familyIdParam = new SqliteParameter("@FamilyID", familyId);
+                DataTable result = database.ExecuteQuery(query, familyIdParam);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    User child = new User
+                    {
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        UserName = row["UserName"] == DBNull.Value ? string.Empty : row["UserName"].ToString(),
+                        Email = row["Email"] == DBNull.Value ? string.Empty : row["Email"].ToString(),
+                        PasswordHash = row["PasswordHash"] == DBNull.Value ? string.Empty : row["PasswordHash"].ToString(),
+                        Salt = row["Salt"] == DBNull.Value ? string.Empty : row["Salt"].ToString(),
+                        RoleID = row["RoleID"] == DBNull.Value ? 0 : Convert.ToInt32(row["RoleID"]),
+                        FamilyID = row["FamilyID"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["FamilyID"]),
+                        CreatedAt = Convert.ToDateTime(row["CreatedAt"]),
+                        ProfileSettings = row["ProfileSettings"] == DBNull.Value ? string.Empty : row["ProfileSettings"].ToString()
+                    };
+                    children.Add(child);
+                }
+            }
+            return children;
+        }
+
+        public static List<User> GetUsersByFamilyId(int familyId)
+        {
+            List<User> users = new List<User>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT UserID, UserName, Email,PasswordHash,Salt,RoleID,FamilyID,CreatedAt,ProfileSettings FROM Users WHERE FamilyID = @FamilyID";
+
+
+                SqliteParameter familyIdParam = new SqliteParameter("@FamilyID", familyId);
+                DataTable result = database.ExecuteQuery(query, familyIdParam);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    User user = new User
+                    {
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        UserName = row["UserName"] == DBNull.Value ? string.Empty : row["UserName"].ToString(),
+                        Email = row["Email"] == DBNull.Value ? string.Empty : row["Email"].ToString(),
+                        PasswordHash = row["PasswordHash"] == DBNull.Value ? string.Empty : row["PasswordHash"].ToString(),
+                        Salt = row["Salt"] == DBNull.Value ? string.Empty : row["Salt"].ToString(),
+                        RoleID = row["RoleID"] == DBNull.Value ? 0 : Convert.ToInt32(row["RoleID"]),
+                        FamilyID = row["FamilyID"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["FamilyID"]),
+                        CreatedAt = Convert.ToDateTime(row["CreatedAt"]),
+                        ProfileSettings = row["ProfileSettings"] == DBNull.Value ? string.Empty : row["ProfileSettings"].ToString()
+                    };
+                    users.Add(user);
+                }
+            }
+            return users;
+        }
+
+        public static User GetUserByUserId(int userId)
+        {
+            User user = null;
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT UserID, UserName, Email, PasswordHash, Salt, RoleID, FamilyID, ProfileSettings,CreatedAt FROM Users WHERE UserID = @UserID";
+
+                SqliteParameter userIdParam = new SqliteParameter("@UserID", userId);
+                DataTable result = database.ExecuteQuery(query, userIdParam);
+
+                if (result.Rows.Count > 0)
+                {
+                    DataRow row = result.Rows[0];
+                    user = new User
+                    {
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        UserName = row["UserName"] == DBNull.Value ? string.Empty : row["UserName"].ToString(),
+                        Email = row["Email"] == DBNull.Value ? string.Empty : row["Email"].ToString(),
+                        PasswordHash = row["PasswordHash"] == DBNull.Value ? string.Empty : row["PasswordHash"].ToString(),
+                        Salt = row["Salt"] == DBNull.Value ? string.Empty : row["Salt"].ToString(),
+                        RoleID = row["RoleID"] == DBNull.Value ? 0 : Convert.ToInt32(row["RoleID"]),
+                        FamilyID = row["FamilyID"] == DBNull.Value ? (int?)null : Convert.ToInt32(row["FamilyID"]),
+                        CreatedAt = Convert.ToDateTime(row["CreatedAt"]),
+                        ProfileSettings = row["ProfileSettings"] == DBNull.Value ? string.Empty : row["ProfileSettings"].ToString()
+                    };
+                }
+            }
+            return user;
+        }
+
     }
 }

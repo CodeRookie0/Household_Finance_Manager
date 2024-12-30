@@ -3,6 +3,7 @@ using Main.Models;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -23,33 +24,47 @@ namespace Main.GUI
     /// </summary>
     public partial class AddLimits : Window
     {
-        private List<Category> _categories;
+        private List<Category> categoryList;
         private List<Frequencies> _frequencies;
         private List<User> _users;
 
         private readonly int userid;
+        public int roleId;
         private bool firstRun = true;
         public AddLimits(int userId)
         {
             InitializeComponent();
 
-
             userid = userId;
-            _categories = Service.GetDefaultCategories();
-            var tmpFirst = Service.GetUserCategories(userId);
-            _categories.Insert(0, new Category { CategoryName = "Wybierz" });
+            roleId=Service.GetRoleIDByUserID(userId);
 
-            foreach(var a in tmpFirst)
+            categoryList = new List<Category>();
+
+            List<Category> defaultCategories = Service.GetDefaultCategories();
+
+            int familyId = Service.GetFamilyIdByMemberId(userId);
+            List<Category> familyCategories = familyId > 0
+                ? Service.GetFamilyCategories(familyId)
+                : Service.GetUserCategories(userId);
+
+            var allCategories = defaultCategories.Concat(familyCategories).Distinct();
+
+            foreach (var category in allCategories.Where(c => Service.IsCategoryFavoriteForUser(userId, c.CategoryID)))
             {
-                _categories.Add(a);
+                if (!category.CategoryName.StartsWith("❤️ "))
+                {
+                    category.CategoryName = $"❤️ {category.CategoryName}";
+                }
+                categoryList.Add(category);
+            }
+            foreach (var category in allCategories.Where(c => !Service.IsCategoryFavoriteForUser(userId, c.CategoryID)))
+            {
+                categoryList.Add(category);
             }
 
-            var tmp=Service.GetFamilyCategories(userId);
-
-            foreach (var c in tmp)
-            {
-                _categories.Add(c);
-            }
+            categoryList.Insert(0, new Category { CategoryName = "Wybierz" });
+            CategoryList.ItemsSource = categoryList;
+            CategoryList.SelectedIndex = 0;
 
             _frequencies=new List<Frequencies>();
             _frequencies.Insert(0,new Frequencies() {FrequencyName="Wybierz"});
@@ -60,37 +75,38 @@ namespace Main.GUI
                 _frequencies.Add(new Frequencies(){ FrequencyID = int.Parse(dr[0].ToString()), FrequencyName = dr[1].ToString() });
             }
 
-            
-            _users= new List<User>();
-            _users.Insert(0, new User { UserName = "Wyberz" });
-
-            DataTable answer = dBSqlite.ExecuteQuery("SELECT UserID,UserName,Email,PasswordHash,Salt,RoleID,FamilyID FROM Users WHERE UserID=@MyUserID OR FamilyID=@MyFamilyID",
-                new Microsoft.Data.Sqlite.SqliteParameter("@MyUserID", userId),
-                new SqliteParameter("@MyFamilyID",Service.GetFamilyIdByMemberId(userId)));
-
-            foreach (DataRow dr in answer.Rows)
-            {
-                User user = new User();
-                user.UserID = int.Parse(dr[0].ToString());
-                user.UserName = dr[1].ToString();
-                user.Email = dr[2].ToString();
-                user.PasswordHash = dr[3].ToString();
-                user.Salt = dr[4].ToString();
-                user.RoleID = int.Parse(dr[5].ToString());
-                user.FamilyID = int.Parse(dr[6].ToString());
-
-                _users.Add(user);
-            }
-
-            UserList.ItemsSource= _users;
-            UserList.SelectedIndex = 0;
-
-            CategoryList.ItemsSource = _categories;
-            CategoryList.SelectedIndex = 0;
-
-            Frequency.ItemsSource= _frequencies;
+            Frequency.ItemsSource = _frequencies;
             Frequency.SelectedIndex = 0;
-            
+
+            if (roleId == 2)
+            {
+                TypeComboBox.IsEnabled = false;
+
+                _users = new List<User>();
+                _users.Insert(0, new User { UserName = "Wyberz" });
+
+                User user = Service.GetUserByUserId(userId);
+                _users.Add(user);
+
+                List<User> children = Service.GetChildrenByFamilyId(familyId);
+                foreach (User child in children)
+                {
+                    _users.Add(child);
+                }
+            }
+            if (roleId==1)
+            {
+                _users = new List<User>();
+                _users.Insert(0, new User { UserName = "Wyberz" });
+
+                List<User> users = Service.GetUsersByFamilyId(familyId);
+                foreach (User user in users)
+                {
+                    _users.Add(user);
+                }
+            }
+            UserList.ItemsSource = _users;
+            UserList.SelectedIndex = 0;
         }
 
         private void CloseImage_MouseUp(object sender, MouseButtonEventArgs e)

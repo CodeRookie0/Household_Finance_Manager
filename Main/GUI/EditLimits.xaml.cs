@@ -24,37 +24,55 @@ namespace Main.GUI
     public partial class EditLimits : Window
     {
 
-        private List<Category> _categories;
+        private List<Category> categoryList;
         private List<Frequencies> _frequencies;
         private List<User> _users;
 
-        private readonly int userid;
+        private readonly int userId;
+        private readonly int loggedInUserId;
+        public int roleId;
         private bool firstRun = true;
 
         private Limit limit;
 
-        public EditLimits(Limit argModel)
+        public EditLimits(Limit argModel, int loggedInUserId)
         {
             InitializeComponent();
 
-            userid = argModel.UserId;
+            userId = argModel.UserId;
+            this.loggedInUserId = loggedInUserId;
+            roleId =Service.GetRoleIDByUserID(loggedInUserId);
             limit = argModel;
 
-            _categories = Service.GetDefaultCategories();
-            var tmpFirst = Service.GetUserCategories(userid);
-            _categories.Insert(0, new Category { CategoryName = "Wybierz" });
+            categoryList = new List<Category>();
 
-            foreach (var a in tmpFirst)
+            List<Category> defaultCategories = Service.GetDefaultCategories();
+
+            int familyId = Service.GetFamilyIdByMemberId(loggedInUserId);
+            List<Category> familyCategories = familyId > 0
+                ? Service.GetFamilyCategories(familyId)
+                : Service.GetUserCategories(loggedInUserId);
+
+            var allCategories = defaultCategories.Concat(familyCategories).Distinct();
+
+            foreach (var category in allCategories.Where(c => Service.IsCategoryFavoriteForUser(loggedInUserId, c.CategoryID)))
             {
-                _categories.Add(a);
+                if (!category.CategoryName.StartsWith("❤️ "))
+                {
+                    category.CategoryName = $"❤️ {category.CategoryName}";
+                }
+                categoryList.Add(category);
+            }
+            foreach (var category in allCategories.Where(c => !Service.IsCategoryFavoriteForUser(loggedInUserId, c.CategoryID)))
+            {
+                categoryList.Add(category);
             }
 
-            var tmp = Service.GetFamilyCategories(userid);
+            categoryList.Insert(0, new Category { CategoryName = "Wybierz" });
 
-            foreach (var c in tmp)
-            {
-                _categories.Add(c);
-            }
+            CategoryList.ItemsSource = categoryList;
+            Category selectedCategory = categoryList.FirstOrDefault(c => c.CategoryID == argModel.CategoryId);
+            CategoryList.SelectedItem = selectedCategory;
 
             _frequencies = new List<Frequencies>();
             _frequencies.Insert(0, new Frequencies() { FrequencyName = "Wybierz" });
@@ -65,42 +83,41 @@ namespace Main.GUI
                 _frequencies.Add(new Frequencies() { FrequencyID = int.Parse(dr[0].ToString()), FrequencyName = dr[1].ToString() });
             }
 
+            Frequency.ItemsSource = _frequencies;
+            Frequencies frequency = _frequencies.FirstOrDefault(c => c.FrequencyID == argModel.FrequencyId);
+            Frequency.SelectedItem = frequency;
 
-            _users = new List<User>();
-            _users.Insert(0, new User { UserName = "Wyberz" });
-
-            DataTable answer = dBSqlite.ExecuteQuery("SELECT UserID,UserName,Email,PasswordHash,Salt,RoleID,FamilyID FROM Users WHERE UserID=@MyUserID OR FamilyID=@MyFamilyID",
-                new Microsoft.Data.Sqlite.SqliteParameter("@MyUserID", userid),
-                new SqliteParameter("@MyFamilyID", Service.GetFamilyIdByMemberId(userid)));
-
-            foreach (DataRow dr in answer.Rows)
+            if (roleId == 2)
             {
-                User userTmp = new User();
-                userTmp.UserID = int.Parse(dr[0].ToString());
-                userTmp.UserName = dr[1].ToString();
-                userTmp.Email = dr[2].ToString();
-                userTmp.PasswordHash = dr[3].ToString();
-                userTmp.Salt = dr[4].ToString();
-                userTmp.RoleID = int.Parse(dr[5].ToString());
-                userTmp.FamilyID = int.Parse(dr[6].ToString());
+                TypeComboBox.IsEnabled = false;
 
-                _users.Add(userTmp);
+                _users = new List<User>();
+                _users.Insert(0, new User { UserName = "Wyberz" });
+
+                User user = Service.GetUserByUserId(loggedInUserId);
+                _users.Add(user);
+
+                List<User> children = Service.GetChildrenByFamilyId(familyId);
+                foreach (User child in children)
+                {
+                    _users.Add(child);
+                }
+            }
+            if (roleId == 1)
+            {
+                _users = new List<User>();
+                _users.Insert(0, new User { UserName = "Wyberz" });
+
+                List<User> users = Service.GetUsersByFamilyId(familyId);
+                foreach (User user in users)
+                {
+                    _users.Add(user);
+                }
             }
 
             UserList.ItemsSource = _users;
-
-            User user = _users.FirstOrDefault(c => c.UserID == argModel.UserId);
-            UserList.SelectedItem = user;
-
-            CategoryList.ItemsSource = _categories;
-
-            Category category = _categories.FirstOrDefault(c => c.CategoryID == argModel.CategoryId);
-            CategoryList.SelectedItem = category;
-
-
-            Frequency.ItemsSource = _frequencies;
-            Frequencies frequency = _frequencies.FirstOrDefault(c=>c.FrequencyID==argModel.FrequencyId);
-            Frequency.SelectedItem = frequency;
+            User selectedUser = _users.FirstOrDefault(c => c.UserID == argModel.UserId);
+            UserList.SelectedItem = selectedUser;
         }
 
         private void CloseImage_MouseUp(object sender, MouseButtonEventArgs e)
@@ -126,7 +143,7 @@ namespace Main.GUI
                 int answer = dBSqlite.ExecuteNonQuery(
                     "UPDATE Limits SET FamilyID = @MyFamilyId, UserID = @MyUserId, CategoryID = @MyCategoryId, LimitAmount = @MyLimitAmount, FrequencyID = @MyFrequencyId " +
                     "WHERE LimitID = @MyLimitID",
-                    new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userid)),
+                    new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userId)),
                     new SqliteParameter("@MyUserId", tmp.UserID),
                     new SqliteParameter("@MyCategoryId", thisCategory.CategoryID),
                     new SqliteParameter("@MyFrequencyId", thisFrequency.FrequencyID),
