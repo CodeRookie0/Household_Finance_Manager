@@ -971,6 +971,12 @@ namespace Main.Logic
             {
                 try
                 {
+                    string updateTransactionsQuery = "UPDATE Transactions SET StoreID = NULL WHERE StoreID = @StoreID);";
+                    database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@StoreID", storeId));
+
+                    string updateRecurringPaymentsQuery = "UPDATE RecurringPayments SET StoreID = NULL WHERE StoreID = @StoreID);";
+                    database.ExecuteNonQuery(updateRecurringPaymentsQuery, new SqliteParameter("@StoreID", storeId));
+
                     string deleteFavoriteCategoriesQuery = "DELETE FROM FavoriteStores WHERE StoreID = @StoreID";
                     database.ExecuteNonQuery(deleteFavoriteCategoriesQuery, new SqliteParameter("@StoreID", storeId));
 

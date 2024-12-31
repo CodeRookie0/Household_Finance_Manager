@@ -36,7 +36,7 @@ Grid.Column="0">
                 <TextBlock x:Name="AddUser" Text="Przypisany: Jan Kowalski" FontSize="14" Margin="0,2,0,2"/>
                 <TextBlock x:Name="FrequencyUser" Text="Częstotliwość: Miesięcznie" FontSize="14"  Margin="0,2,0,2"/>
                 <TextBlock x:Name="CategoryName" Text="Kategoria: Zakupy" FontSize="14"  Margin="0,2,0,2"/>
-                <Grid Width="343"  Margin="0,15,0,0">
+                <Grid Width="335"  Margin="0,15,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
