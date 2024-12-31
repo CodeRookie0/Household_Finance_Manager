@@ -1986,6 +1986,68 @@ namespace Main.Logic
             return limits;
         }
 
+        public static ObservableCollection<Limit> GetFilteredUserLimits(int? isFamilyWide = null, int? userId = null, int? categoryId = null, int? frequencyId = null, double? minAmount = null, double? maxAmount = null, bool? isExceededYes = null, bool? isExceededNo = null)
+        {
+            ObservableCollection<Limit> limits = new ObservableCollection<Limit>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"SELECT LimitID, FamilyID, UserID, CategoryID, LimitAmount, FrequencyID, IsFamilyWide, CreatedByUserID
+                         FROM Limits
+                         WHERE 1=1";
+                List<SqliteParameter> parameters = new List<SqliteParameter>();
+                if (userId.HasValue && userId.Value !=1)
+                {
+                    query += " AND UserID = @UserID";
+                    parameters.Add(new SqliteParameter("@UserID", userId.Value));
+                }
+
+                if (isFamilyWide.HasValue && isFamilyWide.Value-1 != -1)
+                {
+                    query += " AND IsFamilyWide = @IsFamilyWide";
+                    parameters.Add(new SqliteParameter("@IsFamilyWide", isFamilyWide.Value-1));
+                }
+                if (categoryId.HasValue && categoryId.Value != -1)
+                {
+                    query += " AND CategoryID = @CategoryID";
+                    parameters.Add(new SqliteParameter("@CategoryID", categoryId.Value));
+                }
+                if (frequencyId.HasValue && frequencyId.Value != -1)
+                {
+                    query += " AND FrequencyId = @FrequencyId";
+                    parameters.Add(new SqliteParameter("@FrequencyId", frequencyId.Value));
+                }
+                if (minAmount.HasValue)
+                {
+                    query += " AND LimitAmount >= @MinAmount";
+                    parameters.Add(new SqliteParameter("@MinAmount", minAmount.Value));
+                }
+                if (maxAmount.HasValue)
+                {
+                    query += " AND LimitAmount <= @MaxAmount";
+                    parameters.Add(new SqliteParameter("@MaxAmount", maxAmount.Value));
+                }
+
+                DataTable result = database.ExecuteQuery(query, parameters.ToArray());
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Limit limit = new Limit(
+                        limitId: Convert.ToInt32(row["LimitID"]),
+                        familyId: row["FamilyID"] == DBNull.Value ? -1 : Convert.ToInt32(row["FamilyID"]),
+                        userId: row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"]),
+                        categoryId: Convert.ToInt32(row["CategoryID"]),
+                        limitAmount: Convert.ToDouble(row["LimitAmount"]),
+                        frequencyId: Convert.ToInt32(row["FrequencyID"]),
+                        isFamilyWide: Convert.ToInt32(row["IsFamilyWide"]),
+                        createdByUserID: Convert.ToInt32(row["CreatedByUserID"])
+                    );
+
+                    limits.Add(limit);
+                }
+            }
+            return limits;
+        }
+
         public static ObservableCollection<Limit> GetFamilyLimits(int familyId)
         {
             ObservableCollection<Limit> familyLimits = new ObservableCollection<Limit>();
@@ -2007,12 +2069,50 @@ namespace Main.Logic
             return familyLimits;
         }
 
+        public static ObservableCollection<Limit> GetFilteredFamilyLimits(int familyId, int? isFamilyWide = null, int? filterUserId = null, int? categoryId = null, int? frequencyId = null, double? minAmount = null, double? maxAmount = null, bool? isExceededYes = null, bool? isExceededNo = null)
+        {
+            ObservableCollection<Limit> familyLimits = new ObservableCollection<Limit>();
+
+            if (filterUserId.HasValue && filterUserId.Value != -1)
+            {
+                int userId = filterUserId.Value;
+                ObservableCollection<Limit> userLimits = GetFilteredUserLimits(isFamilyWide, userId, categoryId, frequencyId, minAmount, maxAmount, isExceededYes, isExceededNo);
+
+                foreach (Limit limit in userLimits)
+                {
+                    if (!familyLimits.Any(s => s.LimitId == limit.LimitId))
+                    {
+                        familyLimits.Add(limit);
+                    }
+                }
+            }
+            else
+            {
+                List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+                foreach (FamilyMember member in familyMembers)
+                {
+                    int userId = member.UserID;
+                    ObservableCollection<Limit> userLimits = GetFilteredUserLimits(isFamilyWide, userId, categoryId, frequencyId, minAmount, maxAmount, isExceededYes, isExceededNo);
+
+                    foreach (Limit limit in userLimits)
+                    {
+                        if (!familyLimits.Any(s => s.LimitId == limit.LimitId))
+                        {
+                            familyLimits.Add(limit);
+                        }
+                    }
+                }
+            }
+            return familyLimits;
+        }
+
         public static List<User> GetChildrenByFamilyId(int familyId)
         {
             List<User> children = new List<User>();
             using (DBSqlite database = new DBSqlite())
             {
-                string query = "SELECT UserID, UserName, Email,PasswordHash,Salt,RoleID,FamilyID,CreatedAt,ProfileSettings FROM Users WHERE  FamilyID = @FamilyID AND RoleID = 3";
+                string query = "SELECT UserID, UserName, Email,PasswordHash,Salt,RoleID,FamilyID,CreatedAt,ProfileSettings FROM Users WHERE FamilyID = @FamilyID AND RoleID = 3";
                 
 
                 SqliteParameter familyIdParam = new SqliteParameter("@FamilyID", familyId);
@@ -2097,6 +2197,29 @@ namespace Main.Logic
                 }
             }
             return user;
+        }
+
+        public static List<Frequency> GetFrequencies()
+        {
+            List<Frequency> frequencies = new List<Frequency>();
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT FrequencyID, FrequencyName FROM Frequencies";
+
+                DataTable result = database.ExecuteQuery(query);
+
+                foreach (DataRow row in result.Rows)
+                {
+                    Frequency frequency = new Frequency
+                    {
+                        FrequencyID = row["FrequencyID"] == DBNull.Value ? 0 : Convert.ToInt32(row["FrequencyID"]),
+                        FrequencyName = row["FrequencyName"] == DBNull.Value ? null : Convert.ToString(row["FrequencyName"])
+                    };
+                    frequencies.Add(frequency);
+                }
+            }
+            return frequencies;
         }
 
     }

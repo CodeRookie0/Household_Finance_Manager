@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Main.Models
 {
-    public class Frequencies
+    public class Frequency
     {
         public int FrequencyID {  get; set; }   
         public string FrequencyName {  get; set; }

@@ -31,7 +31,7 @@ namespace Main.GUI
         private ObservableCollection<User> userList;
         private ObservableCollection<Store> storeList;
         private ObservableCollection<Category> categoryList;
-        private ObservableCollection<Frequencies> frequenciesList;
+        private ObservableCollection<Frequency> frequenciesList;
         public AddRecurringPaymentsControl(int argUserId)
         {
             InitializeComponent();
@@ -39,7 +39,7 @@ namespace Main.GUI
             userId = argUserId;
 
             userList= new ObservableCollection<User>(); 
-            frequenciesList = new ObservableCollection<Frequencies>();
+            frequenciesList = new ObservableCollection<Frequency>();
 
             LoadUser();
             //LoadStore();
@@ -141,12 +141,12 @@ namespace Main.GUI
 
         private void LoadFrequencyPayment()
         {
-            frequenciesList.Add(new Frequencies { FrequencyName = "Wybierz" });
+            frequenciesList.Add(new Frequency { FrequencyName = "Wybierz" });
             DBSqlite dBSqlite = new DBSqlite();
             DataTable answer = dBSqlite.ExecuteQuery("SELECT FrequencyID,FrequencyName FROM Frequencies");
             foreach (DataRow row in answer.Rows)
             {
-                Frequencies frequencies = new Frequencies();
+                Frequency frequencies = new Frequency();
                 frequencies.FrequencyID = int.Parse(row[0].ToString());
                 frequencies.FrequencyName= row[1].ToString();
                 frequenciesList.Add(frequencies);
@@ -167,7 +167,7 @@ namespace Main.GUI
             User user=UserComboBox.SelectedItem as User;
             Store store = StoreComboBox.SelectedItem as Store;
             Category category = CategoryComboBox.SelectedItem as Category;
-            Frequencies frequencies=FrequencyComboBox.SelectedItem as Frequencies;
+            Frequency frequencies=FrequencyComboBox.SelectedItem as Frequency;
             int typePayment = TypePayments.SelectedIndex + 1;
             string amount = InputAmount.Text;
             DateTime dateTime;

@@ -423,7 +423,7 @@
     <Compile Include="GUI\StoresControl.xaml.cs">
       <DependentUpon>StoresControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Frequencies.cs" />
+    <Compile Include="Models\Frequency.cs" />
     <Compile Include="Models\Limit.cs" />
     <Compile Include="Models\RecurringPayment.cs" />
     <Compile Include="Models\RecurringPaymentHistory.cs" />

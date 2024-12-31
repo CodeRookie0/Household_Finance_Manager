@@ -25,7 +25,7 @@ namespace Main.GUI
     {
 
         private List<Category> categoryList;
-        private List<Frequencies> _frequencies;
+        private List<Frequency> _frequencies;
         private List<User> _users;
 
         private readonly int userId;
@@ -74,17 +74,17 @@ namespace Main.GUI
             Category selectedCategory = categoryList.FirstOrDefault(c => c.CategoryID == argModel.CategoryId);
             CategoryList.SelectedItem = selectedCategory;
 
-            _frequencies = new List<Frequencies>();
-            _frequencies.Insert(0, new Frequencies() { FrequencyName = "Wybierz" });
+            _frequencies = new List<Frequency>();
+            _frequencies.Insert(0, new Frequency() { FrequencyName = "Wybierz" });
             DBSqlite dBSqlite = new DBSqlite();
             DataTable dt = dBSqlite.ExecuteQuery("SELECT FrequencyID,FrequencyName FROM Frequencies");
             foreach (DataRow dr in dt.Rows)
             {
-                _frequencies.Add(new Frequencies() { FrequencyID = int.Parse(dr[0].ToString()), FrequencyName = dr[1].ToString() });
+                _frequencies.Add(new Frequency() { FrequencyID = int.Parse(dr[0].ToString()), FrequencyName = dr[1].ToString() });
             }
 
             Frequency.ItemsSource = _frequencies;
-            Frequencies frequency = _frequencies.FirstOrDefault(c => c.FrequencyID == argModel.FrequencyId);
+            Frequency frequency = _frequencies.FirstOrDefault(c => c.FrequencyID == argModel.FrequencyId);
             Frequency.SelectedItem = frequency;
 
             if (roleId == 2)
@@ -132,7 +132,7 @@ namespace Main.GUI
             {
                 User tmp = UserList.SelectedItem as User;
                 Category thisCategory = CategoryList.SelectedItem as Category;
-                Frequencies thisFrequency = Frequency.SelectedItem as Frequencies;
+                Frequency thisFrequency = Frequency.SelectedItem as Frequency;
 
                 DBSqlite dBSqlite = new DBSqlite();
 

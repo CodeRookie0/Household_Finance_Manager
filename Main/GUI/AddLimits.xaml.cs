@@ -25,7 +25,7 @@ namespace Main.GUI
     public partial class AddLimits : Window
     {
         private List<Category> categoryList;
-        private List<Frequencies> _frequencies;
+        private List<Frequency> _frequencies;
         private List<User> _users;
 
         private readonly int userid;
@@ -66,13 +66,13 @@ namespace Main.GUI
             CategoryList.ItemsSource = categoryList;
             CategoryList.SelectedIndex = 0;
 
-            _frequencies=new List<Frequencies>();
-            _frequencies.Insert(0,new Frequencies() {FrequencyName="Wybierz"});
+            _frequencies=new List<Frequency>();
+            _frequencies.Insert(0,new Frequency() {FrequencyName="Wybierz"});
             DBSqlite dBSqlite = new DBSqlite();
             DataTable dt = dBSqlite.ExecuteQuery("SELECT FrequencyID,FrequencyName FROM Frequencies");
             foreach (DataRow dr in dt.Rows) 
             {
-                _frequencies.Add(new Frequencies(){ FrequencyID = int.Parse(dr[0].ToString()), FrequencyName = dr[1].ToString() });
+                _frequencies.Add(new Frequency(){ FrequencyID = int.Parse(dr[0].ToString()), FrequencyName = dr[1].ToString() });
             }
 
             Frequency.ItemsSource = _frequencies;
@@ -120,7 +120,7 @@ namespace Main.GUI
             {
                 User tmp=UserList.SelectedItem as User;
                 Category thisCategory=CategoryList.SelectedItem as Category;
-                Frequencies thisFrequency=Frequency.SelectedItem as Frequencies;
+                Frequency thisFrequency=Frequency.SelectedItem as Frequency;
 
                 DBSqlite dBSqlite = new DBSqlite();
                 int answer = dBSqlite.ExecuteNonQuery("INSERT INTO Limits (FamilyID,UserID,CategoryID,LimitAmount,FrequencyID,CreatedByUserID) VALUES(@MyFamilyId,@MyUserId,@MyCategoryId,@MyLimitAmount,@MyFrequencyId,@CreatedByUserID)",
