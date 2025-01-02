@@ -65,7 +65,7 @@ namespace Main.GUI
             {
                 amount = amount.Substring(1);
             }
-            InputAmount.Text = amount;
+            InputAmount.Text = amount.Replace(',','.');
 
             DataPayment.Text = argRecuringPayment.PaymentDate.ToString();
 
@@ -347,7 +347,7 @@ namespace Main.GUI
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
-                    new SqliteParameter("@Date", dateTime.ToString()),
+                    new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
                     new SqliteParameter("@ToUserId", user.UserID),
                     new SqliteParameter("@RecurringPaymentId", RecurringPayment.RecurringPaymentID)); // Dodano identyfikator płatności
@@ -384,7 +384,7 @@ namespace Main.GUI
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
-                    new SqliteParameter("@Date", dateTime.ToString()),
+                    new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
                     new SqliteParameter("@ToUserId", user.UserID),
                     new SqliteParameter("@RecurringPaymentId", RecurringPayment.RecurringPaymentID)); // Dodano identyfikator płatności

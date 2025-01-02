@@ -148,7 +148,7 @@ namespace Main.GUI
         {
             HighlightButton(StatisticsBorder, StatisticsTextBlock);
             buttonActiveStates[StatisticsButton] = true;
-            MainContentArea.Content = new StatisticsControl();
+            MainContentArea.Content = new StatisticsControl(userId, this);
             SelectedUserControlTextBlock.Text = StatisticsTextBlock.Text;
         }
 

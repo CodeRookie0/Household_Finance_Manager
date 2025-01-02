@@ -5,7 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:oxy="http://oxyplot.org/wpf"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="650" d:DesignWidth="1150">
     <Grid Background="White">
 
         <Grid.ColumnDefinitions>
@@ -14,21 +14,99 @@
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="47" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        
-        <Grid Margin="10" Grid.Row="0" Grid.Column="0">
-            <oxy:PlotView x:Name="plotView"/>
-        </Grid>
-        <Grid Margin="10" Grid.Row="0" Grid.Column="1">
-            <oxy:PlotView x:Name="plotView1"/>
-        </Grid>
+
+        <Border BorderBrush="#993AA9AD" BorderThickness="0,0,0,1" Grid.Row="0" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"  Margin="10,5,10,5">
+                <TextBlock Text="Użytkownik:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold" FontSize="14"/>
+                <ComboBox x:Name="UserComboBox" FontSize="14" Width="110" Height="30" VerticalContentAlignment="Center" Margin="5,0,10,0" DisplayMemberPath="UserName" SelectedValuePath="UserID">
+                </ComboBox>
+                <TextBlock x:Name="TransactionTypeTextBlock" Text="Typ transakcji:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14" TextWrapping="WrapWithOverflow"/>
+                <ComboBox x:Name="TransactionTypeComboBox" FontSize="14" Width="100" Height="30" VerticalContentAlignment="Center" Margin="5,0,10,0"  DisplayMemberPath="TypeName" SelectedValuePath="TransactionTypeID">
+                </ComboBox>
+                <TextBlock Text="Okres:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14"/>
+                <ComboBox x:Name="PeriodComboBox" FontSize="14" Width="130" Height="30" VerticalContentAlignment="Center" Margin="0,0,10,0" SelectionChanged="PeriodComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Dzisiaj"/>
+                    <ComboBoxItem Content="Bieżący tydzień" />
+                    <ComboBoxItem Content="Bieżący miesiąc" />
+                    <ComboBoxItem Content="Bieżący rok" />
+                    <ComboBoxItem Content="Inny" />
+                </ComboBox>
+                <StackPanel x:Name="DateRangePanel" Orientation="Horizontal" Visibility="Collapsed">
+                    <TextBlock Text="Data:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14"/>
+                    <DatePicker x:Name="StartDatePicker" FontSize="14" Width="105" Height="30" VerticalContentAlignment="Center" Margin="0,0,0,0"/>
+                    <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14"/>
+                    <DatePicker x:Name="EndDatePicker" FontSize="14" Width="105" Height="30" VerticalContentAlignment="Center" Margin="0,0,0,0"/>
+                </StackPanel>
+                <Button x:Name="FilterButton" Content="Zastosuj" FontSize="14" Width="80" Height="30" Margin="20,0,10,0" Background="#4EB1B6" Foreground="White" BorderThickness="0" Command="{Binding FilterCommand}" Click="FilterButton_Click">
+                </Button>
+                <Button x:Name="ClearFiltersButton" Content="Wyczyść" FontSize="14" Width="80" Height="30" Margin="10,0,0,0" Background="Gray" Foreground="White" BorderThickness="0" Command="{Binding ClearFilterCommand}" Click="ClearFiltersButton_Click">
+                </Button>
+            </StackPanel>
+        </Border>
+
         <Grid Margin="10" Grid.Row="1" Grid.Column="0">
-            <oxy:PlotView x:Name="plotView2"/>
+            <oxy:PlotView x:Name="categoryExpensesPieChart"/>
         </Grid>
         <Grid Margin="10" Grid.Row="1" Grid.Column="1">
-            <oxy:PlotView x:Name="plotView3"/>
+            <oxy:PlotView x:Name="periodExpensesBarChart"/>
+        </Grid>
+        <Grid Margin="10" Grid.Row="2" Grid.Column="0">
+            <oxy:PlotView x:Name="incomeVsExpensesLineChart"/>
+        </Grid>
+        <Grid Margin="10" Grid.Row="2" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Top 10 Największych Wydatków" 
+                   FontSize="18" 
+                   FontWeight="Bold"
+                   Margin="0,0,0,10"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" />
+            <Grid Grid.Row="1">
+            <DataGrid x:Name="TopExpensesDataGrid" 
+              AutoGenerateColumns="False" 
+              CanUserAddRows="False" 
+              IsReadOnly="True" 
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="No." Binding="{Binding Rank}" Width="35" FontSize="14"/>
+                    <DataGridTemplateColumn Header="Kategoria" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CategoryName}" FontSize="14"/>
+                                    <TextBlock Text="{Binding SubcategoryName}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Kwota" Binding="{Binding FormattedAmount}" Width="*" FontSize="14"/>
+                    <DataGridTemplateColumn Header="Data" Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DateFormatted}" FontSize="14"/>
+                                    <TextBlock Text="{Binding Time}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="User" Binding="{Binding UserName}" Width="*" FontSize="14"/>
+                </DataGrid.Columns>
+            </DataGrid>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

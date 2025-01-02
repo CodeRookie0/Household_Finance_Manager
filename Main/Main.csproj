@@ -266,10 +266,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="GUI\IncomeExpensesChart.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="GUI\JoinFamilyControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -354,9 +350,6 @@
     </Compile>
     <Compile Include="GUI\FamilyTransactionsControl.xaml.cs">
       <DependentUpon>FamilyTransactionsControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="GUI\IncomeExpensesChart.xaml.cs">
-      <DependentUpon>IncomeExpensesChart.xaml</DependentUpon>
     </Compile>
     <Compile Include="GUI\JoinFamilyControl.xaml.cs">
       <DependentUpon>JoinFamilyControl.xaml</DependentUpon>

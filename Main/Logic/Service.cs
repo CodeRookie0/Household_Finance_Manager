@@ -1509,6 +1509,7 @@ namespace Main.Logic
             }
             return familyTransactions;
         }
+
         public static List<Transaction> GetFilteredFamilyTransactions(int familyId, int? filterUserId = null, DateTime? startDate = null, DateTime? endDate = null, int? categoryId = null, int? storeId = null, int? transactionTypeId = null, double? amountFrom = null, double? amountTo = null)
         {
             List<Transaction> familyTransactions = new List<Transaction>();
@@ -1543,6 +1544,109 @@ namespace Main.Logic
             }
             return familyTransactions;
         }
+        public static List<Transaction> GetTop10UserTransactions(int? userId = null, string dateFrom = null, string dateTo = null, int? transactionTypeId = null)
+        {
+            List<Transaction> transactions = new List<Transaction>();
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = "SELECT TransactionID, UserID, Amount, TransactionTypeID, CategoryID, SubcategoryID, StoreID, Note, Date FROM Transactions WHERE 1 = 1";
+                List<SqliteParameter> parameters = new List<SqliteParameter>();
+
+                if (userId.HasValue && userId.Value != -1)
+                {
+                    query += " AND UserID = @UserId";
+                    parameters.Add(new SqliteParameter("@UserId", userId.Value));
+                }
+                if (!string.IsNullOrEmpty(dateFrom))
+                {
+                    query += " AND Date >= @DateFrom";
+                    parameters.Add(new SqliteParameter("@DateFrom", dateFrom));
+                }
+                if (!string.IsNullOrEmpty(dateTo))
+                {
+                    query += " AND Date <= @DateTo";
+                    parameters.Add(new SqliteParameter("@DateTo", dateTo));
+                }
+                if (transactionTypeId.HasValue && transactionTypeId.Value != -1)
+                {
+                    query += " AND TransactionTypeID = @TransactionTypeID";
+                    parameters.Add(new SqliteParameter("@TransactionTypeID", transactionTypeId.Value));
+                }
+                if (transactionTypeId.HasValue)
+                {
+                    if (transactionTypeId.Value == 1)
+                    {
+                        query += " ORDER BY Amount DESC";
+                    }
+                    else if (transactionTypeId.Value == 2)
+                    {
+                        query += " ORDER BY Amount ASC";
+                    }
+                }
+                query += " LIMIT 10";
+
+                DataTable result = database.ExecuteQuery(query, parameters.ToArray());
+
+                string queryWithParameters = query;
+                foreach (var param in parameters)
+                {
+                    queryWithParameters = queryWithParameters.Replace(param.ParameterName, param.Value.ToString());
+                }
+                Console.WriteLine( queryWithParameters);
+                foreach (DataRow row in result.Rows)
+                {
+                    Transaction transaction = new Transaction
+                    {
+                        TransactionID = row["TransactionID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionID"]),
+                        UserID = row["UserID"] == DBNull.Value ? 0 : Convert.ToInt32(row["UserID"]),
+                        Amount = row["Amount"] == DBNull.Value ? 0.0m : Convert.ToDecimal(row["Amount"]),
+                        TransactionTypeID = row["TransactionTypeID"] == DBNull.Value ? 0 : Convert.ToInt32(row["TransactionTypeID"]),
+                        CategoryID = row["CategoryID"] == DBNull.Value ? -1 : Convert.ToInt32(row["CategoryID"]),
+                        SubcategoryID = row["SubcategoryID"] == DBNull.Value ? -1 : Convert.ToInt32(row["SubcategoryID"]),
+                        StoreID = row["StoreID"] == DBNull.Value ? -1 : Convert.ToInt32(row["StoreID"]),
+                        Note = row["Note"] == DBNull.Value ? null : Convert.ToString(row["Note"]),
+                        Date = row["Date"] == DBNull.Value ? DateTime.MinValue : Convert.ToDateTime(row["Date"])
+                    };
+                    transactions.Add(transaction);
+                }
+            }
+            return transactions;
+        }
+
+        public static List<Transaction> GetTop10FamilyTransactions(int familyId, int? filterUserId = null, string startDate = null, string endDate = null, int? transactionTypeId = null)
+        {
+            List<Transaction> allTransactions = new List<Transaction>();
+
+            if (filterUserId.HasValue && filterUserId.Value != -1)
+            {
+                int userId = filterUserId.Value;
+                List<Transaction> userTransactions = GetTop10UserTransactions(userId: userId, dateFrom: startDate, dateTo: endDate, transactionTypeId : transactionTypeId);
+
+                allTransactions.AddRange(userTransactions);
+            }
+            else
+            {
+                List<FamilyMember> familyMembers = GetFamilyMembersByFamilyId(familyId);
+
+                foreach (FamilyMember member in familyMembers)
+                {
+                    int userId = member.UserID;
+                    List<Transaction> userTransactions = GetTop10UserTransactions(userId: userId, dateFrom: startDate, dateTo: endDate, transactionTypeId: transactionTypeId);
+                    allTransactions.AddRange(userTransactions);
+                }
+            }
+
+            var sortedTransactions = transactionTypeId.HasValue && transactionTypeId.Value == 1
+                 ? allTransactions.OrderByDescending(t => t.Amount)
+                 : allTransactions.OrderBy(t => t.Amount); 
+
+            var top10Transactions = sortedTransactions
+                .Take(10)
+                .ToList();
+
+            return top10Transactions;
+        }
+
 
         public static ObservableCollection<Store> GetUserStores(int userId)
         {

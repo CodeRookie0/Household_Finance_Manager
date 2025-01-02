@@ -181,7 +181,8 @@ namespace Main.GUI
             {
                 if (DateTime.TryParseExact($"{datePart} {timePart}", "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime combinedDateTime))
                 {
-                    query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + combinedDateTime + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
+                    string formattedDate = combinedDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    query.Append(") VALUES ('"+userid.ToString()+"','" + amount + "', '" + note + "', '" + formattedDate + "','"+(InpuTypeTransaction.SelectedIndex+1)+"'");
                 }
                 else
                 {
@@ -192,7 +193,8 @@ namespace Main.GUI
             {
                 if (DateTime.TryParseExact($"{datePart} {timePart}", "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime combinedDateTime))
                 {
-                    query.Append(") VALUES ('" + userid.ToString() + "',-" + amount + ", '" + note + "', '" + combinedDateTime + "','" + (InpuTypeTransaction.SelectedIndex + 1) + "'");
+                    string formattedDate = combinedDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                    query.Append(") VALUES ('" + userid.ToString() + "',-" + amount + ", '" + note + "', '" + formattedDate + "','" + (InpuTypeTransaction.SelectedIndex + 1) + "'");
                 }
                 else
                 {

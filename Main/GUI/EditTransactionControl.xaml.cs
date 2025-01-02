@@ -254,7 +254,8 @@ namespace Main.GUI
             query.Append("Note = '" + note + "', ");
             if (DateTime.TryParseExact($"{datePart} {timePart}", "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime combinedDateTime))
             {
-                query.Append("Date = '" + combinedDateTime + "', ");
+                string formattedDate = combinedDateTime.ToString("yyyy-MM-dd HH:mm:ss");
+                query.Append("Date = '" + formattedDate + "', ");
             }
             else
             {

@@ -2,9 +2,11 @@
 using Main.Models;
 using Microsoft.Data.Sqlite;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -231,7 +233,7 @@ namespace Main.GUI
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
-                    new SqliteParameter("@Date", dateTime.ToString()),
+                    new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
                     new SqliteParameter("@ToUserId", user.UserID));
                 if (answer > 0)
@@ -255,7 +257,7 @@ namespace Main.GUI
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
-                    new SqliteParameter("@Date", dateTime.ToString()),
+                    new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
                     new SqliteParameter("@ToUserId", user.UserID));
                 if (answer > 0)
