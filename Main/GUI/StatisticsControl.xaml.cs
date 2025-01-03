@@ -183,7 +183,14 @@ namespace Main.GUI
                 filterUserId = (UserComboBox.SelectedValue as int?) == -1 ? (int?)null : (int?)UserComboBox.SelectedValue;
                 TopTransactions = Service.GetTop10FamilyTransactions(familyId, filterUserId: filterUserId, startDate: startDate, endDate: endDate, transactionTypeId: transactionTypeId);
             }
-
+            if (transactionTypeId == 1)
+            {
+                TopExpensesTextBlock.Text = "Top 10 Największych Przychodów";
+            }
+            else if (transactionTypeId == 2)
+            {
+                TopExpensesTextBlock.Text = "Top 10 Największych Wydatków";
+            }
             LoadTopTransactions();
             LoadCharts();
         }
