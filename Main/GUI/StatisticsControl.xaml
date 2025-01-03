@@ -21,7 +21,7 @@
 
         <Border BorderBrush="#993AA9AD" BorderThickness="0,0,0,1" Grid.Row="0" Grid.ColumnSpan="2">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center"  Margin="10,5,10,5">
-                <TextBlock Text="Użytkownik:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold" FontSize="14"/>
+                <TextBlock x:Name="UserTextBlock" Text="Użytkownik:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold" FontSize="14"/>
                 <ComboBox x:Name="UserComboBox" FontSize="14" Width="110" Height="30" VerticalContentAlignment="Center" Margin="5,0,10,0" DisplayMemberPath="UserName" SelectedValuePath="UserID">
                 </ComboBox>
                 <TextBlock x:Name="TransactionTypeTextBlock" Text="Typ transakcji:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14" TextWrapping="WrapWithOverflow"/>

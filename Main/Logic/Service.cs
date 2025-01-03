@@ -1592,7 +1592,6 @@ namespace Main.Logic
                 {
                     queryWithParameters = queryWithParameters.Replace(param.ParameterName, param.Value.ToString());
                 }
-                Console.WriteLine( queryWithParameters);
                 foreach (DataRow row in result.Rows)
                 {
                     Transaction transaction = new Transaction
