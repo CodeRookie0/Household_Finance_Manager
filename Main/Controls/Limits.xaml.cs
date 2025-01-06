@@ -1,8 +1,11 @@
 ﻿using Main.GUI;
 using Main.Logic;
 using Main.Models;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +41,28 @@ namespace Main.Controls
             CategoryName.Text ="Kategoria: "+ Service.GetCategoryNameByCategoryID(argModel.CategoryId);
             FrequencyUser.Text="Częstotliwość: "+Service.GetFrequencyNameByFrequencyID(argModel.FrequencyId);
             AddUser.Text = "Przypisany: " + Service.GetUserNameByUserID(argModel.UserId);
-            SpentAmountTextBlock.Text = "60.00 zł";
+
+            DBSqlite dBSqlite = new DBSqlite();
+            DataTable answer = dBSqlite.ExecuteQuery("SELECT SUM(Amount) FROM Transactions WHERE CategoryID=@CategoryId AND UserID=@UserId",
+                new Microsoft.Data.Sqlite.SqliteParameter("@CategoryId", argModel.CategoryId),
+                new SqliteParameter("@UserId", argModel.UserId));
+            if(answer.Rows.Count > 0)
+            {
+                DataRow dataRow = answer.Rows[0];
+                if (!dataRow.IsNull(0))
+                {
+                    SpentAmountTextBlock.Text = dataRow[0].ToString() + " zł";
+                    LimitAmount.Value = double.Parse(dataRow[0].ToString());
+
+                }
+                else
+                {
+                    SpentAmountTextBlock.Text = "00.00 zł";
+                    LimitAmount.Value = 0;
+                }
+            }
+            
+            //SpentAmountTextBlock.Text = "60.00 zł";
             LimitAmountTextBlock.Text = argModel.LimitAmount.ToString("C");
 
             if(roleId == 3)
@@ -54,6 +78,9 @@ namespace Main.Controls
                     DeleteLimitButton.Visibility = Visibility.Collapsed;
                 }
             }
+
+
+
         }
 
         public event EventHandler RefreshData;
@@ -67,7 +94,24 @@ namespace Main.Controls
 
         private void DeleteLimitButton_Click(object sender, RoutedEventArgs e)
         {
+            if (MessageBox.Show("Czy na pewno chcesz usunąć ten limit ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
 
+                DBSqlite dBSqlite = new DBSqlite();
+                int answer = dBSqlite.ExecuteNonQuery("DELETE FROM Limits WHERE LimitID=@ArgLimitId",
+                    new Microsoft.Data.Sqlite.SqliteParameter("@ArgLimitId", thisLimits.LimitId));
+                if (answer > 0)
+                {
+                    MessageBox.Show("Limit został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                    RefreshData?.Invoke(this, EventArgs.Empty);
+                }
+                else
+                {
+                    MessageBox.Show("Limit nie został usunięty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+
+            
         }
     }
 }

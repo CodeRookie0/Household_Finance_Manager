@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Globalization;
 
 namespace Main.GUI
 {
@@ -118,7 +120,11 @@ namespace Main.GUI
             UserList.ItemsSource = _users;
             User selectedUser = _users.FirstOrDefault(c => c.UserID == argModel.UserId);
             UserList.SelectedItem = selectedUser;
+
+            Amount.Text = argModel.LimitAmount.ToString();
         }
+
+        
 
         private void CloseImage_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -127,44 +133,50 @@ namespace Main.GUI
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
-            if (PanelListUser.Visibility == Visibility.Visible)
+            if (MoneyValidation(Amount.Text))
             {
-                User tmp = UserList.SelectedItem as User;
-                Category thisCategory = CategoryList.SelectedItem as Category;
-                Frequency thisFrequency = Frequency.SelectedItem as Frequency;
-
-                DBSqlite dBSqlite = new DBSqlite();
-
-                // Załóżmy, że LimitID jest dostępny w 'tmp' lub 'thisCategory' lub innym obiekcie (możesz go dodać do obiektów User, Category, Frequencies jeśli to konieczne)
-                int limitID =limit.LimitId; // Funkcja do pobrania identyfikatora limitu, np. z wybranego elementu w UI
-
-                // Zapytanie UPDATE zamiast INSERT
-                int answer = dBSqlite.ExecuteNonQuery(
-                    "UPDATE Limits SET FamilyID = @MyFamilyId, UserID = @MyUserId, CategoryID = @MyCategoryId, LimitAmount = @MyLimitAmount, FrequencyID = @MyFrequencyId " +
-                    "WHERE LimitID = @MyLimitID",
-                    new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userId)),
-                    new SqliteParameter("@MyUserId", tmp.UserID),
-                    new SqliteParameter("@MyCategoryId", thisCategory.CategoryID),
-                    new SqliteParameter("@MyFrequencyId", thisFrequency.FrequencyID),
-                    new SqliteParameter("@MyLimitAmount", Amount.Text.ToString()),
-                    new SqliteParameter("@MyLimitID", limitID) // Zakładając, że limitID jest dostępny
-                );
-
-                if (answer > 0)
+                if (PanelListUser.Visibility == Visibility.Visible)
                 {
-                    MessageBox.Show("Limit został zaktualizowany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                    this.Close();
+                    User tmp = UserList.SelectedItem as User;
+                    Category thisCategory = CategoryList.SelectedItem as Category;
+                    Frequency thisFrequency = Frequency.SelectedItem as Frequency;
+
+                    DBSqlite dBSqlite = new DBSqlite();
+
+                    // Załóżmy, że LimitID jest dostępny w 'tmp' lub 'thisCategory' lub innym obiekcie (możesz go dodać do obiektów User, Category, Frequencies jeśli to konieczne)
+                    int limitID = limit.LimitId; // Funkcja do pobrania identyfikatora limitu, np. z wybranego elementu w UI
+
+                    // Zapytanie UPDATE zamiast INSERT
+                    int answer = dBSqlite.ExecuteNonQuery(
+                        "UPDATE Limits SET FamilyID = @MyFamilyId, UserID = @MyUserId, CategoryID = @MyCategoryId, LimitAmount = @MyLimitAmount, FrequencyID = @MyFrequencyId " +
+                        "WHERE LimitID = @MyLimitID",
+                        new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userId)),
+                        new SqliteParameter("@MyUserId", tmp.UserID),
+                        new SqliteParameter("@MyCategoryId", thisCategory.CategoryID),
+                        new SqliteParameter("@MyFrequencyId", thisFrequency.FrequencyID),
+                        new SqliteParameter("@MyLimitAmount", Amount.Text.ToString()),
+                        new SqliteParameter("@MyLimitID", limitID) // Zakładając, że limitID jest dostępny
+                    );
+
+                    if (answer > 0)
+                    {
+                        MessageBox.Show("Limit został zaktualizowany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Limit nie został zaktualizowany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Limit nie został zaktualizowany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+                    // Tutaj możesz dodać kod dla przypadku, gdy panel jest niewidoczny
                 }
             }
             else
             {
-                // Tutaj możesz dodać kod dla przypadku, gdy panel jest niewidoczny
+                MessageBox.Show("Wprowadź prawidłową kwotę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
 
@@ -194,5 +206,14 @@ namespace Main.GUI
                 }
             }
         }
+        private bool MoneyValidation(string argAmount)
+        {
+            if (string.IsNullOrEmpty(argAmount))
+                return false;
+            float num;
+            bool isValid = float.TryParse(argAmount, NumberStyles.Currency, CultureInfo.GetCultureInfo("pl-PL"), out num);
+            return isValid;
+        }
+
     }
 }

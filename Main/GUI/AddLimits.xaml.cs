@@ -5,8 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -116,35 +118,51 @@ namespace Main.GUI
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if(PanelListUser.Visibility==Visibility.Visible)
+            if (MoneyValidation(Amount.Text))
             {
-                User tmp=UserList.SelectedItem as User;
-                Category thisCategory=CategoryList.SelectedItem as Category;
-                Frequency thisFrequency=Frequency.SelectedItem as Frequency;
-
-                DBSqlite dBSqlite = new DBSqlite();
-                int answer = dBSqlite.ExecuteNonQuery("INSERT INTO Limits (FamilyID,UserID,CategoryID,LimitAmount,FrequencyID,CreatedByUserID) VALUES(@MyFamilyId,@MyUserId,@MyCategoryId,@MyLimitAmount,@MyFrequencyId,@CreatedByUserID)",
-                    new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userid)),
-                    new SqliteParameter("@MyUserId",tmp.UserID),
-                    new SqliteParameter("@MyCategoryId",thisCategory.CategoryID),
-                    new SqliteParameter("@MyFrequencyId",thisFrequency.FrequencyID),
-                    new SqliteParameter("@MyLimitAmount",Amount.Text.ToString()),
-                    new SqliteParameter("@CreatedByUserID", userid));
-                if (answer>0)
+                if (PanelListUser.Visibility == Visibility.Visible)
                 {
-                    MessageBox.Show("Limit został dodany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
-                    this.Close();
+                    User tmp = UserList.SelectedItem as User;
+                    Category thisCategory = CategoryList.SelectedItem as Category;
+                    Frequency thisFrequency = Frequency.SelectedItem as Frequency;
+
+                    DBSqlite dBSqlite = new DBSqlite();
+                    int answer = dBSqlite.ExecuteNonQuery("INSERT INTO Limits (FamilyID,UserID,CategoryID,LimitAmount,FrequencyID,CreatedByUserID) VALUES(@MyFamilyId,@MyUserId,@MyCategoryId,@MyLimitAmount,@MyFrequencyId,@CreatedByUserID)",
+                        new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userid)),
+                        new SqliteParameter("@MyUserId", tmp.UserID),
+                        new SqliteParameter("@MyCategoryId", thisCategory.CategoryID),
+                        new SqliteParameter("@MyFrequencyId", thisFrequency.FrequencyID),
+                        new SqliteParameter("@MyLimitAmount", Amount.Text.ToString()),
+                        new SqliteParameter("@CreatedByUserID", userid));
+                    if (answer > 0)
+                    {
+                        MessageBox.Show("Limit został dodany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        this.Close();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Limit nie został dodany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
                 }
                 else
                 {
-                    MessageBox.Show("Limit nie został dodany", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
+
                 }
             }
             else
             {
-
+                MessageBox.Show("Wprowadź prawidłową kwotę","Komunikat",MessageBoxButton.OK, MessageBoxImage.Information);
             }
+        }
+
+        private bool MoneyValidation(string argAmount)
+        {
+            if (string.IsNullOrEmpty(argAmount))
+                return false;
+            float num;
+            bool isValid = float.TryParse(argAmount, NumberStyles.Currency, CultureInfo.GetCultureInfo("pl-PL"), out num);
+            return isValid;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -171,5 +189,7 @@ namespace Main.GUI
                 }
             }
         }
+
+      
     }
 }
