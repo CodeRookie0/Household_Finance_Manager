@@ -133,6 +133,15 @@
                             </Button>
                         </StackPanel>
                     </Border>
+                    <Border x:Name="RaportBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="RaportButton" Style="{StaticResource NoHoverButtonStyle}" Height="46" Click="RaportButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="RaportButton_MouseEnter" MouseLeave="RaportButton_MouseLeave">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock x:Name="RaportTextBlock" Text="Raport" FontSize="18" FontWeight="DemiBold" Foreground="Black" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </StackPanel>
             <Border x:Name="ExitBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0"  Grid.Row="1">

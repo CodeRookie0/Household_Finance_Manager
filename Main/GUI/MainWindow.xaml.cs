@@ -72,6 +72,7 @@ namespace Main.GUI
             buttonActiveStates[LimitsButton] = false;
             buttonActiveStates[RecurringPaymentsButton] = false;
             buttonActiveStates[FamilyMembersButton] = false;
+            buttonActiveStates[RaportButton] = false;
             
             DashboardButton_Click(DashboardButton, null);
         }
@@ -467,6 +468,9 @@ namespace Main.GUI
             FamilyMembersBorder.Background = Brushes.White;
             FamilyMembersTextBlock.Foreground = Brushes.Black;
 
+            RaportBorder.Background = Brushes.White;
+            RaportTextBlock.Foreground = Brushes.Black;
+
             ExitTextBlock.Foreground = Brushes.Black;
 
             ArrowImage.Source = new BitmapImage(new Uri("../Resources/arrow_down_black.png", UriKind.Relative));
@@ -476,6 +480,31 @@ namespace Main.GUI
         {
             ProfileSettingsControl profileSettings = new ProfileSettingsControl(userId,this);
             profileSettings.ShowDialog();
+        }
+
+        private void RaportButton_Click(object sender, RoutedEventArgs e)
+        {
+            HighlightButton(RaportBorder, RaportTextBlock);
+            buttonActiveStates[RaportButton] = true;
+            SelectedUserControlTextBlock.Text = RaportTextBlock.Text;
+
+            MainContentArea.Content = new RaportControls(userId);
+        }
+
+        private void RaportButton_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!buttonActiveStates[RaportButton])
+            {
+                RaportBorder.Background = Brushes.White;
+            }
+        }
+
+        private void RaportButton_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!buttonActiveStates[RaportButton])
+            {
+                RaportBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#264EB1B6"));
+            }
         }
     }
 }

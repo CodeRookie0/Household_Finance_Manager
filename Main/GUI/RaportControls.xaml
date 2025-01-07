@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="Main.GUI.RaportControls"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Main.GUI"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1150" d:Background="White">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Vertical"  Grid.Row="0" Grid.Column="0">
+            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
+                <TextBlock FontSize="20" Margin="20,0,20,0" Text="Typ"/>
+                <ComboBox x:Name="Typ" Width="485">
+                    <ComboBoxItem Content="Miesięczne" IsSelected="True"/>
+                    <ComboBoxItem Content="Kwartalne"/>
+                    <ComboBoxItem Content="Roczne"/>
+                </ComboBox>
+            </StackPanel>
+
+            <DataGrid x:Name="Test" Margin="20,20,20,0" AutoGenerateColumns="False" >
+            </DataGrid>
+        </StackPanel>
+
+
+        <TextBlock x:Name="TextPrzychud" Text="Największy przychód z " Foreground="Green" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" Grid.Row="0" Grid.Column="1"/>
+        <TextBlock x:Name="TextWydatek" Text="Największy Wydatek " Foreground="Red" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,180,0,0" Grid.Row="0" Grid.Column="1"/>
+
+
+        <TextBlock Text="Maksymalne i minimalne wartości dla wybranych kategorii" HorizontalAlignment="Center" FontSize="23" Grid.ColumnSpan="2" Grid.Row="1"/>
+
+        <DataGrid x:Name="MaxMinCategory" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Row="1" Margin="20,45,20,20"/>
+
+
+    </Grid>
+</UserControl>
