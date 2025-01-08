@@ -2095,7 +2095,7 @@ namespace Main.Logic
             return limits;
         }
 
-        public static ObservableCollection<Limit> GetFilteredUserLimits(int? isFamilyWide = null, int? userId = null, int? categoryId = null, int? frequencyId = null, double? minAmount = null, double? maxAmount = null, bool? isExceededYes = null, bool? isExceededNo = null)
+        public static ObservableCollection<Limit> GetFilteredUserLimits(int? isFamilyWide = null, int? userId = null, int? categoryId = null, int? frequencyId = null, double? minAmount = null, double? maxAmount = null)
         {
             ObservableCollection<Limit> limits = new ObservableCollection<Limit>();
             using (DBSqlite database = new DBSqlite())
@@ -2185,7 +2185,7 @@ namespace Main.Logic
             if (filterUserId.HasValue && filterUserId.Value != -1)
             {
                 int userId = filterUserId.Value;
-                ObservableCollection<Limit> userLimits = GetFilteredUserLimits(isFamilyWide, userId, categoryId, frequencyId, minAmount, maxAmount, isExceededYes, isExceededNo);
+                ObservableCollection<Limit> userLimits = GetFilteredUserLimits(isFamilyWide, userId, categoryId, frequencyId, minAmount, maxAmount);
 
                 foreach (Limit limit in userLimits)
                 {
@@ -2202,7 +2202,7 @@ namespace Main.Logic
                 foreach (FamilyMember member in familyMembers)
                 {
                     int userId = member.UserID;
-                    ObservableCollection<Limit> userLimits = GetFilteredUserLimits(isFamilyWide, userId, categoryId, frequencyId, minAmount, maxAmount, isExceededYes, isExceededNo);
+                    ObservableCollection<Limit> userLimits = GetFilteredUserLimits(isFamilyWide, userId, categoryId, frequencyId, minAmount, maxAmount);
 
                     foreach (Limit limit in userLimits)
                     {

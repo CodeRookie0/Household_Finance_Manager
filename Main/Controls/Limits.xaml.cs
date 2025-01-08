@@ -18,6 +18,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Brushes = System.Windows.Media.Brushes;
+using Color = System.Windows.Media.Color;
+using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace Main.Controls
 {
@@ -29,6 +32,7 @@ namespace Main.Controls
         private Limit thisLimits;
         private readonly int userId;
         private readonly int roleId;
+        public bool IsLimitExceeded { get; private set; }
         public Limits(Limit argModel, int userId)
         {
             this.userId = userId;
@@ -43,7 +47,7 @@ namespace Main.Controls
             AddUser.Text = "Przypisany: " + Service.GetUserNameByUserID(argModel.UserId);
 
             DBSqlite dBSqlite = new DBSqlite();
-            DataTable answer = dBSqlite.ExecuteQuery("SELECT SUM(Amount) FROM Transactions WHERE CategoryID=@CategoryId AND UserID=@UserId",
+            DataTable answer = dBSqlite.ExecuteQuery("SELECT SUM(Amount) FROM Transactions WHERE CategoryID=@CategoryId AND UserID=@UserId AND TransactionTypeID=2",
                 new Microsoft.Data.Sqlite.SqliteParameter("@CategoryId", argModel.CategoryId),
                 new SqliteParameter("@UserId", argModel.UserId));
             if(answer.Rows.Count > 0)
@@ -51,9 +55,20 @@ namespace Main.Controls
                 DataRow dataRow = answer.Rows[0];
                 if (!dataRow.IsNull(0))
                 {
-                    SpentAmountTextBlock.Text = dataRow[0].ToString() + " zł";
-                    LimitAmount.Value = double.Parse(dataRow[0].ToString());
+                    double spentAmount = Math.Abs(double.Parse(dataRow[0].ToString()));
+                    SpentAmountTextBlock.Text = spentAmount.ToString("F2") + " zł";
+                    double spentPercentage = (spentAmount * 100) / argModel.LimitAmount;
+                    IsLimitExceeded = spentPercentage > 100;
 
+                    if (IsLimitExceeded)
+                    {
+                        SpentAmountTextBlock.Foreground = Brushes.Red;
+                        SpentAmountTextBlock.FontWeight = FontWeights.Bold;
+                    }
+
+                    LimitAmount.Value = spentPercentage;
+                    //SpentAmountTextBlock.Text = dataRow[0].ToString() + " zł";
+                    //LimitAmount.Value = double.Parse(dataRow[0].ToString());
                 }
                 else
                 {

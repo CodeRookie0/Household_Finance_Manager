@@ -184,6 +184,15 @@ namespace Main.GUI
             double? amountFrom = null;
             double? amountTo = null;
 
+            int exceededLimit = -1;
+            if(ExceededYesCheckBox.IsChecked == true && ExceededNoCheckBox.IsChecked == false)
+            {
+                exceededLimit = 1;
+            }
+            else if(ExceededYesCheckBox.IsChecked == false && ExceededNoCheckBox.IsChecked == true){
+                exceededLimit = 0;
+            }
+
             if (!string.IsNullOrWhiteSpace(minAmountText) && double.TryParse(minAmountText, NumberStyles.Any, CultureInfo.InvariantCulture, out double parsedAmountFrom))
             {
                 amountFrom = parsedAmountFrom;
@@ -200,9 +209,6 @@ namespace Main.GUI
                 return;
             }
 
-            bool? isExceededYes = ExceededYesCheckBox.IsChecked;
-            bool? isExceededNo = ExceededNoCheckBox.IsChecked;
-
             LimitsGrid.RowDefinitions.Clear();
             LimitsGrid.Children.Clear();
 
@@ -216,7 +222,7 @@ namespace Main.GUI
             if (roleId != 3)
             {
                 familyId = Service.GetFamilyIdByMemberId(userId);
-                allLimits = Service.GetFilteredFamilyLimits(familyId, isFamilyWide, filterUserId, categoryId, frequencyId, amountFrom, amountTo, isExceededYes, isExceededNo);
+                allLimits = Service.GetFilteredFamilyLimits(familyId, isFamilyWide, filterUserId, categoryId, frequencyId, amountFrom, amountTo);
 
                 foreach (Limit limit in allLimits)
                 {
@@ -229,19 +235,24 @@ namespace Main.GUI
                     }
 
                     Limits tmpControl = new Limits(limit, userId);
-                    tmpControl.RefreshData += RunEventRefresh;
-                    tmpControl.MaxHeight = 190;
-                    Grid.SetRow(tmpControl, rowNumber);
-                    Grid.SetColumn(tmpControl, Numbercolumn);
+                    if ((tmpControl.IsLimitExceeded && exceededLimit == 1) ||
+                        (!tmpControl.IsLimitExceeded && exceededLimit == 0) ||
+                        (exceededLimit == -1))
+                    {
+                        tmpControl.RefreshData += RunEventRefresh;
+                        tmpControl.MaxHeight = 190;
+                        Grid.SetRow(tmpControl, rowNumber);
+                        Grid.SetColumn(tmpControl, Numbercolumn);
 
-                    LimitsGrid.Children.Add(tmpControl);
+                        LimitsGrid.Children.Add(tmpControl);
 
-                    Numbercolumn++;
+                        Numbercolumn++;
+                    }
                 }
             }
             else
             {
-                userLimits = Service.GetFilteredUserLimits(isFamilyWide, filterUserId, categoryId, frequencyId, amountFrom, amountTo, isExceededYes, isExceededNo);
+                userLimits = Service.GetFilteredUserLimits(isFamilyWide, filterUserId, categoryId, frequencyId, amountFrom, amountTo);
 
                 foreach (Limit limit in userLimits)
                 {
@@ -254,14 +265,19 @@ namespace Main.GUI
                     };
 
                     Limits tmpControl = new Limits(limit, userId);
-                    tmpControl.RefreshData += RunEventRefresh;
-                    tmpControl.MaxHeight = 190;
-                    Grid.SetRow(tmpControl, rowNumber);
-                    Grid.SetColumn(tmpControl, Numbercolumn);
+                    if ((tmpControl.IsLimitExceeded && exceededLimit == 1) ||
+                        (!tmpControl.IsLimitExceeded && exceededLimit == 0) ||
+                        (exceededLimit == -1))
+                    {
+                        tmpControl.RefreshData += RunEventRefresh;
+                        tmpControl.MaxHeight = 190;
+                        Grid.SetRow(tmpControl, rowNumber);
+                        Grid.SetColumn(tmpControl, Numbercolumn);
 
-                    LimitsGrid.Children.Add(tmpControl);
+                        LimitsGrid.Children.Add(tmpControl);
 
-                    Numbercolumn++;
+                        Numbercolumn++;
+                    }
                 }
             }
         }

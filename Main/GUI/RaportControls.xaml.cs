@@ -98,8 +98,6 @@ namespace Main.GUI
                 TextWydatek.Text += row[0].ToString() + " o wartości " + row[1].ToString() + "zł";
             }
 
-
-
             var AnswerValue = dBSqlite.ExecuteQuery("SELECT CategoryName,MAX(Amount),MIN(Amount) FROM Transactions INNER JOIN Categories ON Transactions.CategoryID=Categories.CategoryID WHERE Transactions.UserId=@UserId Group By Transactions.CategoryID\r\n",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
             if (AnswerValue != null)
@@ -108,8 +106,23 @@ namespace Main.GUI
                 {
                     TransactionSummary transactionSummary = new TransactionSummary();
                     transactionSummary.FirstData = row[0].ToString();
-                    transactionSummary.SecondData = Convert.ToInt32(row[1].ToString());
-                    transactionSummary.ThirdData = Convert.ToInt32(row[2].ToString());
+                    if (int.TryParse(row[1]?.ToString(), out int maxAmount))
+                    {
+                        transactionSummary.SecondData = maxAmount;
+                    }
+                    else
+                    {
+                        transactionSummary.SecondData = 0; // Default or fallback value
+                    }
+
+                    if (int.TryParse(row[2]?.ToString(), out int minAmount))
+                    {
+                        transactionSummary.ThirdData = minAmount;
+                    }
+                    else
+                    {
+                        transactionSummary.ThirdData = 0; // Default or fallback value
+                    }
                     MaxMinCategoryList.Add(transactionSummary);
                 }
             }

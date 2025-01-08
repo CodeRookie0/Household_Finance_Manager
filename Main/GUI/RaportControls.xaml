@@ -32,8 +32,8 @@
         </StackPanel>
 
 
-        <TextBlock x:Name="TextPrzychud" Text="Największy przychód z " Foreground="Green" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" Grid.Row="0" Grid.Column="1"/>
-        <TextBlock x:Name="TextWydatek" Text="Największy Wydatek " Foreground="Red" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,180,0,0" Grid.Row="0" Grid.Column="1"/>
+        <TextBlock x:Name="TextPrzychud" Text="Największy przychód z " Foreground="Green" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" Grid.Row="0" Grid.Column="1"/>
+        <TextBlock x:Name="TextWydatek" Text="Największy wydatek " Foreground="Red" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,180,0,0" Grid.Row="0" Grid.Column="1"/>
 
 
         <TextBlock Text="Maksymalne i minimalne wartości dla wybranych kategorii" HorizontalAlignment="Center" FontSize="23" Grid.ColumnSpan="2" Grid.Row="1"/>
