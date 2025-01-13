@@ -277,7 +277,7 @@ namespace Main.GUI
             this.Close();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void SaveEditRecuringPaymentButton_Click(object sender, RoutedEventArgs e)
         {
 
             User user = UserComboBox.SelectedItem as User;
@@ -414,7 +414,7 @@ namespace Main.GUI
             }
         }
 
-        private void InputAmount_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        private void InputAmountPreview_TextCtrl(object sender, TextCompositionEventArgs e)
         {
             string currentText = ((TextBox)sender).Text;
             bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
@@ -431,7 +431,7 @@ namespace Main.GUI
             e.Handled = !isDigitOrSeparator;
         }
 
-        private void InputAmount_LostFocus(object sender, RoutedEventArgs e)
+        private void InputAmountLostFocus_TextCtrl(object sender, RoutedEventArgs e)
         {
             TextBox textBox = (TextBox)sender;
             string text = textBox.Text;
@@ -476,7 +476,7 @@ namespace Main.GUI
             }
         }
 
-        private void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CategoryComboBox_Change(object sender, SelectionChangedEventArgs e)
         {
             var item = CategoryComboBox.SelectedItem as Category;
             if (item != null)

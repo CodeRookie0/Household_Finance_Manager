@@ -11,18 +11,24 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.IO;
+using PdfSharp.Pdf;
+using PdfSharp.Drawing;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Main.GUI
 {
     /// <summary>
     /// Logika interakcji dla klasy RaportControls.xaml
     /// </summary>
-    public partial class RaportControls : UserControl
+    public partial class RaportControls : System.Windows.Controls.UserControl
     {
         private List<TransactionSummary> transactions{ get; set; }
         private List<TransactionSummary> MaxMinCategoryList { get; set; }
@@ -30,6 +36,100 @@ namespace Main.GUI
         private DataGridTextColumn firstData, SecondData, ThirdData;
 
         private readonly int userId;
+
+        private void GenerateRaportButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filter = "Plik PDF (*.pdf)|*.pdf|Plik Word (*.docx)|*.docx";
+
+            if(saveFileDialog.ShowDialog()==DialogResult.OK)
+            {
+                string extension= System.IO.Path.GetExtension(saveFileDialog.FileName);
+                if(extension ==".pdf")
+                {
+                    PdfDocument document = new PdfDocument();
+                    document.Info.Title = "Raport";
+
+                    PdfPage page = document.AddPage();
+
+                    XGraphics gfx=XGraphics.FromPdfPage(page);
+                    XFont font = new XFont("Arial", 10);
+
+                    double yPosition = 20;
+                    double xPosition = 40;
+
+                    foreach(DataGridColumn column in Test.Columns)
+                    {
+                        gfx.DrawString(column.Header.ToString(),font,XBrushes.Black,new XPoint(xPosition,yPosition));
+                        xPosition += 100;
+                    }
+
+                    yPosition += 20;
+
+                    foreach (var item in Test.Items)
+                    {
+                        xPosition = 40;
+                        foreach (var column in Test.Columns)
+                        {
+                            // Pobieramy wartość komórki
+                            var cellValue = column.GetCellContent(item) as TextBlock;
+                            if (cellValue != null)
+                            {
+                                gfx.DrawString(cellValue.Text, font, XBrushes.Black, new XPoint(xPosition, yPosition));
+                            }
+                            xPosition += 100; // Przesuwamy się w prawo po każdej kolumnie
+                        }
+                        yPosition += 20; // Przesuwamy się w dół po każdym wierszu
+                    }
+
+                    document.Save(saveFileDialog.FileName);
+                    
+
+                }
+                else if(extension ==".docx") //Tworzy plik ale jest błąd
+                {
+                   using(WordprocessingDocument wordDocument=WordprocessingDocument.Create(saveFileDialog.FileName,DocumentFormat.OpenXml.WordprocessingDocumentType.Document))
+                   {
+                        MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
+                        mainPart.Document = new Document(new Body());
+
+                        DocumentFormat.OpenXml.Drawing.Table table =new DocumentFormat.OpenXml.Drawing.Table();
+                        Body body = mainPart.Document.Body;
+                        body.Append(table);
+
+
+                        var columns = Test.Columns.Select(c => c.Header.ToString()).ToList();
+                        DocumentFormat.OpenXml.Drawing.TableRow headerRow = new DocumentFormat.OpenXml.Drawing.TableRow();
+
+                        foreach(var column in columns)
+                        {
+                            DocumentFormat.OpenXml.Drawing.TableCell headerCell = new DocumentFormat.OpenXml.Drawing.TableCell(new DocumentFormat.OpenXml.Drawing.Paragraph(new DocumentFormat.OpenXml.Drawing.Run(new Text(column))));
+                            headerRow.Append(headerCell);
+                        }
+                        table.Append(headerRow);
+
+                        foreach(var item in Test.Items)
+                        {
+                            DocumentFormat.OpenXml.Drawing.TableRow row = new DocumentFormat.OpenXml.Drawing.TableRow();
+
+                            if(item is TransactionSummary dataRow)
+                            {
+                                row.Append(new DocumentFormat.OpenXml.Drawing.TableCell(new DocumentFormat.OpenXml.Drawing.Paragraph(new DocumentFormat.OpenXml.Drawing.Run(new Text(dataRow.FirstData.ToString())))));
+                                row.Append(new DocumentFormat.OpenXml.Drawing.TableCell(new DocumentFormat.OpenXml.Drawing.Paragraph(new DocumentFormat.OpenXml.Drawing.Run(new Text(dataRow.SecondData.ToString())))));
+                                row.Append(new DocumentFormat.OpenXml.Drawing.TableCell(new DocumentFormat.OpenXml.Drawing.Paragraph(new DocumentFormat.OpenXml.Drawing.Run(new Text(dataRow.ThirdData.ToString())))));
+
+                            }
+
+                            table.Append(row);
+                        }
+
+                        mainPart.Document.Save();
+
+                   }
+                }
+            }
+        }
+
         public RaportControls(int userId)
         {
             InitializeComponent();
@@ -42,19 +142,19 @@ namespace Main.GUI
             firstData = new DataGridTextColumn
             {
                 Header = "Miesiąc",
-                Binding = new Binding("FirstData")
+                Binding = new System.Windows.Data.Binding("FirstData")
             };
 
             SecondData = new DataGridTextColumn
             {
                 Header = "Liczba Transakcji",
-                Binding = new Binding("SecondData")
+                Binding = new System.Windows.Data.Binding("SecondData")
             };
 
             ThirdData= new DataGridTextColumn
             {
                 Header = "Suma",
-                Binding = new Binding("ThirdData")
+                Binding = new System.Windows.Data.Binding("ThirdData")
             };
 
             Test.Columns.Add(firstData);
@@ -130,19 +230,19 @@ namespace Main.GUI
             var CategoryName = new DataGridTextColumn
             {
                 Header = "Kategoria",
-                Binding = new Binding("FirstData")
+                Binding = new System.Windows.Data.Binding("FirstData")
             };
 
             var MaxValue = new DataGridTextColumn
             {
                 Header = "Maksymalna Wartość",
-                Binding = new Binding("SecondData")
+                Binding = new System.Windows.Data.Binding("SecondData")
             };
 
             var MinValue = new DataGridTextColumn
             {
                 Header = "Minimalna Wartość",
-                Binding = new Binding("ThirdData")
+                Binding = new System.Windows.Data.Binding("ThirdData")
             };
 
             MaxMinCategory.Columns.Add(CategoryName);
@@ -155,8 +255,8 @@ namespace Main.GUI
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            
-            ComboBox cmb= sender as ComboBox;   
+
+            System.Windows.Controls.ComboBox cmb = sender as System.Windows.Controls.ComboBox;   
             if (cmb!=null)
             {
                 ComboBoxItem item= cmb.SelectedItem as ComboBoxItem;

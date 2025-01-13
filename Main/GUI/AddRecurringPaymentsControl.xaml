@@ -21,7 +21,7 @@
         <Image x:Name="CloseImage" Source="../Resources/close.png" Grid.Column="1" Panel.ZIndex="1" MouseUp="ExitDialog_Click"  Style="{StaticResource CloseButtonImageStyle}"/>
 
         <Border Background="#3AA9AD" Grid.RowSpan="2" Grid.Column="0">
-            
+            <Image Source="../Resources/AddRecuringPayment.png" Grid.Column="0" Grid.RowSpan="2"/>
         </Border>
 
         <Border Background="White" Grid.Row="0" Grid.Column="1">
@@ -44,7 +44,7 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                         <TextBlock Text="Kategoria *" Width="150" TextAlignment="Left"/>
-                        <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="CategoryName" Width="300" SelectionChanged="CategoryComboBox_SelectionChanged"/>
+                        <ComboBox x:Name="CategoryComboBox" DisplayMemberPath="CategoryName" Width="300" SelectionChanged="CategoryComboBox_Change"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
@@ -65,7 +65,7 @@
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                         <TextBlock Text="Kwota *" Width="150" TextAlignment="Left"/>
-                        <TextBox x:Name="InputAmount" Width="300"  PreviewTextInput="InputAmount_PreviewTextInput" LostFocus="InputAmount_LostFocus"/>
+                        <TextBox x:Name="InputAmount" Width="300"  PreviewTextInput="InputAmountPreview_TextCtrl" LostFocus="InputAmountLostFocus_TextCtrl"/>
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
@@ -78,7 +78,7 @@
                         <ComboBox x:Name="FrequencyComboBox" DisplayMemberPath="FrequencyName" Width="300"/>
                     </StackPanel>
 
-                    <Button Content="Dodaj Cykliczną płatność" Style="{StaticResource PrimaryActionButtonStyle}" Click="Button_Click"/>
+                    <Button Content="Dodaj Cykliczną płatność" Style="{StaticResource PrimaryActionButtonStyle}" Click="AddRecuringPaymentButton_Click"/>
 
                 </StackPanel>
                     
