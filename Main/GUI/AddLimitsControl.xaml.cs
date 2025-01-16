@@ -85,7 +85,7 @@ namespace Main.GUI
                 TypeComboBox.IsEnabled = false;
 
                 _users = new List<User>();
-                _users.Insert(0, new User { UserName = "Wyberz" });
+                _users.Insert(0, new User { UserName = "Wybierz" });
 
                 User user = Service.GetUserByUserId(userId);
                 _users.Add(user);
@@ -99,7 +99,7 @@ namespace Main.GUI
             if (roleId==1)
             {
                 _users = new List<User>();
-                _users.Insert(0, new User { UserName = "Wyberz" });
+                _users.Insert(0, new User { UserName = "Wybierz" });
 
                 List<User> users = Service.GetUsersByFamilyId(familyId);
                 foreach (User user in users)
@@ -123,12 +123,34 @@ namespace Main.GUI
                 if (PanelListUser.Visibility == Visibility.Visible)
                 {
                     User tmp = UserList.SelectedItem as User;
+                    if (tmp.UserName == "Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać użytkownika", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
                     Category thisCategory = CategoryList.SelectedItem as Category;
+                    if (thisCategory.CategoryName == "Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać kategorię", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
                     Frequency thisFrequency = Frequency.SelectedItem as Frequency;
+                    if (thisFrequency.FrequencyName == "Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać częstotliwość", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    int? familyId = Service.GetFamilyIdByMemberId(userid);
+                    if (familyId == -1)
+                    {
+                        familyId = null;
+                    }
 
                     DBSqlite dBSqlite = new DBSqlite();
                     int answer = dBSqlite.ExecuteNonQuery("INSERT INTO Limits (FamilyID,UserID,CategoryID,LimitAmount,FrequencyID,CreatedByUserID) VALUES(@MyFamilyId,@MyUserId,@MyCategoryId,@MyLimitAmount,@MyFrequencyId,@CreatedByUserID)",
-                        new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userid)),
+                        new SqliteParameter("@MyFamilyId", familyId),
                         new SqliteParameter("@MyUserId", tmp.UserID),
                         new SqliteParameter("@MyCategoryId", thisCategory.CategoryID),
                         new SqliteParameter("@MyFrequencyId", thisFrequency.FrequencyID),
@@ -145,14 +167,10 @@ namespace Main.GUI
                         return;
                     }
                 }
-                else
-                {
-
-                }
             }
             else
             {
-                MessageBox.Show("Wprowadź prawidłową kwotę","Komunikat",MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Wprowadź prawidłową kwotę","Komunikat",MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -939,16 +939,16 @@ namespace Main.Logic
                     string deleteCategoriesQuery = "DELETE FROM Categories WHERE UserID = @UserID;";
                     database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@UserID", userId));
 
-                    string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = (SELECT FROM Family WHERE PrimaryUserID = @UserID);";
+                    string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);";
                     database.ExecuteNonQuery(updateUsersQuery, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyGoalsQuery = "DELETE FROM Goals WHERE FamilyID = @FamilyID;\r\n";
+                    string deleteFamilyGoalsQuery = "DELETE FROM Goals WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);;";
                     database.ExecuteNonQuery(deleteFamilyGoalsQuery, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyLimitsQuery = "DELETE FROM Limits WHERE FamilyID = @FamilyID;\r\n";
+                    string deleteFamilyLimitsQuery = "DELETE FROM Limits WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);;";
                     database.ExecuteNonQuery(deleteFamilyLimitsQuery, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyJoinRequestsQuery = "DELETE FROM JoinRequests WHERE FamilyID = @FamilyID;\r\n";
+                    string deleteFamilyJoinRequestsQuery = "DELETE FROM JoinRequests WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);;";
                     database.ExecuteNonQuery(deleteFamilyJoinRequestsQuery, new SqliteParameter("@UserID", userId));
 
                     string deleteFamilyQuery = "DELETE FROM Family WHERE PrimaryUserID = @UserID;";
@@ -959,7 +959,7 @@ namespace Main.Logic
 
                     return true;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     return false;
                 }
@@ -971,10 +971,10 @@ namespace Main.Logic
             {
                 try
                 {
-                    string updateTransactionsQuery = "UPDATE Transactions SET StoreID = NULL WHERE StoreID = @StoreID);";
+                    string updateTransactionsQuery = "UPDATE Transactions SET StoreID = NULL WHERE StoreID = @StoreID;";
                     database.ExecuteNonQuery(updateTransactionsQuery, new SqliteParameter("@StoreID", storeId));
 
-                    string updateRecurringPaymentsQuery = "UPDATE RecurringPayments SET StoreID = NULL WHERE StoreID = @StoreID);";
+                    string updateRecurringPaymentsQuery = "UPDATE RecurringPayments SET StoreID = NULL WHERE StoreID = @StoreID;";
                     database.ExecuteNonQuery(updateRecurringPaymentsQuery, new SqliteParameter("@StoreID", storeId));
 
                     string deleteFavoriteCategoriesQuery = "DELETE FROM FavoriteStores WHERE StoreID = @StoreID";
@@ -1657,7 +1657,6 @@ namespace Main.Logic
                 Stores.StoreID, 
                 Stores.StoreName, 
                 Stores.UserID, 
-                Stores.IsFavorite, 
                 Categories.CategoryName
             FROM 
                 Stores
@@ -1670,10 +1669,11 @@ namespace Main.Logic
 
                 foreach (DataRow row in result.Rows)
                 {
+                    int storeId = Convert.ToInt32(row["StoreID"]);
                     Store store = new Store(
                         storeId: Convert.ToInt32(row["StoreID"]),
                         userId: row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"]),
-                        isFavorite: Convert.ToBoolean(row["IsFavorite"])
+                        isFavorite: IsStoreFavorite(userId, storeId)
                     )
                     {
                         StoreName = row["StoreName"].ToString(),
@@ -1695,8 +1695,7 @@ namespace Main.Logic
                     SELECT 
                         Stores.StoreID, 
                         Stores.StoreName, 
-                        Stores.UserID, 
-                        Stores.IsFavorite, 
+                        Stores.UserID,  
                         Categories.CategoryName
                     FROM 
                         Stores
@@ -1714,10 +1713,11 @@ namespace Main.Logic
 
                 foreach (DataRow row in result.Rows)
                 {
+                    int storeId = Convert.ToInt32(row["StoreID"]);
                     Store store = new Store(
                         storeId: Convert.ToInt32(row["StoreID"]),
                         userId: row["UserID"] == DBNull.Value ? -1 : Convert.ToInt32(row["UserID"]),
-                        isFavorite: Convert.ToBoolean(row["IsFavorite"])
+                        isFavorite: IsStoreFavorite(userId,storeId)
                     )
                     {
                         StoreName = row["StoreName"].ToString(),
@@ -1729,6 +1729,32 @@ namespace Main.Logic
             }
             return stores;
         }
+
+        public static bool IsStoreFavorite(int userId, int storeId)
+        {
+            bool isFavorite = false;
+
+            using (DBSqlite database = new DBSqlite())
+            {
+                string query = @"
+                    SELECT COUNT(*) 
+                    FROM FavoriteStores
+                    WHERE UserID = @UserID AND StoreID = @StoreID";
+
+                int count = Convert.ToInt32(database.ExecuteScalar(query,
+                    new SqliteParameter("@UserID", userId),
+                    new SqliteParameter("@StoreID", storeId)
+                ));
+
+                if (count > 0)
+                {
+                    isFavorite = true;
+                }
+            }
+
+            return isFavorite;
+        }
+
 
         public static ObservableCollection<Store> GetFamilyStores(int familyId)
         {

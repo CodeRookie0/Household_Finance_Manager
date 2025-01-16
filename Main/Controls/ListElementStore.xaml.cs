@@ -93,7 +93,7 @@ namespace Main.Controls
 
         private void Delete_Store(object sender, RoutedEventArgs e)
         {
-            if (MessageBox.Show("Czy na pewno chcesz usunąć sklep " + store.StoreName + ", stworzony przez "+store.CreatedBy+ "?\nPo usunięciu sklepu wszystkie transakcje z nim powiązane utracą przypisanie do tego sklepu.", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Czy na pewno chcesz usunąć sklep " + store.StoreName + ", stworzony przez "+store.CreatedBy+ "?\nPo usunięciu sklepu wszystkie transakcje i cykliczne płatności z nim powiązane utracą przypisanie do tego sklepu.", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
             {
                 if (Service.DeleteStore(store.StoreId))
                 {

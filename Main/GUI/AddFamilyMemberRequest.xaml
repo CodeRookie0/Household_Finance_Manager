@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Main.GUI"
         mc:Ignorable="d"
          Background="Transparent" WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True"
-         Title="SettingProifl" Height="600" Width="1000" BorderThickness="3" BorderBrush="#3AA9AD">
+         Title="SettingProifl" Height="500" Width="780" BorderThickness="3" BorderBrush="#3AA9AD">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -22,32 +22,36 @@
         <Border Background="#ffffff" Grid.Row="0" Grid.ColumnSpan="2" BorderThickness="3" BorderBrush="#3AA9AD">
 
             <TextBlock Text="Prośby o dodanie do rodziny" Grid.ColumnSpan="2" Grid.Row="0"
-                       FontSize="32" HorizontalAlignment="Center" Margin="20"/>
+                       FontSize="32" HorizontalAlignment="Center" Margin="15"/>
         </Border>
 
-        <Border  Grid.Row="1" Grid.ColumnSpan="2" Background="#ffffff" BorderThickness="3" BorderBrush="#3AA9AD">
-
+        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#ffffff" BorderThickness="3" BorderBrush="#3AA9AD" Padding="10">
             <ListBox x:Name="ListUser" Background="#F3F3F3" BorderThickness="0" Padding="15">
-                
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" Margin="0,0,10,0"/>
-                            <ComboBox x:Name="Roles"   SelectedItem="{Binding Role}" Width="120">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="250" />
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="280" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock Text="{Binding Name}" Margin="10,0" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="16" Grid.Column="0" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+
+                            <ComboBox x:Name="Roles" SelectedItem="{Binding Role}" Width="150" Height="35" Margin="10,0" FontSize="16" VerticalContentAlignment="Center" Grid.Column="1">
                                 <ComboBoxItem Content="Wybierz" IsSelected="True"/>
                                 <ComboBoxItem Content="Admin"/>
                                 <ComboBoxItem Content="Partner"/>
                                 <ComboBoxItem Content="Child"/>
                             </ComboBox>
-                            <Button x:Name="AddUser" Content="Akceptuj" Click="Button_Click" Background="Green" Foreground="White" Width="120" Margin="10"/>
-                            <Button Content="Odrzuć" Click="Button_Click_1" Background="Red" Foreground="White" Width="120" Margin="10"/>
-                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Grid.Column="2">
+                                <Button x:Name="AddUser" Content="Akceptuj" Click="Button_Click" Background="#4CAF50" Foreground="White" Width="120" Height="35" BorderBrush="Transparent" Padding="5,10" FontWeight="Bold" Margin="10,0"/>
+                                <Button Content="Odrzuć" Click="Button_Click_1" Background="#F44336" Foreground="White" Width="120" Height="35" BorderBrush="Transparent" Padding="5,10" FontWeight="Bold" Margin="10,0"/>
+                            </StackPanel>
+                        </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
-
-        
-        
     </Grid>
 </Window>

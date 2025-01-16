@@ -162,7 +162,7 @@ namespace Main.GUI
 
             if (categoryName.Length < minNameLength)
             {
-                MessageBox.Show("Nazwa kategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Nazwa kategorii musi mieć co najmniej " + minNameLength + " znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
@@ -180,7 +180,7 @@ namespace Main.GUI
 
                                 if (subcategoryName.Length < minNameLength)
                                 {
-                                    MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaków.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                                    MessageBox.Show("Nazwa podkategorii musi mieć co najmniej " + minNameLength + " znaki.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                                     return;
                                 }
 

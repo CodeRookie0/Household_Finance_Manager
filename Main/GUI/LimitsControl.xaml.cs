@@ -9,6 +9,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -293,6 +294,130 @@ namespace Main.GUI
             ExceededYesCheckBox.IsChecked = false;
             ExceededNoCheckBox.IsChecked = false;
             LoadLimits();
+        }
+
+        private void AmountFromTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string currentText = ((TextBox)sender).Text;
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+            if (e.Text == "." || e.Text == ",")
+            {
+                if (currentText.Contains(".") || currentText.Contains(","))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            e.Handled = !isDigitOrSeparator;
+        }
+
+        private void AmountToTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            string currentText = ((TextBox)sender).Text;
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+            if (e.Text == "." || e.Text == ",")
+            {
+                if (currentText.Contains(".") || currentText.Contains(","))
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
+
+            e.Handled = !isDigitOrSeparator;
+        }
+
+        private void AmountFromTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+
+            if (text.Contains(","))
+            {
+                text = text.Replace(",", ".");
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                if (text.Contains("."))
+                {
+                    string[] parts = text.Split('.');
+
+                    if (string.IsNullOrEmpty(parts[0]))
+                    {
+                        parts[0] = "0";
+                    }
+
+                    if (parts.Length > 1 && parts[1].Length > 2)
+                    {
+                        parts[1] = parts[1].Substring(0, 2);
+                    }
+
+                    text = parts[0] + "." + parts[1];
+                }
+                else
+                {
+                    text = text + ".00";
+                }
+
+                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                {
+                    textBox.Text = text;
+                }
+                else
+                {
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                    textBox.Text = "";
+                }
+            }
+        }
+
+        private void AmountToTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox textBox = (TextBox)sender;
+            string text = textBox.Text;
+
+            if (text.Contains(","))
+            {
+                text = text.Replace(",", ".");
+            }
+
+            if (!string.IsNullOrEmpty(text))
+            {
+                if (text.Contains("."))
+                {
+                    string[] parts = text.Split('.');
+
+                    if (string.IsNullOrEmpty(parts[0]))
+                    {
+                        parts[0] = "0";
+                    }
+
+                    if (parts.Length > 1 && parts[1].Length > 2)
+                    {
+                        parts[1] = parts[1].Substring(0, 2);
+                    }
+
+                    text = parts[0] + "." + parts[1];
+                }
+                else
+                {
+                    text = text + ".00";
+                }
+
+                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                {
+                    textBox.Text = text;
+                }
+                else
+                {
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    textBox.Text = "";
+                }
+            }
         }
     }
 }

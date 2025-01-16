@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Globalization;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace Main.GUI
 {
@@ -94,7 +95,7 @@ namespace Main.GUI
                 TypeComboBox.IsEnabled = false;
 
                 _users = new List<User>();
-                _users.Insert(0, new User { UserName = "Wyberz" });
+                _users.Insert(0, new User { UserName = "Wybierz" });
 
                 User user = Service.GetUserByUserId(loggedInUserId);
                 _users.Add(user);
@@ -108,7 +109,7 @@ namespace Main.GUI
             if (roleId == 1)
             {
                 _users = new List<User>();
-                _users.Insert(0, new User { UserName = "Wyberz" });
+                _users.Insert(0, new User { UserName = "Wybierz" });
 
                 List<User> users = Service.GetUsersByFamilyId(familyId);
                 foreach (User user in users)
@@ -138,8 +139,30 @@ namespace Main.GUI
                 if (PanelListUser.Visibility == Visibility.Visible)
                 {
                     User tmp = UserList.SelectedItem as User;
+                    if (tmp.UserName == "Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać użytkownika", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
                     Category thisCategory = CategoryList.SelectedItem as Category;
+                    if (thisCategory.CategoryName == "Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać kategorię", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+
                     Frequency thisFrequency = Frequency.SelectedItem as Frequency;
+                    if (thisFrequency.FrequencyName == "Wybierz")
+                    {
+                        MessageBox.Show("Proszę wybrać częstotliwość", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                        return;
+                    }
+                    int? familyId = Service.GetFamilyIdByMemberId(userId);
+                    if (familyId == -1)
+                    {
+                        familyId = null;
+                    }
 
                     DBSqlite dBSqlite = new DBSqlite();
 
@@ -150,7 +173,7 @@ namespace Main.GUI
                     int answer = dBSqlite.ExecuteNonQuery(
                         "UPDATE Limits SET FamilyID = @MyFamilyId, UserID = @MyUserId, CategoryID = @MyCategoryId, LimitAmount = @MyLimitAmount, FrequencyID = @MyFrequencyId " +
                         "WHERE LimitID = @MyLimitID",
-                        new SqliteParameter("@MyFamilyId", Service.GetFamilyIdByMemberId(userId)),
+                        new SqliteParameter("@MyFamilyId", familyId),
                         new SqliteParameter("@MyUserId", tmp.UserID),
                         new SqliteParameter("@MyCategoryId", thisCategory.CategoryID),
                         new SqliteParameter("@MyFrequencyId", thisFrequency.FrequencyID),
@@ -169,14 +192,10 @@ namespace Main.GUI
                         return;
                     }
                 }
-                else
-                {
-                    // Tutaj możesz dodać kod dla przypadku, gdy panel jest niewidoczny
-                }
             }
             else
             {
-                MessageBox.Show("Wprowadź prawidłową kwotę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Wprowadź prawidłową kwotę", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
             }
 
 

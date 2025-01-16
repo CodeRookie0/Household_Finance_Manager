@@ -228,14 +228,14 @@ namespace Main.GUI
                 int answer = dBSqlite.ExecuteNonQuery("INSERT INTO RecurringPayments (RecurringPaymentName,UserID,StoreID,CategoryID,Amount,TransactionTypeID,PaymentDate,FrequencyID,IsActive,CreatedByUserID)" +
                     " VALUES (@TitlePayments,@ToUserId,@Store,@CategoryId,@Amount,@TransactionTypeID,@Date,@Frequency,1,@UserId)",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
-                    new SqliteParameter("@UserId", userId),
+                    new SqliteParameter("@UserId", user.UserID),
                     new SqliteParameter("@Store", store.StoreId),
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
                     new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
-                    new SqliteParameter("@ToUserId", user.UserID));
+                    new SqliteParameter("@ToUserId", userId));
                 if (answer > 0)
                 {
                     MessageBox.Show("Płatność cykliczna została dodana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -253,13 +253,13 @@ namespace Main.GUI
                 int answer = dBSqlite.ExecuteNonQuery("INSERT INTO RecurringPayments (RecurringPaymentName,UserID,CategoryID,Amount,TransactionTypeID,PaymentDate,FrequencyID,IsActive,CreatedByUserID)" +
                     " VALUES (@TitlePayments,@UserId,@CategoryId,@Amount,@TransactionTypeID,@Date,@Frequency,1,@ToUserId)",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
-                    new SqliteParameter("@UserId", userId),
+                    new SqliteParameter("@UserId", user.UserID),
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
                     new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
-                    new SqliteParameter("@ToUserId", user.UserID));
+                    new SqliteParameter("@ToUserId", userId));
                 if (answer > 0)
                 {
                     MessageBox.Show("Płatność cykliczna została dodana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);

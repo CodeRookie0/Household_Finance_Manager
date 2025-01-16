@@ -385,7 +385,16 @@ namespace Main.GUI
         private void AmountFromTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             string currentText = ((TextBox)sender).Text;
-            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+            bool isDigitOrSeparatorOrMinus = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == "," || e.Text == "-";
+
+            if (e.Text == "-")
+            {
+                if (((TextBox)sender).SelectionStart != 0)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
 
             if (e.Text == "." || e.Text == ",")
             {
@@ -396,13 +405,22 @@ namespace Main.GUI
                 }
             }
 
-            e.Handled = !isDigitOrSeparator;
+            e.Handled = !isDigitOrSeparatorOrMinus;
         }
 
         private void AmountToTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             string currentText = ((TextBox)sender).Text;
-            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+            bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == "," || e.Text == "-";
+
+            if (e.Text == "-")
+            {
+                if (((TextBox)sender).SelectionStart != 0)
+                {
+                    e.Handled = true;
+                    return;
+                }
+            }
 
             if (e.Text == "." || e.Text == ",")
             {
@@ -428,13 +446,23 @@ namespace Main.GUI
 
             if (!string.IsNullOrEmpty(text))
             {
+                if (text.Contains("-"))
+                {
+                    if (text.IndexOf("-") != 0 || text.Count(c => c == '-') > 1)
+                    {
+                        MessageBox.Show("Proszę podać poprawną kwotę. Znak '-' może być wpisany tylko jako pierwszy znak.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        textBox.Text = "";
+                        return;
+                    }
+                }
+
                 if (text.Contains("."))
                 {
                     string[] parts = text.Split('.');
 
-                    if (string.IsNullOrEmpty(parts[0]))
+                    if (string.IsNullOrEmpty(parts[0]) || (parts[0] == "-" && parts.Length > 1 && string.IsNullOrEmpty(parts[1])))
                     {
-                        parts[0] = "0";
+                        parts[0] = parts[0] == "-" ? "-" : "0";
                     }
 
                     if (parts.Length > 1 && parts[1].Length > 2)
@@ -449,13 +477,13 @@ namespace Main.GUI
                     text = text + ".00";
                 }
 
-                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                if (Regex.IsMatch(text, @"^-?\d+(\.\d{1,2})?$"))
                 {
                     textBox.Text = text;
                 }
                 else
                 {
-                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                     textBox.Text = "";
                 }
             }
@@ -473,13 +501,23 @@ namespace Main.GUI
 
             if (!string.IsNullOrEmpty(text))
             {
+                if (text.Contains("-"))
+                {
+                    if (text.IndexOf("-") != 0 || text.Count(c => c == '-') > 1)
+                    {
+                        MessageBox.Show("Proszę podać poprawną kwotę. Znak '-' może być wpisany tylko jako pierwszy znak.", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
+                        textBox.Text = "";
+                        return;
+                    }
+                }
+
                 if (text.Contains("."))
                 {
                     string[] parts = text.Split('.');
 
-                    if (string.IsNullOrEmpty(parts[0]))
+                    if (string.IsNullOrEmpty(parts[0]) || (parts[0] == "-" && parts.Length > 1 && string.IsNullOrEmpty(parts[1])))
                     {
-                        parts[0] = "0";
+                        parts[0] = parts[0] == "-" ? "-" : "0";
                     }
 
                     if (parts.Length > 1 && parts[1].Length > 2)
@@ -494,17 +532,141 @@ namespace Main.GUI
                     text = text + ".00";
                 }
 
-                if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+                if (Regex.IsMatch(text, @"^-?\d+(\.\d{1,2})?$"))
                 {
                     textBox.Text = text;
                 }
                 else
                 {
-                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+                    MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).", "Błąd", MessageBoxButton.OK, MessageBoxImage.Error);
                     textBox.Text = "";
                 }
             }
         }
+
+        //private void AmountFromTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        //{
+        //    string currentText = ((TextBox)sender).Text;
+        //    bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+        //    if (e.Text == "." || e.Text == ",")
+        //    {
+        //        if (currentText.Contains(".") || currentText.Contains(","))
+        //        {
+        //            e.Handled = true;
+        //            return;
+        //        }
+        //    }
+
+        //    e.Handled = !isDigitOrSeparator;
+        //}
+
+        //private void AmountToTextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        //{
+        //    string currentText = ((TextBox)sender).Text;
+        //    bool isDigitOrSeparator = char.IsDigit(e.Text, 0) || e.Text == "." || e.Text == ",";
+
+        //    if (e.Text == "." || e.Text == ",")
+        //    {
+        //        if (currentText.Contains(".") || currentText.Contains(","))
+        //        {
+        //            e.Handled = true;
+        //            return;
+        //        }
+        //    }
+
+        //    e.Handled = !isDigitOrSeparator;
+        //}
+
+        //private void AmountFromTextBox_LostFocus(object sender, RoutedEventArgs e)
+        //{
+        //    TextBox textBox = (TextBox)sender;
+        //    string text = textBox.Text;
+
+        //    if (text.Contains(","))
+        //    {
+        //        text = text.Replace(",", ".");
+        //    }
+
+        //    if (!string.IsNullOrEmpty(text))
+        //    {
+        //        if (text.Contains("."))
+        //        {
+        //            string[] parts = text.Split('.');
+
+        //            if (string.IsNullOrEmpty(parts[0]))
+        //            {
+        //                parts[0] = "0";
+        //            }
+
+        //            if (parts.Length > 1 && parts[1].Length > 2)
+        //            {
+        //                parts[1] = parts[1].Substring(0, 2);
+        //            }
+
+        //            text = parts[0] + "." + parts[1];
+        //        }
+        //        else
+        //        {
+        //            text = text + ".00";
+        //        }
+
+        //        if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+        //        {
+        //            textBox.Text = text;
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+        //            textBox.Text = "";
+        //        }
+        //    }
+        //}
+
+        //private void AmountToTextBox_LostFocus(object sender, RoutedEventArgs e)
+        //{
+        //    TextBox textBox = (TextBox)sender;
+        //    string text = textBox.Text;
+
+        //    if (text.Contains(","))
+        //    {
+        //        text = text.Replace(",", ".");
+        //    }
+
+        //    if (!string.IsNullOrEmpty(text))
+        //    {
+        //        if (text.Contains("."))
+        //        {
+        //            string[] parts = text.Split('.');
+
+        //            if (string.IsNullOrEmpty(parts[0]))
+        //            {
+        //                parts[0] = "0";
+        //            }
+
+        //            if (parts.Length > 1 && parts[1].Length > 2)
+        //            {
+        //                parts[1] = parts[1].Substring(0, 2);
+        //            }
+
+        //            text = parts[0] + "." + parts[1];
+        //        }
+        //        else
+        //        {
+        //            text = text + ".00";
+        //        }
+
+        //        if (Regex.IsMatch(text, @"^\d+(\.\d{1,2})?$"))
+        //        {
+        //            textBox.Text = text;
+        //        }
+        //        else
+        //        {
+        //            MessageBox.Show("Proszę podać poprawną kwotę (do dwóch miejsc po przecinku).");
+        //            textBox.Text = "";
+        //        }
+        //    }
+        //}
 
         private void AddTransactionButton_Click(object sender, RoutedEventArgs e)
         {

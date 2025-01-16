@@ -74,7 +74,7 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Częstotliowść płatności *" Width="150" TextAlignment="Left"/>
+                        <TextBlock Text="Częstotliwość płatności *" Width="150" TextAlignment="Left"/>
                         <ComboBox x:Name="FrequencyComboBox" DisplayMemberPath="FrequencyName" Width="300"/>
                     </StackPanel>
 

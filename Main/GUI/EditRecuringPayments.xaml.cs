@@ -342,14 +342,14 @@ namespace Main.GUI
                 // Zapytanie do aktualizacji rekordu w tabeli RecurringPayments z uwzględnieniem sklepu
                 answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET RecurringPaymentName = @TitlePayments, UserID = @UserId, StoreID = @Store, CategoryID = @CategoryId, Amount = @Amount, TransactionTypeID = @TransactionTypeID, PaymentDate = @Date, FrequencyID = @Frequency, IsActive = 1, CreatedByUserID = @ToUserId WHERE RecurringPaymentID = @RecurringPaymentId",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
-                    new SqliteParameter("@UserId", userId),
+                    new SqliteParameter("@UserId", user.UserID),
                     new SqliteParameter("@Store", store.StoreId),
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
                     new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
-                    new SqliteParameter("@ToUserId", user.UserID),
+                    new SqliteParameter("@ToUserId", userId),
                     new SqliteParameter("@RecurringPaymentId", RecurringPayment.RecurringPaymentID)); // Dodano identyfikator płatności
 
                 if (answer > 0)
@@ -380,13 +380,13 @@ namespace Main.GUI
                 // Zapytanie do aktualizacji rekordu w tabeli RecurringPayments BEZ sklepu
                 answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET RecurringPaymentName = @TitlePayments, UserID = @UserId, StoreID = NULL, CategoryID = @CategoryId, Amount = @Amount, TransactionTypeID = @TransactionTypeID, PaymentDate = @Date, FrequencyID = @Frequency, IsActive = 1, CreatedByUserID = @ToUserId WHERE RecurringPaymentID = @RecurringPaymentId",
                     new SqliteParameter("@TitlePayments", InputPayment.Text),
-                    new SqliteParameter("@UserId", userId),
+                    new SqliteParameter("@UserId", user.UserID),
                     new SqliteParameter("@CategoryId", category.CategoryID),
                     new SqliteParameter("@Amount", amount),
                     new SqliteParameter("@TransactionTypeID", typePayment),
                     new SqliteParameter("@Date", dateTime.ToString("yyyy-MM-dd HH:mm:ss")),
                     new SqliteParameter("@Frequency", frequencies.FrequencyID),
-                    new SqliteParameter("@ToUserId", user.UserID),
+                    new SqliteParameter("@ToUserId", userId),
                     new SqliteParameter("@RecurringPaymentId", RecurringPayment.RecurringPaymentID)); // Dodano identyfikator płatności
 
                 if (answer > 0)

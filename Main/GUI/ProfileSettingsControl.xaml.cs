@@ -83,11 +83,17 @@ namespace Main.GUI
                         
                         if (success)
                         {
-                            MessageBox.Show("Konto zostało pomyślnie usunięta.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
-                            mainWindow.Close();
+                            foreach (Window window in Application.Current.Windows)
+                            {
+                                if (window != this)
+                                {
+                                    window.Close();
+                                }
+                            }
                             LoginControl loginControl = new LoginControl();
                             loginControl.Show();
                             this.Close();
+                            MessageBox.Show("Konto zostało pomyślnie usunięte.", "Sukces", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                         else
                         {

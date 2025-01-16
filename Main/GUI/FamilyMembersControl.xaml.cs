@@ -51,6 +51,7 @@ namespace Main.GUI
             else if (!Service.IsPrimaryUser(userId) && roleId == 1)
             {
                 FamilySettingsButton.Visibility = Visibility.Collapsed;
+                LeaveFamilyButton.Visibility = Visibility.Visible;
             }
 
             joinRequestMembers = new ObservableCollection<PendingUser>(GeneratePendingUser());

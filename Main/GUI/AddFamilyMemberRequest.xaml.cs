@@ -59,9 +59,11 @@ namespace Main.GUI
             var thisUser = Button.DataContext as PendingUser;
             if (thisUser != null)
             {
+                int index = ListUser.Items.IndexOf(thisUser);
+                ListUser.SelectedIndex = index;
                 if (ListUser.SelectedIndex != -1)
                 {
-                    int index = ListUser.SelectedIndex;
+                    //int index = ListUser.SelectedIndex;
                     ListBoxItem item = (ListBoxItem)ListUser.ItemContainerGenerator.ContainerFromIndex(index);
                     ComboBox cb = FindDescendant<ComboBox>(item);
                     ComboBoxItem tmp = (ComboBoxItem)cb.SelectedValue;
@@ -104,8 +106,6 @@ namespace Main.GUI
                             MessageBox.Show("Użytkownik dodany do rodziny " + thisUser.Name, "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                     }
-
-
                 }
             }
         }

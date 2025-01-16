@@ -59,6 +59,7 @@ namespace Main.GUI
                 CategoriesBorder.Visibility = Visibility.Collapsed;
                 StoresBorder.Visibility = Visibility.Collapsed;
                 FamilyTransactionsBorder.Visibility = Visibility.Collapsed;
+                RaportBorder.Visibility = Visibility.Collapsed;
             }
 
             buttonActiveStates[TransactionsButton] = false;

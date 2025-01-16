@@ -40,7 +40,7 @@
 
         <DataGrid x:Name="MaxMinCategory" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Row="1" Margin="20,45,20,80"/>
 
-        <Button Content="Generuj Raport" Click="GenerateRaportButton_Click" FontSize="20"  Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Bottom" Width="500" Margin="0,0,0,20" Height="40" Style="{StaticResource submitButton}"/>
+        <Button Content="Generuj Raport" Click="GenerateRaportButton_Click" FontSize="20"  Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="250" Margin="0,0,20,10" Height="60" Style="{StaticResource PrimaryActionButtonStyle}"/>
 
 
     </Grid>

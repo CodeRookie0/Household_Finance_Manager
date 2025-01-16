@@ -125,19 +125,19 @@ namespace Main.GUI
             RecurringPayment obj=button.DataContext as RecurringPayment;
             if(obj!=null) 
             {
-                if (MessageBox.Show("Czy chcesz zdeaktywować płatność " + obj.RecurringPaymentName + " ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (MessageBox.Show("Czy chcesz dezaktywować płatność " + obj.RecurringPaymentName + " ?", "Komunikat", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     DBSqlite dBSqlite = new DBSqlite();
                     int answer = dBSqlite.ExecuteNonQuery("UPDATE RecurringPayments SET IsActive = 0 WHERE RecurringPaymentID = @RecurringPaymentID",
                         new Microsoft.Data.Sqlite.SqliteParameter("@RecurringPaymentID", obj.RecurringPaymentID));
                     if (answer > 0)
                     {
-                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " została zdeaktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " została dezaktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
                         LoadPayments();
                     }
                     else
                     {
-                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " nie została zdeaktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Płatność " + obj.RecurringPaymentName + " nie została dezaktywowana", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Information);
 
                     }
                 }
