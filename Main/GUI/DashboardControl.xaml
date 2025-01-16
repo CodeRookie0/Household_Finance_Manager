@@ -4,40 +4,158 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Main.GUI"
+             xmlns:oxy="http://oxyplot.org/wpf"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1150">
     <Grid Background="White" Margin="10">
-        <TextBlock Text="Details" 
-                   FontSize="24" 
-                   FontWeight="Bold" 
+        <Grid.RowDefinitions>
+            <RowDefinition Height="158" />
+            <RowDefinition Height="165" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock x:Name="LimitsTextBlock" Text="Podsumowanie stanu limitów"
+                   Grid.Column="0"
+                   Grid.Row="0"
+                   FontSize="20" 
+                   FontWeight="SemiBold" 
                    Foreground="Black" 
                    HorizontalAlignment="Left" 
-                   Margin="20,10,0,0"/>
+                   Margin="20,0,20,130"/>
+        <TextBlock x:Name="LimitsPeriodTextBlock" Text="styczeń 2023"
+                   Grid.Column="0"
+                   Grid.Row="0"
+                   FontSize="14"  
+                   Foreground="Gray" 
+                   HorizontalAlignment="Left" 
+                   Margin="20,30,20,105"/>
 
-        <StackPanel Orientation="Horizontal" Margin="20,50,0,0">
-            <Border Background="#4EB1B6" CornerRadius="10" Width="150" Height="100" Margin="10">
+        <StackPanel Orientation="Horizontal" Margin="10,53,10,0" Grid.Row="0">
+            <Border Background="#E74C3C" CornerRadius="10" Width="160" Height="80" Margin="10">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Income" FontSize="16" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="$5000" FontSize="24" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Przekroczone" FontSize="16" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="ExceededLimitsTextBlock" Text="5" FontSize="24" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
-            <Border Background="#3AA9AD" CornerRadius="10" Width="150" Height="100" Margin="10">
+            <Border Background="#3AA9AD" CornerRadius="10" Width="160" Height="80" Margin="10">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Expenses" FontSize="16" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="$2500" FontSize="24" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Nieprzekroczone" FontSize="16" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="NotExceededLimitsTextBlock" Text="8" FontSize="24" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
-            <Border Background="Gray" CornerRadius="10" Width="150" Height="100" Margin="10">
+            <Border Background="Gray" CornerRadius="10" Width="160" Height="80" Margin="10">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="Savings" FontSize="16" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
-                    <TextBlock Text="$1500" FontSize="24" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="Ogółem" FontSize="16" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="TotalLimitsTextBlock" Text="13" FontSize="24" Foreground="White" FontWeight="Bold" HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
         </StackPanel>
 
-        <TextBlock Text="Monthly Overview" FontSize="20" FontWeight="Bold" Margin="20,200,0,0"/>
-        <TextBlock Text="Here you can add charts or graphs" FontSize="14" Margin="20,230,0,0" Foreground="Gray"/>
+        <TextBlock x:Name="TransactionAnalysisTextBlock" Text="Analiza przychodów i wydatków"
+                   Grid.Column="0"
+                   Grid.Row="1"
+                   FontSize="20" 
+                   FontWeight="SemiBold" 
+                   Foreground="Black" 
+                   HorizontalAlignment="Left" 
+                   Margin="20,0,20,135"/>
+        <TextBlock x:Name="TransactionAnalysisPeriodTextBlock" Text="styczeń 2023"
+                   Grid.Column="0"
+                   Grid.Row="1"
+                   FontSize="14" 
+                   Foreground="Gray" 
+                   HorizontalAlignment="Left" 
+                   Margin="20,30,20,110"/>
+
+        <StackPanel Orientation="Horizontal" Margin="10,55,10,0" Grid.Row="1" Height="105">
+            <Border Background="#E8F5F6" BorderBrush="#3AA9AD" BorderThickness="1" CornerRadius="10" Width="250" Height="80" Margin="10">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Przychody" FontSize="16" Foreground="#3AA9AD" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock  Text="{Binding Przychody }" FontSize="24" Foreground="#3AA9AD" FontWeight="Bold" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                </StackPanel>
+            </Border>
+
+            <Border Background="#FDEDEC"  BorderBrush="#E74C3C" BorderThickness="1" CornerRadius="10" Width="250" Height="80" Margin="10">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="Wydatki" FontSize="16" Foreground="#E74C3C" FontWeight="Bold" HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding Wydatki}"  FontSize="24" Foreground="#E74C3C" FontWeight="Bold" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" MaxWidth="240"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <TextBlock Text="Przepływ pieniędzy"
+                   Grid.Column="0"
+                   Grid.Row="2"
+                   FontSize="18" 
+                   FontWeight="SemiBold" 
+                   Foreground="Black" 
+                   HorizontalAlignment="Left" 
+                   Margin="20,0,20,280"/>
+        <TextBlock x:Name="MoneyFlowPeriodTextBlock" Text="styczeń 2023"
+                   Grid.Column="0"
+                   Grid.Row="2"
+                   FontSize="14" 
+                   Foreground="Gray" 
+                   HorizontalAlignment="Left" 
+                   Margin="20,30,20,260"/>
+        <Grid Margin="0,60,0,0" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <oxy:PlotView x:Name="incomeVsExpensesLineChart"/>
+        </Grid>
+
+        <TextBlock Text="Ostatnie transakcje"
+                   Grid.Column="1"
+                   Grid.Row="0"
+                   Grid.RowSpan="2"
+                   FontSize="18" 
+                   FontWeight="SemiBold" 
+                   Foreground="Black" 
+                   HorizontalAlignment="Left"
+                   Margin="20,0,0,243"/>
+        <Grid Grid.Row="0" Grid.Column="1" Margin="20,40,20,10" Grid.RowSpan="2">
+            <DataGrid x:Name="LastTransactionsDataGrid" 
+              AutoGenerateColumns="False" 
+              CanUserAddRows="False" 
+              IsReadOnly="True" 
+              HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch">
+                <DataGrid.Resources>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="FontSize" Value="14"/>
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="No." Binding="{Binding Rank}" Width="35" FontSize="14"/>
+                    <DataGridTemplateColumn Header="Kategoria" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding CategoryName}" FontSize="14"/>
+                                    <TextBlock Text="{Binding SubcategoryName}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Kwota" Binding="{Binding FormattedAmount}" Width="*" FontSize="14"/>
+                    <DataGridTemplateColumn Header="Data" Width="80">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DateFormatted}" FontSize="14"/>
+                                    <TextBlock Text="{Binding Time}" FontSize="14" Foreground="Gray"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="User" Binding="{Binding UserName}" Width="*" FontSize="14"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
     </Grid>
 </UserControl>

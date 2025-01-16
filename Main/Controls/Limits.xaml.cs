@@ -1,9 +1,11 @@
-﻿using Main.GUI;
+﻿using DocumentFormat.OpenXml.Wordprocessing;
+using Main.GUI;
 using Main.Logic;
 using Main.Models;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Data;
+using System.Runtime.InteropServices.ComTypes;
 using System.Windows;
 using System.Windows.Controls;
 using Brushes = System.Windows.Media.Brushes;
@@ -32,10 +34,55 @@ namespace Main.Controls
             FrequencyUser.Text="Częstotliwość: "+Service.GetFrequencyNameByFrequencyID(argModel.FrequencyId);
             AddUser.Text = "Przypisany: " + Service.GetUserNameByUserID(argModel.UserId);
 
+            DateTime startDate = DateTime.Now;
+            DateTime endDate = DateTime.Now;
+
+            switch (argModel.FrequencyId)
+            {
+                case 1: 
+                    startDate = DateTime.Now.Date;
+                    endDate = DateTime.Now.Date.AddDays(1).AddTicks(-1);
+                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
+                    break;
+
+                case 2: 
+                    startDate = DateTime.Now.Date.AddDays(-(int)DateTime.Now.DayOfWeek + (int)DayOfWeek.Monday);
+                    endDate = startDate.AddDays(7).AddTicks(-1);
+                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
+                    break;
+                case 3:
+                    startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                    endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddTicks(-1);
+                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
+                    break;
+
+                case 4:
+                    int quarter = (DateTime.Now.Month - 1) / 3 + 1;
+                    startDate = new DateTime(DateTime.Now.Year, (quarter - 1) * 3 + 1, 1);
+                    endDate = new DateTime(DateTime.Now.Year, quarter * 3, 1)
+                        .AddMonths(2)
+                        .AddTicks(-1);
+                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
+                    break;
+                case 5:
+                    startDate = DateTime.Now.Date.AddMonths(-12);
+                    endDate = new DateTime(DateTime.Now.Year, 12,31).AddDays(1).AddTicks(-1);
+                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
+                    break;
+
+                default:
+                    startDate = DateTime.Now.Date;
+                    endDate = DateTime.Now.Date.AddDays(1).AddTicks(-1);
+                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
+                    break;
+            }
+
             DBSqlite dBSqlite = new DBSqlite();
-            DataTable answer = dBSqlite.ExecuteQuery("SELECT SUM(Amount) FROM Transactions WHERE CategoryID=@CategoryId AND UserID=@UserId AND TransactionTypeID=2",
+            DataTable answer = dBSqlite.ExecuteQuery("SELECT SUM(Amount) FROM Transactions WHERE CategoryID=@CategoryId AND UserID=@UserId AND TransactionTypeID=2 AND Date >= @StartDate AND Date <= @EndDate",
                 new Microsoft.Data.Sqlite.SqliteParameter("@CategoryId", argModel.CategoryId),
-                new SqliteParameter("@UserId", argModel.UserId));
+                new SqliteParameter("@UserId", argModel.UserId),
+                new Microsoft.Data.Sqlite.SqliteParameter("@StartDate", startDate.ToString("yyyy-MM-dd HH:mm:ss")),
+                new Microsoft.Data.Sqlite.SqliteParameter("@EndDate", endDate.ToString("yyyy-MM-dd HH:mm:ss")));
             if(answer.Rows.Count > 0)
             {
                 DataRow dataRow = answer.Rows[0];
@@ -79,9 +126,6 @@ namespace Main.Controls
                     DeleteLimitButton.Visibility = Visibility.Collapsed;
                 }
             }
-
-
-
         }
 
         public event EventHandler RefreshData;

@@ -122,7 +122,7 @@ namespace Main.GUI
         {
             HighlightButton(DashboardBorder, DashboardTextBlock);
             buttonActiveStates[DashboardButton] = true;
-            MainContentArea.Content = new DashboardControl();
+            MainContentArea.Content = new DashboardControl(userId, this);
             SelectedUserControlTextBlock.Text= DashboardTextBlock.Text;
         }
         public void FamilyMembersButton_Click(object sender, RoutedEventArgs e)
