@@ -26,7 +26,7 @@
         <StackPanel Orientation="Horizontal" Margin="0,0,0,5" VerticalAlignment="Top">
             <!--  Rodzaj limitu -->
             <StackPanel Orientation="Vertical" Margin="15,5,5,5">
-                <TextBlock Text="Rodzaj limitu" FontSize="14" FontWeight="Bold" Foreground="Black" Margin="0,0,0,5"/>
+                <TextBlock x:Name="LimitTypeTextBox" Text="Rodzaj limitu" FontSize="14" FontWeight="Bold" Foreground="Black" Margin="0,0,0,5"/>
                 <ComboBox x:Name="LimitTypeComboBox" FontSize="14" Foreground="Black" Width="115" Height="30" VerticalContentAlignment="Center">
                     <ComboBoxItem Content="Wybierz" IsSelected="True"/>
                     <ComboBoxItem Content="Indywidualny"/>
@@ -36,7 +36,7 @@
 
             <!-- Użytkownik -->
             <StackPanel Orientation="Vertical" Margin="5">
-                <TextBlock Text="Użytkownik" FontSize="14" FontWeight="Bold" Foreground="Black" Margin="0,0,0,5"/>
+                <TextBlock x:Name="UserTextBlock" Text="Użytkownik" FontSize="14" FontWeight="Bold" Foreground="Black" Margin="0,0,0,5"/>
                 <ComboBox x:Name="UserComboBox" FontSize="14" Foreground="Black" Width="115" Height="30" DisplayMemberPath="UserName" SelectedValuePath="UserID" VerticalContentAlignment="Center"/>
             </StackPanel>
 

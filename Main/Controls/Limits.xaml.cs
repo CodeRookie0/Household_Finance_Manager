@@ -3,24 +3,10 @@ using Main.Logic;
 using Main.Models;
 using Microsoft.Data.Sqlite;
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Brushes = System.Windows.Media.Brushes;
-using Color = System.Windows.Media.Color;
-using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace Main.Controls
 {

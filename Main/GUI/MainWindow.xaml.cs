@@ -2,17 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Main.GUI
 {
@@ -67,7 +61,7 @@ namespace Main.GUI
             buttonActiveStates[FamilyTransactionsButton] = false;
             buttonActiveStates[DashboardButton] = false;
             buttonActiveStates[StatisticsButton] = false;
-            buttonActiveStates[GoalsButton] = false;
+            //buttonActiveStates[GoalsButton] = false;
             buttonActiveStates[CategoriesButton] = false;
             buttonActiveStates[StoresButton] = false;
             buttonActiveStates[LimitsButton] = false;
@@ -156,9 +150,9 @@ namespace Main.GUI
 
         private void GoalsButton_Click(object sender, RoutedEventArgs e)
         {
-            HighlightButton(GoalsBorder, GoalsTextBlock);
-            buttonActiveStates[GoalsButton] = true;
-            SelectedUserControlTextBlock.Text = GoalsTextBlock.Text;
+            //HighlightButton(GoalsBorder, GoalsTextBlock);
+            //buttonActiveStates[GoalsButton] = true;
+            //SelectedUserControlTextBlock.Text = GoalsTextBlock.Text;
         }
 
         public void CategoriesButton_Click(object sender, RoutedEventArgs e)
@@ -302,18 +296,18 @@ namespace Main.GUI
 
         private void GoalsButton_MouseEnter(object sender, MouseEventArgs e)
         {
-            if (!buttonActiveStates[GoalsButton])  
-            {
-                GoalsBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#264EB1B6"));
-            }
+            //if (!buttonActiveStates[GoalsButton])  
+            //{
+            //    GoalsBorder.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#264EB1B6"));
+            //}
         }
 
         private void GoalsButton_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (!buttonActiveStates[GoalsButton]) 
-            {
-                GoalsBorder.Background = Brushes.White;
-            }
+            //if (!buttonActiveStates[GoalsButton]) 
+            //{
+            //    GoalsBorder.Background = Brushes.White;
+            //}
         }
 
         private void CategoriesButton_MouseEnter(object sender, MouseEventArgs e)
@@ -451,8 +445,8 @@ namespace Main.GUI
             StatisticsBorder.Background = Brushes.White;
             StatisticsTextBlock.Foreground = Brushes.Black;
 
-            GoalsBorder.Background = Brushes.White;
-            GoalsTextBlock.Foreground = Brushes.Black;
+            //GoalsBorder.Background = Brushes.White;
+            //GoalsTextBlock.Foreground = Brushes.Black;
 
             CategoriesBorder.Background = Brushes.White;
             CategoriesTextBlock.Foreground = Brushes.Black;

@@ -97,7 +97,7 @@
                             </Button>
                         </StackPanel>
                     </Border>
-                    <Border x:Name="GoalsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
+                    <!--<Border x:Name="GoalsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <Button x:Name="GoalsButton" Style="{StaticResource NoHoverButtonStyle}" Height="46"  Click="GoalsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="GoalsButton_MouseEnter" MouseLeave="GoalsButton_MouseLeave">
                                 <StackPanel Orientation="Horizontal" Width="205">
@@ -105,7 +105,7 @@
                                 </StackPanel>
                             </Button>
                         </StackPanel>
-                    </Border>
+                    </Border>-->
                     <Border x:Name="LimitsBorder" Background="White" CornerRadius="15" BorderThickness="0" BorderBrush="Transparent" Margin="10,0,10,0">
                         <StackPanel Orientation="Horizontal">
                             <Button x:Name="LimitsButton" Style="{StaticResource NoHoverButtonStyle}" Height="46"  Click="LimitsButton_Click" Background="Transparent" BorderBrush="Transparent" Padding="10,10" Width="230" MouseEnter="LimitsButton_MouseEnter" MouseLeave="LimitsButton_MouseLeave">
@@ -168,8 +168,8 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="SelectedUserControlTextBlock" Text="Strona główna" FontSize="24" FontWeight="Bold" VerticalAlignment="Center" Margin="15,0,0,0" Grid.Column="0"/>
-                <Image x:Name="NotificationsIconImage" Source="../Resources/notification.png" Width="27" Height="27" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,130,5"/>
-                <Image x:Name="ProfileSettingsIconImage" Source="../Resources/settings.png" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,210,5" MouseDown="ProfileSettingsIconImage_MouseDown"/>
+                <!--<Image x:Name="NotificationsIconImage" Source="../Resources/notification.png" Width="27" Height="27" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,130,5"/>-->
+                <Image x:Name="ProfileSettingsIconImage" Source="../Resources/settings.png" Width="30" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,130,5" MouseDown="ProfileSettingsIconImage_MouseDown"/><!--Margin="5,5,210,5"-->  
                 <Image Source="../Resources/logo_PNG.png" Width="55" Height="55" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5,5,15,5"/>
                 
                 <Border Background="#A3D4E0" Height="1" Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Bottom"/>

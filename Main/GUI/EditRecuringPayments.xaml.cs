@@ -6,17 +6,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace Main.GUI
 {
@@ -303,6 +296,19 @@ namespace Main.GUI
             if (category.CategoryName == "Wybierz")
             {
                 MessageBox.Show("Wybierz kategorię z listy", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            decimal parsedAmount;
+            if (!decimal.TryParse(amount, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out parsedAmount))
+            {
+                MessageBox.Show("Niepoprawny format kwoty", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (parsedAmount <= 0)
+            {
+                MessageBox.Show("Kwota musi być większa niż 0", "Komunikat", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 

@@ -1,26 +1,14 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
+using System.Data; 
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions; 
 using System.Windows;
-using System.Xml.Linq;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-using Main.Models;
-using System.Runtime.InteropServices.ComTypes;
-using Main.Controls;
-using OxyPlot;
-using System.Windows.Controls.Primitives;
+using Main.Models; 
 
 namespace Main.Logic
 {
@@ -2161,7 +2149,7 @@ namespace Main.Logic
                     query += " AND LimitAmount <= @MaxAmount";
                     parameters.Add(new SqliteParameter("@MaxAmount", maxAmount.Value));
                 }
-
+                
                 DataTable result = database.ExecuteQuery(query, parameters.ToArray());
 
                 foreach (DataRow row in result.Rows)
