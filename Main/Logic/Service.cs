@@ -891,64 +891,70 @@ namespace Main.Logic
             {
                 try
                 {
-                    string deleteFavoriteCategoriesQuery = "DELETE FROM FavoriteCategories WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteFavoriteCategoriesQuery, new SqliteParameter("@UserID", userId));
+                    string updateRecurringPayments = "UPDATE RecurringPayments SET StoreID = NULL WHERE StoreID IN (SELECT StoreID FROM Stores WHERE UserID = @UserID);";
+                    database.ExecuteNonQuery(updateRecurringPayments, new SqliteParameter("@UserID", userId));
 
-                    string deleteFavouriteStoresQuery = "DELETE FROM FavoriteStores WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteFavouriteStoresQuery, new SqliteParameter("@UserID", userId));
+                    string updateTransactionsStore = "UPDATE Transactions SET StoreID = NULL WHERE StoreID IN (SELECT StoreID FROM Stores WHERE UserID = @UserID);";
+                    database.ExecuteNonQuery(updateTransactionsStore, new SqliteParameter("@UserID", userId));
 
-                    string deleteNotificationsQuery = "DELETE FROM Notifications WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteNotificationsQuery, new SqliteParameter("@UserID", userId));
+                    string updateTransactionsSubcategory = "UPDATE Transactions SET SubcategoryID = NULL WHERE SubcategoryID IN (SELECT SubcategoryID FROM Subcategories WHERE CategoryID IN(SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID);";
+                    database.ExecuteNonQuery(updateTransactionsSubcategory, new SqliteParameter("@UserID", userId));
 
-                    string deleteGoalsQuery = "DELETE FROM Goals WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteGoalsQuery, new SqliteParameter("@UserID", userId));
+                    string updateUserFamily = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);";
+                    database.ExecuteNonQuery(updateUserFamily, new SqliteParameter("@UserID", userId));
 
-                    string deleteLimitsQuery = "DELETE FROM Limits WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteLimitsQuery, new SqliteParameter("@UserID", userId));
+                    string updateLimitsFamily = "UPDATE Limits SET FamilyID = NULL WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);";
+                    database.ExecuteNonQuery(updateLimitsFamily, new SqliteParameter("@UserID", userId));
 
-                    string deleteReccuringPaymentHistoryQuery = "DELETE FROM RecurringPaymentHistory WHERE RecurringPaymentID IN (SELECT RecurringPaymentID FROM RecurringPayments WHERE UserID = @UserID);";
-                    database.ExecuteNonQuery(deleteReccuringPaymentHistoryQuery, new SqliteParameter("@UserID", userId));
+                    string deleteFavoriteStores = "DELETE FROM FavoriteStores WHERE StoreID IN (SELECT StoreID FROM Stores WHERE UserID = @UserID) OR UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteFavoriteStores, new SqliteParameter("@UserID", userId));
 
-                    string deleteRecurringPaymentsQuery = "DELETE FROM RecurringPayments WHERE UserID = @UserID OR CreatedByUserID = @UserID;";
-                    database.ExecuteNonQuery(deleteRecurringPaymentsQuery, new SqliteParameter("@UserID", userId));
+                    string deleteStoresByUser = "DELETE FROM Stores WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteStoresByUser, new SqliteParameter("@UserID", userId));
 
-                    string deleteTransactionsQuery = "DELETE FROM Transactions WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteTransactionsQuery, new SqliteParameter("@UserID", userId));
+                    string deleteRecurringPaymentHistory = "DELETE FROM RecurringPaymentHistory WHERE RecurringPaymentID IN (SELECT RecurringPaymentID FROM RecurringPayments WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID)) " +
+                        "OR RecurringPaymentID IN (SELECT RecurringPaymentID FROM RecurringPayments WHERE UserID = @UserID) " +
+                        "OR RecurringPaymentID IN (SELECT RecurringPaymentID FROM RecurringPayments WHERE CreatedByUserID = @UserID);";
+                    database.ExecuteNonQuery(deleteRecurringPaymentHistory, new SqliteParameter("@UserID", userId));
 
-                    string deleteJoinRequestssQuery = "DELETE FROM JoinRequests WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteJoinRequestssQuery, new SqliteParameter("@UserID", userId));
+                    string updateRecurringPaymentHistoryTransaction = "UPDATE RecurringPaymentHistory SET TransactionID = NULL WHERE TransactionID IN (SELECT TransactionID FROM Transactions WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID);";
+                    database.ExecuteNonQuery(updateRecurringPaymentHistoryTransaction, new SqliteParameter("@UserID", userId));
 
-                    string deleteStoresQuery = "DELETE FROM Stores WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteStoresQuery, new SqliteParameter("@UserID", userId));
+                    string deleteRecurringPayments = "DELETE FROM RecurringPayments WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID OR CreatedByUserID = @UserID;";
+                    database.ExecuteNonQuery(deleteRecurringPayments, new SqliteParameter("@UserID", userId));
 
-                    string deleteSubcategoriesQuery = "DELETE FROM Subcategories WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteSubcategoriesQuery, new SqliteParameter("@UserID", userId));
+                    string deleteTransactions = "DELETE FROM Transactions WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteTransactions, new SqliteParameter("@UserID", userId));
 
-                    string deleteCategoriesQuery = "DELETE FROM Categories WHERE UserID = @UserID;";
-                    database.ExecuteNonQuery(deleteCategoriesQuery, new SqliteParameter("@UserID", userId));
+                    string deleteLimits = "DELETE FROM Limits WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID OR CreatedByUserID = @UserID;";
+                    database.ExecuteNonQuery(deleteLimits, new SqliteParameter("@UserID", userId));
 
-                    string updateUsersQuery = "UPDATE Users SET FamilyID = NULL WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);";
-                    database.ExecuteNonQuery(updateUsersQuery, new SqliteParameter("@UserID", userId));
+                    string deleteFavoriteCategories = "DELETE FROM FavoriteCategories WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteFavoriteCategories, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyGoalsQuery = "DELETE FROM Goals WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);;";
-                    database.ExecuteNonQuery(deleteFamilyGoalsQuery, new SqliteParameter("@UserID", userId));
+                    string deleteSubcategories = "DELETE FROM Subcategories WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteSubcategories, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyLimitsQuery = "DELETE FROM Limits WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);;";
-                    database.ExecuteNonQuery(deleteFamilyLimitsQuery, new SqliteParameter("@UserID", userId));
+                    string deleteStoresByCategory = "DELETE FROM Stores WHERE CategoryID IN (SELECT CategoryID FROM Categories WHERE UserID = @UserID) OR UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteStoresByCategory, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyJoinRequestsQuery = "DELETE FROM JoinRequests WHERE FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);;";
-                    database.ExecuteNonQuery(deleteFamilyJoinRequestsQuery, new SqliteParameter("@UserID", userId));
+                    string deleteCategories = "DELETE FROM Categories WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteCategories, new SqliteParameter("@UserID", userId));
 
-                    string deleteFamilyQuery = "DELETE FROM Family WHERE PrimaryUserID = @UserID;";
-                    database.ExecuteNonQuery(deleteFamilyQuery, new SqliteParameter("@UserID", userId));
+                    string deleteJoinRequests = "DELETE FROM JoinRequests WHERE UserID = @UserID OR FamilyID = (SELECT FamilyID FROM Family WHERE PrimaryUserID = @UserID);";
+                    database.ExecuteNonQuery(deleteJoinRequests, new SqliteParameter("@UserID", userId));
 
-                    string deleteUserQuery = "DELETE FROM Users WHERE UserID = @UserID;\r\n";
-                    database.ExecuteNonQuery(deleteUserQuery, new SqliteParameter("@UserID", userId));
+                    string deleteFamily = "DELETE FROM Family WHERE PrimaryUserID = @UserID;";
+                    database.ExecuteNonQuery(deleteFamily, new SqliteParameter("@UserID", userId));
+
+                    string deleteUser = "DELETE FROM Users WHERE UserID = @UserID;";
+                    database.ExecuteNonQuery(deleteUser, new SqliteParameter("@UserID", userId));
 
                     return true;
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     return false;
                 }
             }

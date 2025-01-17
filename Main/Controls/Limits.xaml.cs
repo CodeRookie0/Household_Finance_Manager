@@ -42,18 +42,15 @@ namespace Main.Controls
                 case 1: 
                     startDate = DateTime.Now.Date;
                     endDate = DateTime.Now.Date.AddDays(1).AddTicks(-1);
-                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
                     break;
 
                 case 2: 
                     startDate = DateTime.Now.Date.AddDays(-(int)DateTime.Now.DayOfWeek + (int)DayOfWeek.Monday);
                     endDate = startDate.AddDays(7).AddTicks(-1);
-                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
                     break;
                 case 3:
                     startDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
                     endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1).AddMonths(1).AddTicks(-1);
-                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
                     break;
 
                 case 4:
@@ -62,18 +59,15 @@ namespace Main.Controls
                     endDate = new DateTime(DateTime.Now.Year, quarter * 3, 1)
                         .AddMonths(2)
                         .AddTicks(-1);
-                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
                     break;
                 case 5:
                     startDate = DateTime.Now.Date.AddMonths(-12);
                     endDate = new DateTime(DateTime.Now.Year, 12,31).AddDays(1).AddTicks(-1);
-                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
                     break;
 
                 default:
                     startDate = DateTime.Now.Date;
                     endDate = DateTime.Now.Date.AddDays(1).AddTicks(-1);
-                    Console.WriteLine(startDate.ToString() + " - " + endDate.ToString());
                     break;
             }
 
