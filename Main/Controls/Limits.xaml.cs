@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Wordprocessing;
-using Main.GUI;
+﻿using Main.GUI;
 using Main.Logic;
 using Main.Models;
 using Microsoft.Data.Sqlite;

@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Main.GUI"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1150" d:Background="White">
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -15,32 +16,96 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Vertical"  Grid.Row="0" Grid.Column="0">
-            <StackPanel Margin="0,10,0,0" Orientation="Horizontal">
-                <TextBlock FontSize="20" Margin="20,0,20,0" Text="Typ"/>
-                <ComboBox x:Name="Typ" Width="485">
-                    <ComboBoxItem Content="Miesięczne" IsSelected="True"/>
-                    <ComboBoxItem Content="Kwartalne"/>
-                    <ComboBoxItem Content="Roczne"/>
+        <Border BorderBrush="#993AA9AD" BorderThickness="0,0,0,1" Margin="0,0,0,130" Grid.Row="0" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Center"  Margin="10,20,10,5">
+                <TextBlock x:Name="UserTextBlock" Text="Użytkownik:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold" FontSize="14"/>
+                <ComboBox x:Name="UserComboBox" FontSize="14" Width="110" Height="30" VerticalContentAlignment="Center" Margin="5,0,10,0" DisplayMemberPath="UserName" SelectedValuePath="UserID">
                 </ComboBox>
+                <TextBlock x:Name="TransactionTypeTextBlock" Text="Typ transakcji:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14" TextWrapping="WrapWithOverflow"/>
+                <ComboBox x:Name="TransactionTypeComboBox" FontSize="14" Width="100" Height="30" VerticalContentAlignment="Center" Margin="5,0,10,0"  DisplayMemberPath="TypeName" SelectedValuePath="TransactionTypeID">
+                </ComboBox>
+                <TextBlock Text="Okres:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14"/>
+                <ComboBox x:Name="PeriodComboBox" FontSize="14" Width="130" Height="30" VerticalContentAlignment="Center" Margin="0,0,10,0" SelectionChanged="PeriodComboBox_SelectionChanged">
+                    <ComboBoxItem Content="Dzisiaj"/>
+                    <ComboBoxItem Content="Bieżący tydzień" />
+                    <ComboBoxItem Content="Bieżący miesiąc" />
+                    <ComboBoxItem Content="Bieżący rok" />
+                    <ComboBoxItem Content="Inny" />
+                </ComboBox>
+                <StackPanel x:Name="DateRangePanel" Orientation="Horizontal" Visibility="Collapsed">
+                    <TextBlock Text="Data:" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14"/>
+                    <DatePicker x:Name="StartDatePicker" FontSize="14" Width="105" Height="30" VerticalContentAlignment="Center" Margin="0,0,0,0"/>
+                    <TextBlock Text="-" VerticalAlignment="Center" Margin="10,0,10,0" FontWeight="Bold" FontSize="14"/>
+                    <DatePicker x:Name="EndDatePicker" FontSize="14" Width="105" Height="30" VerticalContentAlignment="Center" Margin="0,0,0,0"/>
+                </StackPanel>
+                <Button x:Name="FilterButton" Content="Zastosuj" FontSize="14" Width="80" Height="30" Margin="20,0,10,0" Background="#4EB1B6" Foreground="White" BorderThickness="0" Command="{Binding FilterCommand}" Click="FilterButton_Click">
+                </Button>
+                <Button x:Name="ClearFiltersButton" Content="Wyczyść" FontSize="14" Width="80" Height="30" Margin="10,0,0,0" Background="Gray" Foreground="White" BorderThickness="0" Command="{Binding ClearFilterCommand}" Click="ClearFiltersButton_Click">
+                </Button>
+
+                <Button Content="Generuj Raport" Click="GenerateRaportButton_Click" FontSize="14" Background="#4EB1B6" Foreground="White"   Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Center" HorizontalAlignment="Center" Width="120" Margin="10,0,0,0" Height="30"/>
+
             </StackPanel>
+        </Border>
 
-            <DataGrid x:Name="Test" Margin="20,20,20,0" AutoGenerateColumns="False" >
-            </DataGrid>
-        </StackPanel>
-
-
-        <TextBlock x:Name="TextPrzychud" Text="Największy przychód z " Foreground="Green" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,80,0,0" Grid.Row="0" Grid.Column="1"/>
-        <TextBlock x:Name="TextWydatek" Text="Największy wydatek " Foreground="Red" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,180,0,0" Grid.Row="0" Grid.Column="1"/>
+        <DataGrid x:Name="ViewRaport" BorderBrush="#4EB1B6" BorderThickness="2"  Grid.ColumnSpan="2"  Grid.RowSpan="2" Margin="30,100,580,0">
+          
+        </DataGrid>
 
 
-        <TextBlock Text="Maksymalne i minimalne wartości dla wybranych kategorii" HorizontalAlignment="Center" FontSize="23" Grid.ColumnSpan="2" Grid.Row="1"/>
 
-        <DataGrid x:Name="MaxMinCategory" AutoGenerateColumns="False" Grid.ColumnSpan="2" Grid.Row="1" Margin="20,45,20,80"/>
+        <DataGrid x:Name="TopExpensesDataGrid" BorderBrush="#4EB1B6" BorderThickness="2" Grid.RowSpan="2" Grid.ColumnSpan="2" Margin="590,130,30,0" AutoGenerateColumns="False" 
+CanUserAddRows="False" 
+IsReadOnly="True" >
+            <DataGrid.Resources>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="FontSize" Value="14"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="No." Binding="{Binding Rank}" Width="35" FontSize="14"/>
+                <DataGridTemplateColumn Header="Kategoria" Width="*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding CategoryName}" FontSize="14"/>
+                                <TextBlock Text="{Binding SubcategoryName}" FontSize="14" Foreground="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Kwota" Binding="{Binding FormattedAmount}" Width="*" FontSize="14"/>
+                <DataGridTemplateColumn Header="Data" Width="80">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding DateFormatted}" FontSize="14"/>
+                                <TextBlock Text="{Binding Time}" FontSize="14" Foreground="Gray"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="User" Binding="{Binding UserName}" Width="*" FontSize="14"/>
+            </DataGrid.Columns>
 
-        <Button Content="Generuj Raport" Click="GenerateRaportButton_Click" FontSize="20"  Grid.ColumnSpan="2" Grid.Row="1" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="250" Margin="0,0,20,10" Height="60" Style="{StaticResource PrimaryActionButtonStyle}"/>
+        </DataGrid>
+        
+
+        <TextBlock x:Name="TopExpensesTextBlock" Text="Top 10 Największych Wydatków" 
+        FontSize="18" 
+        FontWeight="Bold"
+        Margin="0,95,0,10"
+        HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Column="1" Grid.RowSpan="1" />
+
+
+        <TextBlock x:Name="MinAndMaxLabel" VerticalAlignment="Top" Margin="0,10,0,0" Text="Maksymalne i mimnimalne wartości dla wybranych kategorii" Grid.Row="2" Grid.Column="0" FontSize="20" FontWeight="Bold"/>
+        <DataGrid x:Name="MaksAndMinAmountCategory" Grid.Row="2" Margin="10,50,10,10" Grid.Column="0"/>
+
+
 
 
     </Grid>
