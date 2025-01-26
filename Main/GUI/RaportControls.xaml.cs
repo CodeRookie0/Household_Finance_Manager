@@ -286,11 +286,8 @@ namespace Main.GUI
             MaksAndMinTable.Columns.Add("Maksymalna Wartość", typeof(string));
             MaksAndMinTable.Columns.Add("Minimalna Wartość", typeof(string));
 
-
-
-
-
             InitializeComboBoxes();
+            FilterButton_Click(null, new RoutedEventArgs());
             LoadLimitsSummary();
             LoadTransactionSummary();
             LoadTopTransactions();
@@ -319,7 +316,7 @@ namespace Main.GUI
 
             var MaxPrzychod = dBSqlite.ExecuteQuery("SELECT  SubcategoryName,ROUND(SUM(Amount), 2) AS TotalRevenue\r\nFROM Transactions INNER JOIN Subcategories ON Transactions.SubcategoryID=Subcategories.SubcategoryID\r\nWHERE TransactionTypeID=1 AND Transactions.UserID=@UserId\r\nGROUP BY TransactionID\r\nORDER BY TotalRevenue DESC\r\nLIMIT 1",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
-            if (MaxPrzychod != null)
+            if (MaxPrzychod != null && MaxPrzychod.Rows.Count > 0)
             {
                 DataRow row = MaxPrzychod.Rows[0];
                 // TextPrzychud.Text += row[0].ToString() + " o wartości " + row[1].ToString()+"zł";
@@ -327,7 +324,7 @@ namespace Main.GUI
 
             var maxWydate = dBSqlite.ExecuteQuery("SELECT  SubcategoryName,ROUND(SUM(Amount), 2) AS TotalRevenue\r\nFROM Transactions INNER JOIN Subcategories ON Transactions.SubcategoryID=Subcategories.SubcategoryID\r\nWHERE TransactionTypeID=2 AND Transactions.UserID=@UserId\r\nGROUP BY TransactionID\r\nORDER BY TotalRevenue DESC\r\nLIMIT 1",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
-            if (maxWydate != null)
+            if (maxWydate != null && maxWydate.Rows.Count > 0)
             {
                 DataRow row = maxWydate.Rows[0];
                 //TextWydatek.Text += row[0].ToString() + " o wartości " + row[1].ToString() + "zł";
@@ -335,7 +332,7 @@ namespace Main.GUI
 
             var AnswerValue = dBSqlite.ExecuteQuery("SELECT CategoryName,MAX(Amount),MIN(Amount) FROM Transactions INNER JOIN Categories ON Transactions.CategoryID=Categories.CategoryID WHERE Transactions.UserId=@UserId Group By Transactions.CategoryID\r\n",
                 new Microsoft.Data.Sqlite.SqliteParameter("@UserId", userId));
-            if (AnswerValue != null)
+            if (AnswerValue != null && AnswerValue.Rows.Count > 0)
             {
                 foreach (DataRow row in AnswerValue.Rows)
                 {
@@ -388,7 +385,6 @@ namespace Main.GUI
 
             ViewRaport.ItemsSource = dataTable.DefaultView;
             MaksAndMinAmountCategory.ItemsSource = MaksAndMinTable.DefaultView;
-
         }
 
         private void PeriodComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -432,7 +428,6 @@ namespace Main.GUI
 
             LoadLimitsSummary();
             LoadTransactionSummary();
-            LoadTopTransactions();
 
             int? filterUserId;
 
@@ -454,6 +449,7 @@ namespace Main.GUI
             {
                 TopExpensesTextBlock.Text = "Top 10 Największych Wydatków";
             }
+            LoadTopTransactions();
         }
 
         private void ClearFiltersButton_Click(object sender, RoutedEventArgs e)
@@ -464,6 +460,8 @@ namespace Main.GUI
             UserComboBox.SelectedIndex = 0;
             StartDatePicker.SelectedDate = null;
             EndDatePicker.SelectedDate = null;
+
+            FilterButton_Click(null, new RoutedEventArgs());
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
